@@ -1,0 +1,18 @@
+{"variants": {"": [
+    {
+        "model": "dungeonunleash:block/end_soil",
+        "y": 0
+    },
+    {
+        "model": "dungeonunleash:block/end_soil",
+        "y": 90
+    },
+    {
+        "model": "dungeonunleash:block/end_soil",
+        "y": 180
+    },
+    {
+        "model": "dungeonunleash:block/end_soil",
+        "y": 270
+    }
+]}}

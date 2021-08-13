@@ -19,18 +19,16 @@ repositories {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    minecraft "com.mojang:minecraft:1.17.1"
+    mappings "net.fabricmc:yarn:1.17.1+build.37:v2"
+    modImplementation "net.fabricmc:fabric-loader:0.11.6"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    //Fabric api
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.37.2+1.17"
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
+    implementation 'org.mini2Dx:gdx-collections:1.9.13'
+    implementation group: 'org.json', name: 'json', version: '20090211'
 }
-
 processResources {
 	inputs.property "version", project.version
 
@@ -85,3 +83,10 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+task generateJson(type:JavaExec) {
+    group = 'mod'
+    mainClass.set("com.xeloklox.dungeons.unleashed.gen.AssetGenerator")
+    classpath = sourceSets.main.runtimeClasspath
+}
+

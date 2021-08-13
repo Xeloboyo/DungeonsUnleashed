@@ -1,0 +1,7 @@
+{
+  "credit": "autogen",
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "dungeonunleash:block/default"
+  }
+}
