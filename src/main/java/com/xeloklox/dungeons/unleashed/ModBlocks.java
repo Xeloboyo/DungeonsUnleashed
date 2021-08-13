@@ -97,12 +97,14 @@ public class ModBlocks{
 
         final String END_GRASS_model = BlockModel.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
         END_GRASS = new RegisteredBlock("end_grass",
-            Globals.bootQuery(()->new BasicBlock(Material.SOLID_ORGANIC, settings->
+            Globals.bootQuery(()->new ModGrassBlock(Material.SOLID_ORGANIC, END_SOIL.get(), 2,
+            settings->
                 settings.breakByHand(true)
                 .breakByTool(FabricToolTags.SHOVELS)
                 .sounds(BlockSoundGroup.SOUL_SOIL)
                 .hardness(0.6f)
-                .resistance(0.6f))
+                .resistance(0.6f)
+                .ticksRandomly())
             ),
             true,
             ModItems.getSettings((s)->s.group(ItemGroup.BUILDING_BLOCKS)),
