@@ -11,8 +11,9 @@ public abstract class Registerable<T>{
     public String id;
     T registration;
     Registry registry;
+    RegisterEnvironment environment;
 
-    public Registerable(String id, T registration, Registry registry){
+    public Registerable(String id, T registration, Registry registry, RegisterEnvironment rd){
         this.id = id;
         this.registration = registration;
         this.registry = registry;
@@ -23,6 +24,7 @@ public abstract class Registerable<T>{
                 System.out.println("[MOD REGISTRY]: CONFLICT!!! : " + id + " of registry " + registry.toString());
             }
         }
+        environment = rd;
     }
 
     public void register(){
@@ -38,7 +40,15 @@ public abstract class Registerable<T>{
         return registry;
     }
 
+    public RegisterEnvironment getEnvironment(){
+        return environment;
+    }
+
     public String getJSONID(){
         return MODID+":"+id;
+    }
+
+    public enum RegisterEnvironment{
+        CLIENT,SERVER,CLIENT_AND_SERVER
     }
 }

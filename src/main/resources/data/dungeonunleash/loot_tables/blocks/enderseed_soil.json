@@ -5,13 +5,14 @@
             "conditions": [
                 {"condition": "minecraft:survives_explosion"},
                 {
+                    "condition": "minecraft:match_tool",
+                    "predicate": {"tag": "fabric:hoes"}
+                },
+                {
                     "condition": "minecraft:inverted",
                     "term": {
                         "condition": "minecraft:match_tool",
-                        "predicate": {
-                            "enchantments": [{"enchantment": "minecraft:silk_touch"}],
-                            "tag": "fabric:hoes"
-                        }
+                        "predicate": {"enchantments": [{"enchantment": "minecraft:silk_touch"}]}
                     }
                 }
             ],
@@ -30,6 +31,7 @@
                 "name": "minecraft:ender_pearl",
                 "type": "minecraft:item"
             }],
+            "functions": [],
             "rolls": 1
         },
         {
@@ -48,6 +50,7 @@
                 "name": "dungeonunleash:end_soil",
                 "type": "minecraft:item"
             }],
+            "functions": [],
             "rolls": 1
         },
         {
@@ -63,6 +66,7 @@
                 "name": "dungeonunleash:enderseed_soil",
                 "type": "minecraft:item"
             }],
+            "functions": [],
             "rolls": 1
         }
     ],

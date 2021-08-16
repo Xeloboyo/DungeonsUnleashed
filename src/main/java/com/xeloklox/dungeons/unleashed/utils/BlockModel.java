@@ -53,6 +53,20 @@ public class BlockModel{
         return name;
     }
 
+    public static String customTemplate(String template,String name,String tex){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template",template);
+            jo.put("tex_particle",tex);
+            jo.put("tex_0",tex);
+            jo.put("name",name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return "@@"+jo.toString();
+    }
+
+
     static ObjectMap<String,String> templateMap = new ObjectMap<>();
     public static JSONObject getTemplate(String name) {
         if(templateMap.containsKey(name)){

@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "com.xeloklox.dungeons.unleashed.DungeonsUnleashed"
+    ],
+    "client": [
+      "com.xeloklox.dungeons.unleashed.DungeonsUnleashedClient"
     ]
   },
   "mixins": [

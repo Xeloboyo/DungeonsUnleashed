@@ -1,0 +1,22 @@
+{
+    "overrides": [
+        {
+            "model": "dungeonunleash:item/leyden_jar2",
+            "predicate": {"charge": 0.25}
+        },
+        {
+            "model": "dungeonunleash:item/leyden_jar3",
+            "predicate": {"charge": 0.5}
+        },
+        {
+            "model": "dungeonunleash:item/leyden_jar4",
+            "predicate": {"charge": 0.75}
+        },
+        {
+            "model": "dungeonunleash:item/leyden_jar5",
+            "predicate": {"charge": 1}
+        }
+    ],
+    "parent": "item/generated",
+    "textures": {"layer0": "dungeonunleash:item/leyden_jar"}
+}

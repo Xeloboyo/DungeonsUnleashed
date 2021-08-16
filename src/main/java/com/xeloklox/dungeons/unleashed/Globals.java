@@ -25,10 +25,12 @@ public class Globals{
         }
         return register.get(o).containsKey(id);
     }
-    public static void registerAll(){
+    public static void registerAll(Registerable.RegisterEnvironment env){
         register.forEach(entry->{
             entry.value.forEach(entry2-> {
-                entry2.value.register();
+                if(entry2.value.getEnvironment().equals(env)){
+                    entry2.value.register();
+                }
             });
         });
     }

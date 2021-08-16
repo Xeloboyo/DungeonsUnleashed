@@ -6,6 +6,7 @@ import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.C_match_tool.*
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import net.minecraft.enchantment.*;
+import net.minecraft.state.property.*;
 import org.apache.commons.lang3.*;
 import org.json.*;
 import org.lwjgl.system.CallbackI.*;
@@ -47,6 +48,7 @@ public class LootTableJson extends JsonConfiguration{
         float bonusrolls=0.0f;
         public Array<LootPoolEntry> entries= new Array<>();
         public Array<LootPoolCondition> conditions= new Array<>();
+        public Array<LootPoolFunction> functions= new Array<>();
 
         public LootPool setRolls(int rolls){
             this.rolls = rolls;
@@ -66,6 +68,10 @@ public class LootTableJson extends JsonConfiguration{
             conditions.add(cond);
             return this;
         }
+        public LootPool addFunction(LootPoolFunction function){
+            functions.add(function);
+            return this;
+        }
 
         public JSONObject toJSON(){
             JSONObject jo = new JSONObject();
@@ -82,6 +88,14 @@ public class LootTableJson extends JsonConfiguration{
                     conditionsjson.put(lp.base);
                 }
                 jo.put("conditions",conditionsjson);
+
+                JSONArray functionsjson = new JSONArray();
+                for(LootPoolFunction lp:functions){
+                    conditionsjson.put(lp.base);
+                }
+                jo.put("functions",functionsjson);
+
+
             }catch(JSONException e){}
             return jo;
         }
@@ -90,6 +104,7 @@ public class LootTableJson extends JsonConfiguration{
             public JSONObject output =new JSONObject();
             public Array<LootPoolEntry> children = new Array<>();
             public Array<LootPoolCondition> conditions= new Array<>();
+            public Array<LootPoolFunction> functions= new Array<>();
             LootPoolEntry(LootPoolEntryType type) {
                 try{
                     output.put("type", "minecraft:"+type.name());
@@ -115,6 +130,18 @@ public class LootTableJson extends JsonConfiguration{
                 }catch(Exception ignored){}
                 return this;
             }
+            public LootPoolEntry addFunction(LootPoolFunction cond){
+                try{
+                    if(!output.has("functions")){
+                        output.put("functions", new JSONArray());
+                    }
+                    JSONArray functionsjson = output.getJSONArray("functions");
+                    functionsjson.put(cond.base);
+                    output.put("functions",functionsjson);
+                    functions.add(cond);
+                }catch(Exception ignored){}
+                return this;
+            }
 
             public LootPoolEntry addChild(LootPoolEntryType type , Func<LootPoolEntry,LootPoolEntry> entryFunc){
                 try{
@@ -134,7 +161,36 @@ public class LootTableJson extends JsonConfiguration{
                 item,tag,loot_table,group,alternatives,sequence,dynamic,empty;
             }
         }
+        //region FUNCTIONS
+        public static abstract class LootPoolFunction{
+           JSONObject base = new JSONObject();
+            LootPoolFunction(String name){
+               try{
+                   base.put("function", name);
+               }catch(Exception ignored){}
+           }
+        }
+        public static class F_copy_state extends LootPoolFunction{
+            String block;
+            Property[] props;
 
+            public F_copy_state(String block, Property[] props){
+                super("minecraft:copy_state");
+                this.block = block;
+                this.props = props;
+                try{
+                    base.put("block", this.block);
+                    JSONArray jsonArray = new JSONArray();
+                    for(Property lt: props){
+                        jsonArray.put(lt.getName());
+                    }
+                    base.put("properties",jsonArray);
+                }catch(JSONException ignored){}
+            }
+        }
+        public static F_copy_state copy_block_state(String block, Property... props){return new F_copy_state(block,props);}
+
+        //end region
         //region CONDITIONS
         public static abstract class LootPoolCondition{
             JSONObject base = new JSONObject();

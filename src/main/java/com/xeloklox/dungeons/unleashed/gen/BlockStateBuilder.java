@@ -3,21 +3,33 @@ package com.xeloklox.dungeons.unleashed.gen;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.gen.BlockStateBuilder.*;
 import net.minecraft.state.property.*;
+import org.jetbrains.annotations.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
 
+import java.util.*;
+
 public class BlockStateBuilder{
     // this is not a multipart....
-    public ObjectMap<String, ModelVariantList> map = new ObjectMap<>();
+    public ObjectMap<String, ModelList> map = new ObjectMap<>();
     boolean noState = false;
+    boolean multipart = false;
 
     public static BlockStateBuilder create(){
         return new BlockStateBuilder();
     }
+    public static BlockStateBuilder createMultipart(){
+            var b =  new BlockStateBuilder();
+            b.multipart=true;
+            return b;
+        }
 
-    public <T extends Comparable<T>> BlockStateBuilder addStateVariant(Property<T> prop, T value, Func<ModelVariantList, ModelVariantList> func) throws IllegalBlockStateException{
+    public <T extends Comparable<T>> BlockStateBuilder addStateVariant(Property<T> prop, T value, Func<ModelVariantList, ModelVariantList> func) {
         if(noState){
-            throw new IllegalBlockStateException("Blocks with no BlockState cannot suddenly have a state variant.");
+            throw new IllegalStateException("Blocks with no BlockState cannot suddenly have a state variant.");
+        }
+        if(multipart){
+            throw new IllegalStateException("Multiparts dont have variant states");
         }
         String key = prop.getName() + "=" + value;
         ModelVariantList ml = new ModelVariantList();
@@ -26,24 +38,92 @@ public class BlockStateBuilder{
     }
 
     public BlockStateBuilder noState(Func<ModelVariantList, ModelVariantList> func){
+        if(!map.isEmpty()){
+            throw new IllegalStateException("Blocks with a BlockState cannot suddenly have no state");
+        }
         ModelVariantList ml = new ModelVariantList();
         map.put("", func.get(ml));
         noState = true;
         return this;
     }
 
-    public ObjectMap<String, ModelVariantList> build(){
+    public <T extends Comparable<T>> BlockStateBuilder addPart(Func<ModelMultipart, ModelMultipart> func) {
+        if(!multipart){
+            throw new IllegalStateException("Block needs to be multipart");
+        }
+        if(noState){
+            throw new IllegalStateException("Blocks with no BlockState cannot suddenly have a state.");
+        }
+
+        String key = ""+Math.random();
+        ModelMultipart ml = new ModelMultipart();
+        map.put(key, func.get(ml));
+        return this;
+    }
+
+    public ObjectMap<String, ModelList> build(){
         return map;
     }
 
-    public static class IllegalBlockStateException extends Exception{
-        public IllegalBlockStateException(String message){
-            super(message);
-        }
-    }
 
     //am i doin it right, i don feel like this is good programmin
-    public static class ModelVariantList{
+    public static abstract class ModelList{
+        Array<ModelVariant> list = new Array<>();
+        public abstract void eachModelVariant(Cons<ModelVariant> c);
+    }
+    public static class ModelMultipart extends ModelList{
+        public ModelVariant apply;
+        public boolean or=false;
+        Array<PartConditionSet> conditions = new Array<>();
+        @Override
+        public void eachModelVariant(Cons<ModelVariant> c){
+            c.get(apply);
+        }
+        public ModelMultipart setModel(Func<ModelVariant, ModelVariant> func){
+            apply = (func.get(new ModelVariant()));
+            return this;
+        }
+        public ModelMultipart OR(){
+            or=true;
+            return this;
+        }
+        public<T extends Comparable<T>> ModelMultipart addConditions(Func<PartConditionSet,PartConditionSet> func){
+            conditions.add(func.get(new PartConditionSet()));
+            return this;
+        }
+        public static class PartConditionSet{
+            Array<PartCondition> conditions = new Array<>();
+            public<T extends Comparable<T>> PartConditionSet set(Property<T> prop, T...values){
+               conditions.add(new PartCondition<>(prop, values));
+               return this;
+            }
+            public JSONObject getJson() throws JSONException{
+                JSONObject obj = new JSONObject();
+                for(var cond:conditions){
+                    StringBuilder val = new StringBuilder();
+                    for(var v:cond.values){
+                        val.append(val.length() == 0 ? "" : "|").append(v);
+                    }
+                    obj.put(cond.property.getName(), val.toString());
+                }
+                return obj;
+            }
+        }
+
+        public static class PartCondition<T extends Comparable<T>>{
+            Property<T> property;
+            T[] values;
+
+            PartCondition(Property<T> property,T...values){
+                this.property=property;
+                this.values=values;
+            }
+
+
+        }
+
+    }
+    public static class ModelVariantList extends ModelList{
         Array<ModelVariant> list = new Array<>();
 
         public ModelVariantList addModel(Func<ModelVariant, ModelVariant> func){
@@ -116,4 +196,6 @@ public class BlockStateBuilder{
             return this;
         }
     }
+
+
 }

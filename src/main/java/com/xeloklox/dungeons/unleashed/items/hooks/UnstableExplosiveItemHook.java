@@ -14,10 +14,12 @@ public class UnstableExplosiveItemHook extends ItemEntityHook{
     float explosionSize = 1f;
     int immunity = 100;
     int maxCharge = 250;
-    String EXPLOSION_CHARGE_TAG = "expchrg";
+    public static final String EXPLOSION_CHARGE_TAG = "expchrg";
     //per item in %
     float explosionPowerIncrease = 3f;
-    public UnstableExplosiveItemHook(){}
+
+    public UnstableExplosiveItemHook(){
+    }
 
     public UnstableExplosiveItemHook(float chance, float explosionSize){
         this.chance = chance;
@@ -81,4 +83,30 @@ public class UnstableExplosiveItemHook extends ItemEntityHook{
     public void onDamage(DamageSource source, float amount){
 
     }
+
+    public UnstableExplosiveItemHook setChancePerTick(float chance){
+        this.chance = chance;
+        return this;
+    }
+
+    public UnstableExplosiveItemHook setExplosionSize(float explosionSize){
+        this.explosionSize = explosionSize;
+        return this;
+    }
+
+    public UnstableExplosiveItemHook setImmunity(int immunity){
+        this.immunity = immunity;
+        return this;
+    }
+
+    public UnstableExplosiveItemHook setDelay(int maxCharge){
+        this.maxCharge = maxCharge;
+        return this;
+    }
+
+    public UnstableExplosiveItemHook setExplosionPowerIncrease(float explosionPowerIncrease){
+        this.explosionPowerIncrease = explosionPowerIncrease;
+        return this;
+    }
+
 }

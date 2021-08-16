@@ -7,12 +7,10 @@ import java.util.*;
 
 public abstract class JsonConfiguration extends Generator{
     public static HashSet<String> generated = new HashSet<>();
-    protected String path;
-    protected JSONObject json;
 
+    protected JSONObject json;
     public JsonConfiguration(String path, JSONObject object){
-        super();
-        this.path = path;
+        super(path);
         this.json = object;
     }
     //fills the JSONObject with data to be written to a file

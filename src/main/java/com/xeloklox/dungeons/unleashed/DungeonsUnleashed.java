@@ -1,5 +1,6 @@
 package com.xeloklox.dungeons.unleashed;
 
+import com.xeloklox.dungeons.unleashed.utils.Registerable.*;
 import net.fabricmc.api.ModInitializer;
 
 public class DungeonsUnleashed implements ModInitializer {
@@ -15,14 +16,12 @@ public class DungeonsUnleashed implements ModInitializer {
         try{
             Class.forName(ModItems.class.getName());
             Class.forName(ModBlocks.class.getName());
+            Class.forName(ModRecipes.class.getName());
         }catch(ClassNotFoundException e){
             e.printStackTrace();
         }
 
-        Globals.registerAll();
-
-
-
-
+        Globals.registerAll(RegisterEnvironment.CLIENT_AND_SERVER);
 	}
+
 }

@@ -6,9 +6,11 @@ public class Paths{
     public static final String
         modData             = "src/main/resources/data/"+MODID+"/",
         lootTables          = modData+"loot_tables/",
+        recipes             = modData+"recipes/",
         blockLootTables     = lootTables+"blocks/",
         modResource         = "src/main/resources/assets/"+MODID+"/",
         texture             = modResource+"textures/",
+        models              = modResource+"models/",
         itemModel           = modResource+"models/item/",
         itemTexture         = modResource+"textures/item/",
         blockModel          = modResource+"models/block/",

@@ -1,5 +1,7 @@
 package com.xeloklox.dungeons.unleashed.items;
 
+import com.xeloklox.dungeons.unleashed.items.hooks.*;
+import com.xeloklox.dungeons.unleashed.utils.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
@@ -10,13 +12,21 @@ import net.minecraft.world.*;
 import net.minecraft.world.explosion.*;
 
 public class UnstableItem extends Item{
-    public UnstableItem(Settings settings){
+    public float explosionDelay = 250f;
+    public UnstableItem(Settings settings, Func<UnstableExplosiveItemHook,UnstableExplosiveItemHook> explosionSettings){
         super(settings);
+        ItemEntityWrapper.addHookSelector((item)->{
+            if(item.getStack().isOf(this)){
+                return new UnstableExplosiveItemHook();
+            }
+            return null;
+        });
     }
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected){
         super.inventoryTick(stack, world, entity, slot, selected);
+
     }
 
     @Override
@@ -28,6 +38,16 @@ public class UnstableItem extends Item{
             itemStack.decrement(1);
         }
         return  TypedActionResult.success(itemStack, world.isClient());
+    }
+    public static float getExplosionCharge(ItemStack is){
+        if(is.getItem() instanceof UnstableItem unstableItem){
+            var nbt = is.getNbt();
+            if(nbt==null){
+                return 0;
+            }
+            return nbt.getInt(UnstableExplosiveItemHook.EXPLOSION_CHARGE_TAG)/unstableItem.explosionDelay;
+        }
+        return 0;
     }
 
 

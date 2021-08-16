@@ -4,7 +4,8 @@
   "package": "com.xeloklox.dungeons.unleashed.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "ItemEntityMixin"
+    "ItemEntityMixin",
+    "LightningEntityMixin"
   ],
   "client": [
 

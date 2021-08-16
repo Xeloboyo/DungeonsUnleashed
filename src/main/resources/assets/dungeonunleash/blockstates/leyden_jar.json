@@ -1,0 +1,23 @@
+{"multipart": [
+    {
+        "apply": {"model": "dungeonunleash:block/leyden_jar_rod0"},
+        "when": {"charge": "0"}
+    },
+    {"apply": {"model": "dungeonunleash:block/custom/leyden_jar"}},
+    {
+        "apply": {"model": "dungeonunleash:block/leyden_jar_rod4"},
+        "when": {"charge": "4"}
+    },
+    {
+        "apply": {"model": "dungeonunleash:block/leyden_jar_rod2"},
+        "when": {"charge": "2"}
+    },
+    {
+        "apply": {"model": "dungeonunleash:block/leyden_jar_rod1"},
+        "when": {"charge": "1"}
+    },
+    {
+        "apply": {"model": "dungeonunleash:block/leyden_jar_rod3"},
+        "when": {"charge": "3"}
+    }
+]}

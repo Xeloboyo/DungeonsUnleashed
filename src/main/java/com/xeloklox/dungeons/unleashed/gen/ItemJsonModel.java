@@ -6,6 +6,7 @@ import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
 import net.minecraft.item.*;
 import org.apache.commons.io.*;
 import org.json.*;
+import org.mini2Dx.gdx.utils.*;
 
 import java.io.*;
 
@@ -16,10 +17,11 @@ public class ItemJsonModel extends JsonConfiguration{
     RegisteredItem item;
     public ModelParent modelParent = ModelParent.ITEM_GENERATED;
     public String[] textureLayers;
+    public Array<ItemModelOverride> overrides = new Array<>();
+
 
     public ItemJsonModel(RegisteredItem item){
-        super(Paths.itemModel + item.id + ".json", new JSONObject());
-        this.item = item;
+        this(item,"item/"+item.id,new String[]{});
         if(item.get() instanceof BlockItem){
             modelParent = ModelParent.BLOCK;
             textureLayers = new String[]{};
@@ -28,10 +30,33 @@ public class ItemJsonModel extends JsonConfiguration{
         }
     }
 
+    public ItemJsonModel(RegisteredItem item,String name,String[] textureLayers){
+        super(Paths.models + name + ".json", new JSONObject());
+        this.item = item;
+        this.textureLayers=textureLayers;
+    }
+
     @Override
     public void fillJSONObj(){
         try{
-            json.put("parent", format(modelParent.key));
+            json.put("parent", format(modelParent.key,item.id));
+            if(item.get() instanceof BlockItem){
+                String modelpath = Paths.blockModel+item.id+".json";
+                if(!AssetGenerator.isGenerated(modelpath)){
+                    File cust = new File(Paths.blockModel+"custom/"+item.id+".json");
+                    if(!cust.exists()){
+                        System.out.println("[WARNING] Block model for BlockItem "+item.id+" was not found!");
+                        JSONObject config = new JSONObject(BlockModel.allSidesSame(item.id,"block/default").substring(2));
+                        JSONObject template = BlockModel.getTemplate(config.getString("template"));
+                        new BlockModelJson(item.id,template, config);
+                    }else{
+                        json.put("parent", format(modelParent.key,"/custom/"+item.id));
+                    }
+                }
+
+            }
+
+
             if(textureLayers.length > 0){
                 JSONObject models = new JSONObject();
                 for(int i = 0; i < textureLayers.length; i++){
@@ -39,14 +64,21 @@ public class ItemJsonModel extends JsonConfiguration{
                 }
                 json.put("textures", models);
             }
+            if(overrides.size>0){
+                JSONArray ojson = new JSONArray();
+                for(ItemModelOverride override:overrides){
+                    ojson.put(override.getObj());
+                }
+                json.put("overrides", ojson);
+            }
         }catch(JSONException e){
             e.printStackTrace();
         }
     }
 
-    public String format(String key){
+    public String format(String key,String id){
 
-        key = key.replace("@ID@", item.id);
+        key = key.replace("@ID@", id);
         return key.replace("@MODID@", MODID);
     }
 
@@ -65,10 +97,55 @@ public class ItemJsonModel extends JsonConfiguration{
                 }
             }
         }
+        for(ItemModelOverride override:overrides){
+            if(!AssetGenerator.isGenerated(Paths.models+override.model)){
+                new ItemJsonModel(item,override.model,new String[]{override.model});
+            }
+        }
+    }
+
+    public ItemJsonModel setTextureLayers(String... textureLayers){
+        this.textureLayers = textureLayers;
+        return this;
+    }
+
+    public ItemJsonModel setModelParent(ModelParent modelParent){
+        this.modelParent = modelParent;
+        return this;
     }
 
     public RegisteredItem getItem(){
         return item;
+    }
+
+    public ItemJsonModel addOverride(Func<ItemModelOverride,ItemModelOverride> func){
+        overrides.add(func.get(new ItemModelOverride()));
+        return this;
+    }
+
+    public static class ItemModelOverride{
+        public ObjectMap<String,Float> predicates = new ObjectMap<>();
+        public String model;
+        public ItemModelOverride addModelPredicate(String name, float value){
+            predicates.put(name,value);
+            return this;
+        }
+
+        public ItemModelOverride setModel(String model){
+            this.model = model;
+            return this;
+        }
+
+        public JSONObject getObj() throws JSONException{
+            JSONObject obj = new  JSONObject();
+            obj.put("model",MODID+":"+model);
+            JSONObject predicate = new  JSONObject();
+            predicates.forEach(entry -> {
+                try{predicate.put(entry.key,entry.value);}catch(JSONException ignored){}
+            });
+            obj.put("predicate",predicate);
+            return obj;
+        }
     }
 
     public enum ModelParent{

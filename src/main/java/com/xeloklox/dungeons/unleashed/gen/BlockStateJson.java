@@ -1,6 +1,7 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
+import com.xeloklox.dungeons.unleashed.gen.BlockStateBuilder.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
@@ -30,7 +31,7 @@ public class BlockStateJson extends JsonConfiguration{
     }
 
     @Override
-    public void fillJSONObj(){
+    public void pregenerate(){
         try{
             // generated and missing models are processed here.
             for(String model : modelsToCheck){
@@ -51,24 +52,61 @@ public class BlockStateJson extends JsonConfiguration{
                     formatted.put(model, MODID + ":block/" + model);
                 }
             }
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+    }
 
-            JSONObject variants = new JSONObject();
-            stateConfig.map.forEach(e -> {
-                JSONArray variant = new JSONArray();
-                e.value.eachModelVariant(model -> {
+    @Override
+    public void fillJSONObj(){
+        try{
+
+            if(stateConfig.multipart){
+                JSONArray parts = new JSONArray();
+                stateConfig.map.forEach(e -> {
+                    ModelMultipart multipart = (ModelMultipart)e.value;
                     try{
-                        JSONObject modelcpy = new JSONObject(model.data, JSONObject.getNames(model.data));
+                        JSONObject part = new JSONObject();
+                        JSONObject modelcpy = new JSONObject(multipart.apply.data, JSONObject.getNames(multipart.apply.data));
                         modelcpy.put("model", formatted.get(modelcpy.getString("model")));
-                        variant.put(modelcpy);
+                        if(!multipart.conditions.isEmpty()){
+                            JSONObject conditions = new JSONObject();
+                            if(multipart.or){
+                                JSONArray conditionList = new JSONArray();
+                                for(var cond:multipart.conditions){
+                                    conditionList.put(cond.getJson());
+                                }
+                                conditions.put("OR",conditionList);
+                            }else{
+                                conditions = multipart.conditions.peek().getJson();
+                            }
+                            part.put("when",conditions);
+                        }
+
+                        part.put("apply",modelcpy);
+                        parts.put(part);
+                    }catch(JSONException ignored){ }
+                });
+                json.put("multipart", parts);
+            }else{
+                JSONObject variants = new JSONObject();
+                stateConfig.map.forEach(e -> {
+                    JSONArray variant = new JSONArray();
+                    e.value.eachModelVariant(model -> {
+                        try{
+                            JSONObject modelcpy = new JSONObject(model.data, JSONObject.getNames(model.data));
+                            modelcpy.put("model", formatted.get(modelcpy.getString("model")));
+                            variant.put(modelcpy);
+                        }catch(JSONException e2){
+                        }
+                    });
+                    try{
+                        variants.put(e.key, variant);
                     }catch(JSONException e2){
                     }
                 });
-                try{
-                    variants.put(e.key, variant);
-                }catch(JSONException e2){
-                }
-            });
-            json.put("variants", variants);
+                json.put("variants", variants);
+            }
         }catch(JSONException e){
             e.printStackTrace();
         }
