@@ -64,7 +64,7 @@ public class LootTableJson extends JsonConfiguration{
             entries.add(entryFunc.get(new LootPoolEntry(type)));
             return this;
         }
-        public LootPool addCondition(LootPoolCondition cond){
+        public LootPool condition(LootPoolCondition cond){
             conditions.add(cond);
             return this;
         }
@@ -118,7 +118,7 @@ public class LootTableJson extends JsonConfiguration{
                 return this;
             }
 
-            public LootPoolEntry addCondition(LootPoolCondition cond){
+            public LootPoolEntry condition(LootPoolCondition cond){
                 try{
                     if(!output.has("conditions")){
                         output.put("conditions", new JSONArray());

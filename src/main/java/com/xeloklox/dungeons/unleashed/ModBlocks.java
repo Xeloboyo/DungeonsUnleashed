@@ -26,18 +26,19 @@ public class ModBlocks{
         //A simple inert block
         final String END_SOIL_model = BlockModel.allSidesSame("end_soil","block/end_soil");
         END_SOIL = new RegisteredBlock("end_soil",
-        Globals.bootQuery(()->
-                new BasicBlock(Material.SOIL, settings->
-                            settings
-                            .breakByHand(true)
-                            .breakByTool(FabricToolTags.SHOVELS)
-                            .sounds(BlockSoundGroup.SOUL_SOIL)
-                            .hardness(0.5f)
-                            .resistance(0.6f)
-
+            Globals.bootQuery(() ->
+                    new BasicBlock(Material.SOIL, settings ->
+                    settings
+                    .breakByHand(true)
+                    .breakByTool(FabricToolTags.SHOVELS)
+                    .sounds(BlockSoundGroup.SOUL_SOIL)
+                    .hardness(0.5f)
+                    .resistance(0.6f)
+                    )
                 )
-            ),
-        BlockStateBuilder.create().noState(randomRotationVariants(END_SOIL_model))
+            ,
+            BlockStateBuilder.create().noState(randomRotationVariants(END_SOIL_model)),
+        block-> { }
         );
 
         //---------------------------------------------------------------------
@@ -51,49 +52,46 @@ public class ModBlocks{
         };
 
         ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil",
-        Globals.bootQuery(()->
-                new BasicBlock(Material.SOIL, settings->
-                    settings
-                    .breakByHand(true)
-                    .breakByTool(FabricToolTags.HOES)
-                    .sounds(BlockSoundGroup.SOUL_SOIL)
-                    .hardness(0.7f)
-                    .resistance(0.8f)
+        Globals.bootQuery(() ->
+            new BasicBlock(Material.SOIL, settings ->
+                settings
+                .breakByHand(true)
+                .breakByTool(FabricToolTags.HOES)
+                .sounds(BlockSoundGroup.SOUL_SOIL)
+                .hardness(0.7f)
+                .resistance(0.8f)
                 )
-            ),
-        RenderLayerOptions.NORMAL,
-        (id,item)-> new RegisteredItem(id, item,model->model),
-            ModItems.getSettings((s)->s.group(ItemGroup.BUILDING_BLOCKS)),
-            BlockStateBuilder.create().noState(
-                variants->variants
-                .addModel(model->model.setModel(ENDERSEED_SOIL_model[0]))
-                .addModel(model->model.setModel(ENDERSEED_SOIL_model[1]))
-                .addModel(model->model.setModel(ENDERSEED_SOIL_model[2]))
-                .addModel(model->model.setModel(ENDERSEED_SOIL_model[3]))
-            ),
-            lootTable->
-            lootTable.addPool(pool-> //chance of dropping a ender pearl if mined by a hoe
-                pool.addEntry(item, entry->
-                    entry.setOutput("minecraft:ender_pearl")
-                        .addCondition(droprate_with_enchantment(
-                        "minecraft:fortune",
-                        25 /* <- no enchant % */, 50, 60, 75, 90 // <- max lvl fortune %
-                        )
+            ),BlockStateBuilder.create().noState(
+                variants -> variants
+                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[0]))
+                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[1]))
+                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[2]))
+                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[3]))
+            ),block-> {
+                block.setDrops(lootTable ->
+                    lootTable.addPool(pool -> //chance of dropping a ender pearl if mined by a hoe
+                        pool.addEntry(item, entry ->
+                            entry.setOutput("minecraft:ender_pearl")
+                                .condition(droprate_with_enchantment(
+                                "minecraft:fortune",
+                                25 /* <- no enchant % */, 50, 60, 75, 90 // <- max lvl fortune %
+                                ))
+                        ).condition(survives_explosion())
+                        .condition(matches_tool(filter -> filter.setTag("fabric:hoes")))
+                        .condition(invert(silktouch))
+                    ).addPool(pool -> //always drop the dirt if no silk touch
+                            pool.addEntry(item, entry ->
+                                entry.setOutput(MODID + ":end_soil")
+                            ).condition(survives_explosion())
+                            .condition(invert(silktouch))
+                    ).addPool(pool -> //otherwise drop the original block
+                            pool.addEntry(item, entry ->
+                                entry.setOutput(MODID + ":enderseed_soil")
+                            ).condition(survives_explosion())
+                            .condition(silktouch)
                     )
-                ).addCondition(survives_explosion())
-                .addCondition(matches_tool(filter-> filter.setTag("fabric:hoes")))
-                .addCondition(invert(silktouch))
-            ).addPool(pool-> //always drop the dirt if no silk touch
-                pool.addEntry(item, entry->
-                    entry.setOutput(MODID+":end_soil")
-                ).addCondition(survives_explosion())
-                .addCondition(invert(silktouch))
-            ).addPool(pool-> //otherwise drop the original block
-                pool.addEntry(item, entry->
-                    entry.setOutput(MODID+":enderseed_soil")
-                ).addCondition(survives_explosion())
-                .addCondition(silktouch)
-            )
+                );
+            }
         );
 
 
@@ -102,8 +100,8 @@ public class ModBlocks{
 
         final String END_GRASS_model = BlockModel.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
         END_GRASS = new RegisteredBlock("end_grass",
-            Globals.bootQuery(()->new ModGrassBlock(Material.SOLID_ORGANIC, END_SOIL.get(), 2,
-            settings->
+            Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, END_SOIL.get(), 2,
+                settings ->
                 settings.breakByHand(true)
                 .breakByTool(FabricToolTags.SHOVELS)
                 .sounds(BlockSoundGroup.SOUL_SOIL)
@@ -111,20 +109,20 @@ public class ModBlocks{
                 .resistance(0.6f)
                 .ticksRandomly())
             ),
-        RenderLayerOptions.NORMAL,
-        (id,item)-> new RegisteredItem(id, item,model->model),
-            ModItems.getSettings((s)->s.group(ItemGroup.BUILDING_BLOCKS)),
             BlockStateBuilder.create().noState(randomRotationVariants(END_GRASS_model)),
-        lootTable->
-            lootTable.addPool(pool->
-                pool.addEntry(item,entry->
-                    entry.setOutput(MODID+":end_soil")
-                    .addCondition(invert(silktouch))
-                ).addEntry(item,entry->
-                    entry.setOutput(MODID+":end_grass")
-                    .addCondition(silktouch)
-                )
-            )
+            block -> {
+                block.setDrops(lootTable ->
+                    lootTable.addPool(pool ->
+                        pool.addEntry(item, entry ->
+                            entry.setOutput(MODID + ":end_soil")
+                                 .condition(invert(silktouch))
+                        ).addEntry(item, entry ->
+                            entry.setOutput(MODID + ":end_grass")
+                                 .condition(silktouch)
+                        )
+                    )
+                );
+            }
         );
 
         //---------------------------------------------------------------------
@@ -148,65 +146,74 @@ public class ModBlocks{
 
         //create the block
         LEYDEN_JAR = new RegisteredBlock("leyden_jar",
-            Globals.bootQuery(()->new LeydenJarBlock(Material.GLASS,
-                settings->
-                    settings.breakByHand(true)
-                    .breakByTool(FabricToolTags.PICKAXES)
-                    .sounds(BlockSoundGroup.GLASS)
-                    .hardness(0.3f)
-                    .resistance(0.3f)
-                    .nonOpaque())
-                ),
-            RenderLayerOptions.CUTOUT,
-            (id,bitem)-> new RegisteredItem(id, bitem,model->{
-
-                    model.setModelParent(ModelParent.ITEM_GENERATED).setTextureLayers("item/leyden_jar");
-                    for(int i = 1;i<=MAX_CHARGE;i++){
-                        int finalI = i;
-                        model.addOverride(override-> override.setModel("item/leyden_jar"+(finalI+1)).addModelPredicate("charge", finalI /(float)MAX_CHARGE));
-                    }
-                    return model;
-                },
-            item->item.addPredicate("charge",(itemstack, world, entity, seed) ->
-                    {
-                        NbtCompound blockEntityTag = itemstack.getOrCreateSubNbt("BlockStateTag");
-                        if(blockEntityTag==null){return 0;}
-                        return Strings.parseInt(blockEntityTag.getString(LeydenJarBlock.CHARGE.getName())) / (float)MAX_CHARGE;
-                    }
-                )
+        Globals.bootQuery(() -> new LeydenJarBlock(Material.GLASS,
+            settings ->
+                settings.breakByHand(true)
+                .breakByTool(FabricToolTags.PICKAXES)
+                .sounds(BlockSoundGroup.GLASS)
+                .hardness(0.3f)
+                .resistance(0.3f)
+                .nonOpaque())
             ),
-            ModItems.getSettings((s)->s.group(ItemGroup.BUILDING_BLOCKS).maxCount(8)),
             LEYDEN_JAR_STATE,
-            lootTable->
-            lootTable.addPool(pool->
-                pool.addEntry(item,entry->
-                    entry.setOutput(MODID+":leyden_jar")
-                         .addFunction(copy_block_state(MODID+":leyden_jar",LeydenJarBlock.CHARGE))
-                )
-            )
+            block -> {
+                block.setRenderlayer(RenderLayerOptions.CUTOUT);
+
+                block.setBlockitem((id, bitem) ->
+                    new RegisteredItem(id, bitem,
+                        model -> {
+                            model.setModelParent(ModelParent.ITEM_GENERATED).setTextureLayers("item/leyden_jar");
+                            for(int i = 1; i <= MAX_CHARGE; i++){
+                                int finalI = i;
+                                model.addOverride(override -> override.setModel("item/leyden_jar" + (finalI + 1)).addModelPredicate("charge", finalI / (float)MAX_CHARGE));
+                            }
+                            return model;
+                        },
+                        item -> item.addPredicate("charge", (itemstack, world, entity, seed) -> {
+                            NbtCompound blockEntityTag = itemstack.getOrCreateSubNbt("BlockStateTag");
+                            if(blockEntityTag == null){
+                                return 0;
+                            }
+                            return Strings.parseInt(blockEntityTag.getString(LeydenJarBlock.CHARGE.getName())) / (float)MAX_CHARGE;
+                        })
+                    )
+                );
+
+                block.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.BUILDING_BLOCKS).maxCount(8)));
+
+                block.setDrops(lootTable ->
+                    lootTable.addPool(pool ->
+                        pool.addEntry(item, entry ->
+                            entry.setOutput(MODID + ":leyden_jar")
+                                 .addFunction(copy_block_state(MODID + ":leyden_jar", LeydenJarBlock.CHARGE))
+                        )
+                    )
+                );
+            }
         );
 
         //---------------------------------------------------------------------
         //A multipart complex block with custom behaviour and 32 different states, with a inventory and block entity
         final String INFUSER_model = "custom/infuser";
         INFUSER = new RegisteredBlock("infuser",
-            Globals.bootQuery(()-> new InfuserBlock(Material.STONE,
-            settings->
-                    settings.breakByHand(false)
-                    .breakByTool(FabricToolTags.PICKAXES)
-                    .sounds(BlockSoundGroup.STONE)
-                    .hardness(1.5f)
-                    .resistance(7f))),
-            RenderLayerOptions.NORMAL,
-            (id,item)-> new RegisteredItem(id, item,model->model),
-            ModItems.getSettings((s)->s.group(ItemGroup.DECORATIONS)),
-             BlockStateBuilder.create().noState(oneVariant(BlockModel.customTemplate(INFUSER_model,"infuser","block/custom/infuser"))),
-            lootTable->
-                lootTable.addPool(pool->
-                    pool.addEntry(item,entry->
-                        entry.setOutput(MODID+":infuser")
+            Globals.bootQuery(() -> new InfuserBlock(Material.STONE,
+                settings ->
+                settings.breakByHand(false)
+                .breakByTool(FabricToolTags.PICKAXES)
+                .sounds(BlockSoundGroup.STONE)
+                .hardness(1.5f)
+                .resistance(7f)
+            )),
+            BlockStateBuilder.create().noState(oneVariant(BlockModel.customTemplate(INFUSER_model, "infuser", "block/custom/infuser"))),
+            block -> {
+                block.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.DECORATIONS)));
+                block.setDrops(lootTable ->
+                    lootTable.addPool(pool ->
+                    pool.addEntry(item, entry ->
+                    entry.setOutput(MODID + ":infuser")
                     )
-                )
+                ));
+            }
         );
 
         //end region

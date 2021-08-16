@@ -1,6 +1,5 @@
 package com.xeloklox.dungeons.unleashed.utils;
 
-import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.*;
@@ -11,44 +10,78 @@ import net.minecraft.client.render.*;
 import net.minecraft.item.*;
 import net.minecraft.item.Item.*;
 import net.minecraft.util.registry.*;
-import org.apache.commons.io.*;
-import org.json.*;
-import org.mini2Dx.gdx.utils.*;
-
-import java.io.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.Globals.bootQuery;
 
 public class RegisteredBlock extends Registerable<Block>{
     boolean createBlockItem = true;
-    public final RegisteredItem blockitem;
-    final BlockRenderLayerRegistration renderlayer;
+    public RegisteredItem blockitem = null;//= (id2, item) -> new RegisteredItem(id2, item, model -> model)
+    public BlockRenderLayerRegistration renderlayer;
     BlockStateJson blockStateConfig;
     LootTableJson drops;
-
-    public RegisteredBlock(String id, Block registration,RenderLayerOptions renderlayer, Func2<String,BlockItem,RegisteredItem> blockitem, Settings settings, BlockStateBuilder bsb, Func<LootTableJson,LootTableJson> lt){
+    private Settings settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS), new FabricItemSettings());
+    private BlockStateBuilder bsb;
+    // public RegisteredBlock(String id, Block registration,RenderLayerOptions renderlayer, Func2<String,BlockItem,RegisteredItem> blockitem, Settings settings, BlockStateBuilder bsb, Func<LootTableJson,LootTableJson> lt
+    public RegisteredBlock(String id, Block registration, BlockStateBuilder bsb, Cons<RegisteredBlock> builder){
         super(id, registration, bootQuery(() -> Registry.BLOCK),RegisterEnvironment.CLIENT_AND_SERVER);
-        this.blockitem = blockitem.get(id,new BlockItem(registration, settings));
+        renderlayer = new BlockRenderLayerRegistration(this,RenderLayerOptions.NORMAL);
+        settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS),new FabricItemSettings());
         blockStateConfig = new BlockStateJson(this, bsb);
-        drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
-        this.renderlayer = new BlockRenderLayerRegistration(this,renderlayer);
+        builder.get(this);
+        if(blockitem==null){
+            blockitem = new RegisteredItem(id, new BlockItem(registration, settings),model->model);
+        }
+        if(drops==null){
+            Func<LootTableJson,LootTableJson> lt = lootTable->
+                lootTable.addPool(pool->
+                    pool.addEntry(LootPoolEntryType.item,entry->
+                        entry.setOutput(MODID+":"+id) //just returns the blockitems
+                    )
+                    .condition(LootPool.survives_explosion())
+                );
+            drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
+        }
+        if(renderlayer==null){
+            this.renderlayer = new BlockRenderLayerRegistration(this, RenderLayerOptions.NORMAL);
+        }
     }
 
-    public RegisteredBlock(String id, Block registration, BlockStateBuilder bsb ){
-        this(id, registration, RenderLayerOptions.NORMAL,
-        (id2,item)-> new RegisteredItem(id2, item,model->model),
-        bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS),new FabricItemSettings()),
-        bsb,
-        lootTable->
-            lootTable.addPool(pool->
-                pool.addEntry(LootPoolEntryType.item,entry->
-                    entry.setOutput(MODID+":"+id) //just returns the blockitems
-                )
-                .addCondition(LootPool.survives_explosion())
-            )
-        );
+    public RegisteredBlock setId(String id){
+        this.id = id;
+        return this;
     }
+
+    public RegisteredBlock setRegistration(Block registration){
+        this.registration = registration;
+        return this;
+    }
+
+    public RegisteredBlock setRenderlayer(RenderLayerOptions renderlayer){
+        this.renderlayer.layer=renderlayer.get();
+        return this;
+    }
+
+    public RegisteredBlock setBlockitem(Func2<String, BlockItem, RegisteredItem> blockitem){
+        this.blockitem = blockitem.get(id,new BlockItem(registration, settings));
+        return this;
+    }
+
+    public RegisteredBlock setSettings(Settings settings){
+        this.settings = settings;
+        return this;
+    }
+
+    public RegisteredBlock setBsb(BlockStateBuilder bsb){
+        this.bsb = bsb;
+        return this;
+    }
+
+    public RegisteredBlock setDrops(Func<LootTableJson, LootTableJson> lt){
+        this.drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
+        return this;
+    }
+
 
 
 
