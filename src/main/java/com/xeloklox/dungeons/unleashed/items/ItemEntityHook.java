@@ -40,5 +40,10 @@ public abstract class ItemEntityHook{
         }
         return nbt.getInt(tag);
     }
+    public boolean hasTag(String tag){
+        if(!itemEntity().getStack().hasNbt()){return false;}
+        return getNBT().contains(tag);
+    }
+
 
 }

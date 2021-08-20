@@ -2,6 +2,7 @@ package com.xeloklox.dungeons.unleashed;
 
 import com.xeloklox.dungeons.unleashed.utils.Registerable.*;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.biome.v1.*;
 
 public class DungeonsUnleashed implements ModInitializer {
     public static final String MODID = "dungeonunleash";
@@ -22,6 +23,8 @@ public class DungeonsUnleashed implements ModInitializer {
         }
 
         Globals.registerAll(RegisterEnvironment.CLIENT_AND_SERVER);
+
+        //TheEndBiomes.
 	}
 
 }

@@ -1,15 +1,12 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
-import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.C_match_tool.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.*;
-import com.xeloklox.dungeons.unleashed.utils.*;
-import net.minecraft.enchantment.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.state.property.*;
 import org.apache.commons.lang3.*;
 import org.json.*;
-import org.lwjgl.system.CallbackI.*;
 import org.mini2Dx.gdx.utils.*;
 
 public class LootTableJson extends JsonConfiguration{

@@ -1,7 +1,6 @@
 package com.xeloklox.dungeons.unleashed.blocks;
 
-import com.xeloklox.dungeons.unleashed.*;
-import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.minecraft.block.*;
 import net.minecraft.server.world.*;

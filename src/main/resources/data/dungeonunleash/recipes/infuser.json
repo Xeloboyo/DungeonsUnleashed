@@ -1,0 +1,18 @@
+{
+    "key": {
+        "B": {"item": "minecraft:copper_block"},
+        "C": {"item": "minecraft:copper_ingot"},
+        "E": {"item": "minecraft:ender_pearl"},
+        "L": {"item": "minecraft:end_stone"}
+    },
+    "pattern": [
+        "CLC",
+        "EBE",
+        "LEL"
+    ],
+    "result": {
+        "count": 2,
+        "item": "dungeonunleash:leyden_jar"
+    },
+    "type": "minecraft:crafting_shaped"
+}

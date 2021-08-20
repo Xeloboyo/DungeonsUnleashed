@@ -1,4 +1,4 @@
-package com.xeloklox.dungeons.unleashed.utils;
+package com.xeloklox.dungeons.unleashed.utils.lambda;
 
 import net.minecraft.block.*;
 import net.minecraft.util.math.*;

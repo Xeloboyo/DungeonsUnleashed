@@ -4,6 +4,7 @@ import com.xeloklox.dungeons.unleashed.utils.Registerable.*;
 import net.fabricmc.api.*;
 
 public class DungeonsUnleashedClient implements ClientModInitializer{
+
     @Override
     public void onInitializeClient(){
         try{

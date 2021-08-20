@@ -2,6 +2,7 @@ package com.xeloklox.dungeons.unleashed;
 
 import com.xeloklox.dungeons.unleashed.items.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.item.*;
 import net.minecraft.item.Item.*;
 import net.minecraft.util.*;

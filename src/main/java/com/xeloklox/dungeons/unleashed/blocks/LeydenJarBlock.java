@@ -1,9 +1,8 @@
 package com.xeloklox.dungeons.unleashed.blocks;
 
-import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.minecraft.block.*;
-import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
@@ -16,11 +15,10 @@ import net.minecraft.util.hit.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.*;
 import net.minecraft.world.*;
-import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, Oxidizable{
+public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, Oxidizable, IChargeStorage{
     public static final int MAX_CHARGE = 4;
     public static final IntProperty CHARGE = IntProperty.of("charge",0,MAX_CHARGE);
     public LeydenJarBlock(Material material, Func<FabricBlockSettings, FabricBlockSettings> func){
@@ -83,5 +81,20 @@ public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, 
     @Override
     public void tryDegrade(BlockState state, ServerWorld world, BlockPos pos, Random random){
         //just dont
+    }
+
+    @Override
+    public int getCharge(World world, BlockPos pos){
+        return world.getBlockState(pos).get(CHARGE);
+    }
+
+    @Override
+    public int maxCharge(World world, BlockPos pos){
+        return MAX_CHARGE;
+    }
+
+    @Override
+    public void setCharge(World world, BlockPos pos, int charge){
+        world.setBlockState(pos, world.getBlockState(pos).with(CHARGE, charge));
     }
 }

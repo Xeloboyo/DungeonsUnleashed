@@ -1,16 +1,24 @@
 package com.xeloklox.dungeons.unleashed;
 
+import com.xeloklox.dungeons.unleashed.blockentity.*;
+import com.xeloklox.dungeons.unleashed.blockentity.renderer.*;
+import com.xeloklox.dungeons.unleashed.blockentity.screens.*;
 import com.xeloklox.dungeons.unleashed.blocks.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.gen.BlockStateBuilder.*;
 import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.RegisteredBlock.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import net.fabricmc.fabric.api.screenhandler.v1.*;
 import net.fabricmc.fabric.api.tool.attribute.v1.*;
 import net.minecraft.block.*;
+import net.minecraft.client.model.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
+import net.minecraft.state.property.*;
+import net.minecraft.util.math.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.blocks.LeydenJarBlock.MAX_CHARGE;
@@ -20,11 +28,15 @@ import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoo
 public class ModBlocks{
     public static final RegisteredBlock END_SOIL,ENDERSEED_SOIL,END_GRASS,LEYDEN_JAR,INFUSER;
 
+    public static final RegisteredBlockEntity<InfuserEntity> INFUSER_ENTITY;
+    public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
+    public static final RegisteredScreenHandler<InfuserScreenHandler,InfuserScreen> INFUSER_SCREEN;
+
     static {
         LootPoolCondition silktouch = (matches_tool(filter->filter.setEnchantments("minecraft:silk_touch , [1,-]")));
         //region BLOCKS
         //A simple inert block
-        final String END_SOIL_model = BlockModel.allSidesSame("end_soil","block/end_soil");
+        final String END_SOIL_model = BlockModelPresetBuilder.allSidesSame("end_soil","block/end_soil");
         END_SOIL = new RegisteredBlock("end_soil",
             Globals.bootQuery(() ->
                     new BasicBlock(Material.SOIL, settings ->
@@ -45,10 +57,10 @@ public class ModBlocks{
         //A more complex block with 4 variants and a more advanced ore-like loot table.
 
         final String[] ENDERSEED_SOIL_model = {
-            BlockModel.allSidesSame("enderseed_soil","block/enderseed_soil1"),
-            BlockModel.allSidesSame("enderseed_soil2","block/enderseed_soil2"),
-            BlockModel.allSidesSame("enderseed_soil3","block/enderseed_soil3"),
-            BlockModel.allSidesSame("enderseed_soil4","block/enderseed_soil4")
+            BlockModelPresetBuilder.allSidesSame("enderseed_soil","block/enderseed_soil1"),
+            BlockModelPresetBuilder.allSidesSame("enderseed_soil2","block/enderseed_soil2"),
+            BlockModelPresetBuilder.allSidesSame("enderseed_soil3","block/enderseed_soil3"),
+            BlockModelPresetBuilder.allSidesSame("enderseed_soil4","block/enderseed_soil4")
         };
 
         ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil",
@@ -98,7 +110,7 @@ public class ModBlocks{
         //---------------------------------------------------------------------
         //A block with custom behaviour and a different kind of model.
 
-        final String END_GRASS_model = BlockModel.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
+        final String END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
         END_GRASS = new RegisteredBlock("end_grass",
             Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, END_SOIL.get(), 2,
                 settings ->
@@ -136,7 +148,7 @@ public class ModBlocks{
 
         for(int i =0;i<LEYDEN_JAR_ROD_model.length;i++){
             int finalI = i;
-            LEYDEN_JAR_ROD_model[i] =  BlockModel.customTemplate("custom/leyden_jar_rod","leyden_jar_rod"+i,"block/custom/copper_rod"+i);
+            LEYDEN_JAR_ROD_model[i] =  BlockModelPresetBuilder.customTemplate("block/custom/leyden_jar_rod","leyden_jar_rod"+i,"block/custom/copper_rod"+i);
             //have the rod change based on the state...
             LEYDEN_JAR_STATE.addPart(model->
                 model.setModel(v->v.setModel(LEYDEN_JAR_ROD_model[finalI]))
@@ -194,7 +206,8 @@ public class ModBlocks{
 
         //---------------------------------------------------------------------
         //A multipart complex block with custom behaviour and 32 different states, with a inventory and block entity
-        final String INFUSER_model = "custom/infuser";
+        final String INFUSER_model = BlockModelPresetBuilder.customTemplate("block/custom/infuser", "infuser", "block/custom/infuser");
+
         INFUSER = new RegisteredBlock("infuser",
             Globals.bootQuery(() -> new InfuserBlock(Material.STONE,
                 settings ->
@@ -204,7 +217,12 @@ public class ModBlocks{
                 .hardness(1.5f)
                 .resistance(7f)
             )),
-            BlockStateBuilder.create().noState(oneVariant(BlockModel.customTemplate(INFUSER_model, "infuser", "block/custom/infuser"))),
+            BlockStateBuilder.create()
+                .addStateVariant(HORIZONTAL_FACING(), Direction.NORTH,variant->variant.addModel(INFUSER_model,0))
+                .addStateVariant(HORIZONTAL_FACING(), Direction.EAST,variant->variant.addModel(INFUSER_model,90))
+                .addStateVariant(HORIZONTAL_FACING(), Direction.SOUTH,variant->variant.addModel(INFUSER_model,180))
+                .addStateVariant(HORIZONTAL_FACING(), Direction.WEST,variant->variant.addModel(INFUSER_model,270))
+            ,
             block -> {
                 block.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.DECORATIONS)));
                 block.setDrops(lootTable ->
@@ -217,9 +235,24 @@ public class ModBlocks{
         );
 
         //end region
+        //region ENTITIES
+        INFUSER_ENTITY = new RegisteredBlockEntity<InfuserEntity>("infuser_entity",InfuserEntity::new,INFUSER);
+        INFUSER_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(()->INFUSER_ENTITY.get(), InfuserRenderer::new);
+        INFUSER_SCREEN = new RegisteredScreenHandler<>(
+            "infuserscreen",
+            ScreenHandlerRegistry.registerSimple(INFUSER.getIdentifier(), InfuserScreenHandler::new),
+            InfuserScreen::new
+        );
+         Globals.bootRun(()->{try{Class.forName(InfuserRenderer.class.getName());}catch(ClassNotFoundException ignored){}});
+        //end region
+
+        new JsonModelProvider(); // yes
 
     }
 
+    static DirectionProperty HORIZONTAL_FACING(){
+        return Globals.bootQuery(()->Properties.HORIZONTAL_FACING,  DirectionProperty.of("facing"));
+    }
 
     static Func<ModelVariantList, ModelVariantList> randomRotationVariants(String modelStr){
         return
@@ -235,5 +268,13 @@ public class ModBlocks{
         //rotated randomly when placed like dirt
         variants->variants
         .addModel(model->model.setModel(modelStr));
+    }
+
+
+    public static TexturedModelData test() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        modelPartData.addChild("cube", ModelPartBuilder.create().uv(0, 0).cuboid(-6F, 12F, -6F, 12F, 12F, 12F), ModelTransform.pivot(0F, 0F, 0F));
+        return TexturedModelData.of(modelData, 64, 64);
     }
 }

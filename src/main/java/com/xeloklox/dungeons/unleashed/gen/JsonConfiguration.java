@@ -39,5 +39,7 @@ public abstract class JsonConfiguration extends Generator{
         generated.add(path);
     }
 
-
+    public JSONObject getJson(){
+        return json;
+    }
 }

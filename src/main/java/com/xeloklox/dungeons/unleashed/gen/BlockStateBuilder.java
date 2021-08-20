@@ -1,13 +1,9 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
-import com.xeloklox.dungeons.unleashed.utils.*;
-import com.xeloklox.dungeons.unleashed.gen.BlockStateBuilder.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.state.property.*;
-import org.jetbrains.annotations.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
-
-import java.util.*;
 
 public class BlockStateBuilder{
     // this is not a multipart....
@@ -128,6 +124,10 @@ public class BlockStateBuilder{
 
         public ModelVariantList addModel(Func<ModelVariant, ModelVariant> func){
             list.add(func.get(new ModelVariant()));
+            return this;
+        }
+        public ModelVariantList addModel(String modelstr,int y){
+            addModel(model->model.setModel(modelstr).setY(y));
             return this;
         }
 

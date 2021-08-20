@@ -1,6 +1,11 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
+import com.xeloklox.dungeons.unleashed.utils.*;
+import net.minecraft.client.model.*;
+import net.minecraft.client.render.model.*;
+import net.minecraft.client.render.model.json.*;
+import net.minecraft.util.*;
 import org.apache.commons.io.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
@@ -9,14 +14,22 @@ import java.io.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 
-public class BlockModelJson extends JsonConfiguration{
-    JSONObject config;
-    Array<String> textureList = new Array<>();
+public class ModelJson extends JsonConfiguration implements JsonModelWrapper{
+    public JSONObject config;
+    public Array<String> textureList = new Array<>();
+    public Identifier id;
+    JsonUnbakedModel jsonUnbakedModel;
+    BakedModel model;
+    String name;
 
-    public BlockModelJson(String name, JSONObject template, JSONObject config){
-        super(Paths.blockModel + name + ".json", template);
+    public ModelJson(String name, JSONObject template, JSONObject config){
+        super(Paths.models + name + ".json", template);
+        this.name=name;
+        id = new Identifier(MODID+":"+name);
         this.config = config;
     }
+
+
 
     @Override
     public void fillJSONObj(){
@@ -51,5 +64,39 @@ public class BlockModelJson extends JsonConfiguration{
                 }
             }
         }
+    }
+
+    @Override
+    public Identifier getIdentifier(){
+        return id;
+    }
+
+    @Override
+    public void setIdentifier(Identifier i){
+        id=i;
+    }
+
+    @Override
+    public JsonUnbakedModel getUnbaked(){
+        return jsonUnbakedModel;
+    }
+
+    @Override
+    public void setUnbaked(JsonUnbakedModel i){
+        jsonUnbakedModel=i;
+    }
+
+    @Override
+    public BakedModel getBaked(){
+        return model;
+    }
+
+    @Override
+    public void setBaked(BakedModel i){
+        model=i;
+    }
+
+    public String getName(){
+        return name;
     }
 }

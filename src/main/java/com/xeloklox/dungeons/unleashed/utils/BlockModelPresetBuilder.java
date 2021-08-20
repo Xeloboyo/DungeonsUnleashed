@@ -9,11 +9,11 @@ import java.util.stream.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 
-public class BlockModel{
+public class BlockModelPresetBuilder{
     public static String allSidesSame(String name, String texture){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","cube_all");
+            jo.put("template","block/cube_all");
             jo.put("tex_all",texture);
             jo.put("name",name);
         }catch(JSONException e){
@@ -25,7 +25,7 @@ public class BlockModel{
     public static String cappedTopBottom(String name, String texture){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","cube_capped");
+            jo.put("template","block/cube_capped");
             jo.put("tex_0",texture);
             jo.put("tex_particle",texture);
             jo.put("name",name);
@@ -37,7 +37,7 @@ public class BlockModel{
     public static String TopBottomSide(String name, String top, String side, String bottom){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","cube_bottom_top");
+            jo.put("template","block/cube_bottom_top");
             jo.put("tex_top",top);
             jo.put("tex_bottom",bottom);
             jo.put("tex_side",side);
@@ -54,6 +54,9 @@ public class BlockModel{
     }
 
     public static String customTemplate(String template,String name,String tex){
+        return "@@"+customTemplateObj(template,name,tex).toString();
+    }
+    public static JSONObject customTemplateObj(String template,String name,String tex){
         JSONObject jo = new JSONObject();
         try{
             jo.put("template",template);
@@ -63,7 +66,7 @@ public class BlockModel{
         }catch(JSONException e){
             e.printStackTrace();
         }
-        return "@@"+jo.toString();
+        return jo;
     }
 
 
@@ -76,14 +79,11 @@ public class BlockModel{
                 e.printStackTrace();
             }
         }
-        File f = new File(Paths.blockModel+name+".json");
+        String s = Strings.resourceAsString(Paths.models+name+".json");
+
         try{
-            BufferedReader fr = new BufferedReader(new FileReader(f));
-            String s = fr.lines().collect(Collectors.joining());
             templateMap.put(name,s);
             return new JSONObject(s);
-        }catch(FileNotFoundException e){
-            e.printStackTrace();
         }catch(JSONException e){
             e.printStackTrace();
         }

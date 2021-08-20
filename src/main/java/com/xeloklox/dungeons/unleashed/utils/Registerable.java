@@ -9,7 +9,7 @@ import static com.xeloklox.dungeons.unleashed.Globals.bootStrapped;
 
 public abstract class Registerable<T>{
     public String id;
-    T registration;
+    public T registration;
     Registry registry;
     RegisterEnvironment environment;
 
@@ -21,14 +21,14 @@ public abstract class Registerable<T>{
             if(!Globals.hasId(id, registry)){
                 Globals.register(id, this);
             }else{
-                System.out.println("[MOD REGISTRY]: CONFLICT!!! : " + id + " of registry " + registry.toString());
+                System.out.println("[MOD REGISTRY]: CONFLICT!!! : " + id + " of registry " + registry);
             }
         }
         environment = rd;
     }
 
     public void register(){
-        System.out.println("["+registry.toString()+" MOD REGISTRY]: registered "+id);
+        System.out.println("["+registry+" MOD REGISTRY]: registered "+id);
         Registry.register(registry, new Identifier(MODID, id), registration);
     }
 
@@ -46,6 +46,9 @@ public abstract class Registerable<T>{
 
     public String getJSONID(){
         return MODID+":"+id;
+    }
+    public Identifier getIdentifier(){
+        return new Identifier(MODID,id);
     }
 
     public enum RegisterEnvironment{

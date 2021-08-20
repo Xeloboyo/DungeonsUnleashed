@@ -2,7 +2,7 @@ package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
-import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.item.*;
 import org.apache.commons.io.*;
 import org.json.*;
@@ -46,9 +46,9 @@ public class ItemJsonModel extends JsonConfiguration{
                     File cust = new File(Paths.blockModel+"custom/"+item.id+".json");
                     if(!cust.exists()){
                         System.out.println("[WARNING] Block model for BlockItem "+item.id+" was not found!");
-                        JSONObject config = new JSONObject(BlockModel.allSidesSame(item.id,"block/default").substring(2));
-                        JSONObject template = BlockModel.getTemplate(config.getString("template"));
-                        new BlockModelJson(item.id,template, config);
+                        JSONObject config = new JSONObject(BlockModelPresetBuilder.allSidesSame(item.id,"block/default").substring(2));
+                        JSONObject template = BlockModelPresetBuilder.getTemplate(config.getString("template"));
+                        new ModelJson("block/"+item.id,template, config);
                     }else{
                         json.put("parent", format(modelParent.key,"/custom/"+item.id));
                     }

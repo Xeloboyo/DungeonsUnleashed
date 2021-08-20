@@ -1,12 +1,10 @@
 package com.xeloklox.dungeons.unleashed.items;
 
 import com.xeloklox.dungeons.unleashed.items.hooks.*;
-import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
 import net.minecraft.item.*;
-import net.minecraft.screen.slot.*;
 import net.minecraft.util.*;
 import net.minecraft.world.*;
 import net.minecraft.world.explosion.*;
@@ -26,8 +24,8 @@ public class UnstableItem extends Item{
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected){
         super.inventoryTick(stack, world, entity, slot, selected);
-
     }
+
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand){
@@ -37,6 +35,7 @@ public class UnstableItem extends Item{
             world.createExplosion(user,user.getX(),user.getY(),user.getZ(), (float)(0.8f+Math.random()*0.8),true, Explosion.DestructionType.DESTROY);
             itemStack.decrement(1);
         }
+
         return  TypedActionResult.success(itemStack, world.isClient());
     }
     public static float getExplosionCharge(ItemStack is){

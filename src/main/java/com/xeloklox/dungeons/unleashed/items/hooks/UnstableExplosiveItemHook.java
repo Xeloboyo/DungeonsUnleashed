@@ -4,9 +4,7 @@ import com.xeloklox.dungeons.unleashed.items.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.*;
-import net.minecraft.item.*;
 import net.minecraft.particle.*;
-import net.minecraft.util.math.*;
 import net.minecraft.world.explosion.*;
 
 public class UnstableExplosiveItemHook extends ItemEntityHook{
@@ -27,6 +25,7 @@ public class UnstableExplosiveItemHook extends ItemEntityHook{
     }
 
     public int getExplosionCharge(){
+        if(!hasTag(EXPLOSION_CHARGE_TAG)){return 0;}
         return getOrCreateTag(EXPLOSION_CHARGE_TAG,0);
     }
     public void setExplosionCharge(int value){
@@ -42,7 +41,7 @@ public class UnstableExplosiveItemHook extends ItemEntityHook{
             if(immunity < 0){
                 float jitterchance = Math.min(chanceam*0.1f,0.1f);
                 if(Math.random()<jitterchance){
-                    Mathf.rand((rx,ry,rz)-> {
+                    Mathf.randVec3((rx, ry, rz)-> {
                         itemEntity().setVelocity(rx*0.2,ry*0.2,rz*0.2);
                     });
                 }
@@ -63,7 +62,7 @@ public class UnstableExplosiveItemHook extends ItemEntityHook{
             while(Math.random()<chanceam){
                 ItemEntity pos = itemEntity();
                 float speed = Math.max(explosionCharge*0.05f,1.5f);
-                Mathf.rand((rx,ry,rz)->{
+                Mathf.randVec3((rx, ry, rz)->{
                     world().addParticle(ParticleTypes.PORTAL,
                         pos.getX()+rx*speed, pos.getY()+ry*speed, pos.getZ()+rz*speed,
                         -rx*speed, -ry*speed, -rz*speed);

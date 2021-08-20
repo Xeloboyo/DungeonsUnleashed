@@ -1,7 +1,7 @@
 package com.xeloklox.dungeons.unleashed.utils;
 
 import com.xeloklox.dungeons.unleashed.gen.*;
-import com.xeloklox.dungeons.unleashed.items.hooks.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.*;
 import net.minecraft.client.item.*;
 import net.minecraft.item.*;

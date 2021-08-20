@@ -1,4 +1,4 @@
-package com.xeloklox.dungeons.unleashed.utils;
+package com.xeloklox.dungeons.unleashed.utils.lambda;
 
 public interface Cons<T>{
     void get(T t);
