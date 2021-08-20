@@ -26,7 +26,7 @@ import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.LootPoolEntryType.*;
 
 public class ModBlocks{
-    public static final RegisteredBlock END_SOIL,ENDERSEED_SOIL,END_GRASS,LEYDEN_JAR,INFUSER;
+    public static final RegisteredBlock END_SOIL,ENDERSEED_SOIL,END_GRASS,LEYDEN_JAR,INFUSER,END_WOOD_PLANKS;
 
     public static final RegisteredBlockEntity<InfuserEntity> INFUSER_ENTITY;
     public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
@@ -51,6 +51,23 @@ public class ModBlocks{
             ,
             BlockStateBuilder.create().noState(randomRotationVariants(END_SOIL_model)),
         block-> { }
+        );
+
+        final String END_WOOD_PLANKS_model = BlockModelPresetBuilder.allSidesSame("end_wood_planks","block/end_wood_planks");
+        END_WOOD_PLANKS = new RegisteredBlock("end_wood_planks",
+                Globals.bootQuery(() ->
+                        new BasicBlock(Material.WOOD, settings ->
+                                settings
+                                        .breakByHand(true)
+                                        .breakByTool(FabricToolTags.AXES)
+                                        .sounds(BlockSoundGroup.WOOD)
+                                        .hardness(2f)
+                                        .resistance(3f)
+                        )
+                )
+                ,
+                BlockStateBuilder.create().noState(oneVariant(END_WOOD_PLANKS_model)),
+                block-> { }
         );
 
         //---------------------------------------------------------------------
@@ -238,11 +255,15 @@ public class ModBlocks{
         //region ENTITIES
         INFUSER_ENTITY = new RegisteredBlockEntity<InfuserEntity>("infuser_entity",InfuserEntity::new,INFUSER);
         INFUSER_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(()->INFUSER_ENTITY.get(), InfuserRenderer::new);
-        INFUSER_SCREEN = new RegisteredScreenHandler<>(
-            "infuserscreen",
-            ScreenHandlerRegistry.registerSimple(INFUSER.getIdentifier(), InfuserScreenHandler::new),
-            InfuserScreen::new
-        );
+        INFUSER_SCREEN =
+                Globals.bootQuery( ()->
+                                new RegisteredScreenHandler<>(
+                                        "infuserscreen",
+                                        ScreenHandlerRegistry.registerSimple(INFUSER.getIdentifier(), InfuserScreenHandler::new),
+                                        InfuserScreen::new
+                                ),
+                        null
+                );
          Globals.bootRun(()->{try{Class.forName(InfuserRenderer.class.getName());}catch(ClassNotFoundException ignored){}});
         //end region
 
