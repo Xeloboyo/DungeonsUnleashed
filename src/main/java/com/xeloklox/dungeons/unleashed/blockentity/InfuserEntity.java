@@ -24,10 +24,10 @@ import org.jetbrains.annotations.*;
 import org.mini2Dx.gdx.utils.*;
 
 public class InfuserEntity extends BlockEntity implements BlockEntityClientSerializable,SegmentedInventory, NamedScreenHandlerFactory{
-    float infuseProgress=0;
-    float remainingPowerCharge = 0;
-    public static final float powerPerCharge = 100;
-    float infuseSpeed=0.5f;
+    int infuseProgress=0;
+    int remainingPowerCharge = 0;
+    public static final int powerPerCharge = 100;
+    int infuseDelay=2;
     InfuserRecipe currentRecipe = null;
     boolean[] jarAttach = new boolean[InfuserBlock.connectionRelative.length];
     boolean jarUpdate = true;
@@ -47,12 +47,14 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(7, ItemStack.EMPTY);
     public static InfuserRecipe[] recipes = {
         new InfuserRecipe(Items.ENDER_PEARL, ModItems.UNSTABLE_ENDER_PEARL.get(), 100),
+        new InfuserRecipe(Items.REDSTONE, Items.GUNPOWDER, 50),
         new InfuserRecipe(Items.COAL, Items.DIAMOND, 500)
     };
     public static final int syncedSize = 6;
     public static final int D_POWERSTATUS = 0;
     public static final int D_PROGRESS = 1;
     public static final int D_TOTAL = 2;
+    public static final int D_CHARGELEVEL = 3;
     final int[] syncedInts = new int[syncedSize];
 
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
@@ -89,9 +91,9 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     @Override
     public NbtCompound writeNbt(NbtCompound nbt){
         super.writeNbt(nbt);
-        nbt.putFloat("infuseProgress",infuseProgress);
+        nbt.putInt("infuseProgress",infuseProgress);
         nbt.putFloat("delayTimer",delayTimer);
-        nbt.putFloat("remainingPowerCharge",remainingPowerCharge);
+        nbt.putInt("remainingPowerCharge",remainingPowerCharge);
         nbt.putInt("attach",Utils.toIntMask(jarAttach));
         Inventories.writeNbt(nbt, items);
         return nbt;
@@ -101,8 +103,8 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     public void readNbt(NbtCompound nbt){
         super.readNbt(nbt);
         delayTimer = nbt.getFloat("delayTimer");
-        infuseProgress = nbt.getFloat("infuseProgress");
-        remainingPowerCharge = nbt.getFloat("remainingPowerCharge");
+        infuseProgress = nbt.getInt("infuseProgress");
+        remainingPowerCharge = nbt.getInt("remainingPowerCharge");
         Utils.fromIntMask(nbt.getInt("attach"),jarAttach);
         Inventories.readNbt(nbt, items);
     }
@@ -129,7 +131,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
                 charge+=chargeStorage.getCharge(world,bp);
             }
         }
-        syncedInts[D_POWERSTATUS] = charge;
+        syncedInts[D_POWERSTATUS] =charge;
     }
     public void updateClient(World world, BlockPos pos, BlockState state){
         for(int i=0;i<jarAttach.length;i++){
@@ -150,75 +152,79 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         if(jarUpdate){
             updateCharge(world,pos,state);
         }
-        syncedInts[D_PROGRESS] = (int)(infuseProgress);
-        if(syncedInts[D_POWERSTATUS]>0){
-            int processingslot = this.getSegment("processing").getAnyFilledSlot();
+        syncedInts[D_PROGRESS] = (infuseProgress);
+        syncedInts[D_CHARGELEVEL] = (int)(100f* remainingPowerCharge/powerPerCharge);
 
-            if(currentRecipe!=null){
-
-                if(processingslot==-1){
-                    currentRecipe=null; // welp its empty
-                    //refund the energy :o
-                    remainingPowerCharge+=infuseProgress;
-                }else{
-                    syncedInts[D_TOTAL] = currentRecipe.energy;
-                    if(infuseProgress<currentRecipe.energy){
-
-                        remainingPowerCharge -= infuseSpeed;
-                        infuseProgress += infuseSpeed;
-                        if(remainingPowerCharge<=0){
+        int processingslot = this.getSegment("processing").getAnyFilledSlot();
+        if(currentRecipe!=null){
+            if(processingslot==-1){
+                currentRecipe=null; // welp its empty
+                //refund the energy :o
+                remainingPowerCharge+=infuseProgress;
+            }else{
+                syncedInts[D_TOTAL] = currentRecipe.energy;
+                if(isPowered() && infuseProgress < currentRecipe.energy){
+                    if(world.getTime() % infuseDelay == 0){
+                        remainingPowerCharge -= 1;
+                        infuseProgress += 1;
+                        if(remainingPowerCharge <= 0){
                             jarUpdate = true;
                         }
-
-                    }else{
-                        // all done, move it to output...
-                        setStack(processingslot,currentRecipe.getOutput());
-                        infuseProgress=0;
-                        currentRecipe=null;
-                        readyToMove = true;
-                        delayTimer = delayBetweenInfusion;
-                        this.sync();
                     }
                 }
+                if(infuseProgress>=currentRecipe.energy){
+                    // all done, move it to output...
+                    remainingPowerCharge+=infuseProgress-currentRecipe.energy;
+                    setStack(processingslot,currentRecipe.getOutput());
+                    infuseProgress=0;
+                    currentRecipe=null;
+                    readyToMove = true;
+                    delayTimer = delayBetweenInfusion;
+                    this.sync();
+                }
+            }
+        }else{
+            syncedInts[D_TOTAL] = 0;
+            if(delayTimer>0){
+                delayTimer--;
+                if(delayTimer<=0 && readyToMove){
+                    if(processingslot!=-1){
+                        tryTransferIntoSegment(this.getSegment("output"), processingslot);
+                        this.sync();
+                    }
+                    readyToMove = false;
+                }
             }else{
-                syncedInts[D_TOTAL] = 0;
-                if(delayTimer>0){
-                    delayTimer--;
-                    if(delayTimer<=0 && readyToMove){
-                        if(processingslot!=-1){
-                            tryTransferIntoSegment(this.getSegment("output"), processingslot);
+                if(processingslot != -1){ // somethings there but im not set to craft anything
+                    ItemStack stack = getStack(processingslot);
+                    for(InfuserRecipe recipe : recipes){
+                        if(recipe.input.equals(stack.getItem())){
+                            currentRecipe = recipe;
+                            jarUpdate = true;
                             this.sync();
+                            break;
                         }
-                        readyToMove = false;
                     }
                 }else{
-                    if(processingslot != -1){ // somethings there but im not set to craft anything
-                        ItemStack stack = getStack(processingslot);
+                    // nothings there, see if input has something
+                    int slot = this.getSegment("input").getFirstSlot(item -> {
                         for(InfuserRecipe recipe : recipes){
-                            if(recipe.input.equals(stack.getItem())){
-                                currentRecipe = recipe;
-                                jarUpdate = true;
-                                this.sync();
-                                break;
+                            if(recipe.input.equals(item.getItem())){
+                                return true;
                             }
                         }
-                    }else{
-                        // nothings there, see if input has something
-                        int slot = this.getSegment("input").getFirstSlot(item -> {
-                            for(InfuserRecipe recipe : recipes){
-                                if(recipe.input.equals(item.getItem())){
-                                    return true;
-                                }
-                            }
-                            return false;
-                        });
-                        if(slot != -1){
-                            tryTransferIntoSegment(this.getSegment("processing"), slot);
-                        }
+                        return false;
+                    });
+                    if(slot != -1){
+                        tryTransferIntoSegment(this.getSegment("processing"), slot);
                     }
                 }
             }
         }
+    }
+
+    public boolean isPowered(){
+        return syncedInts[D_POWERSTATUS]>0 || remainingPowerCharge>0;
     }
 
     public float[] getJarAttachAnimationTick(){
@@ -252,7 +258,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         NbtCompound item = new NbtCompound();
         getStack(getSegment("processing").slots[0]).writeNbt(item);
         tag.put("item",item);
-        tag.putBoolean("working",currentRecipe!=null && propertyDelegate.get(D_POWERSTATUS)>0);
+        tag.putBoolean("working",currentRecipe!=null &&  isPowered() );
         return tag;
     }
 

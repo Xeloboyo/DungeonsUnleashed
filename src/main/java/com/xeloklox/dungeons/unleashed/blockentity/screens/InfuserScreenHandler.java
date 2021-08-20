@@ -21,7 +21,4 @@ public class InfuserScreenHandler extends InventoryScreenHandler{
     public InfuserScreenHandler(int syncId,PlayerInventory playerInventory){
        this(syncId,playerInventory, new SimpleInventory(7),new ArrayPropertyDelegate(InfuserEntity.syncedSize));
     }
-
-
-
 }

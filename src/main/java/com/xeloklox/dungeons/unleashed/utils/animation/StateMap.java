@@ -9,7 +9,7 @@ public class StateMap{
     AnimationState current=null;
     AnimationState pending = null;
     float internalTick = 0;
-    Func<StateMap,String> onStateEnd;
+    public Func<StateMap,String> onStateEnd;
 
     public StateMap(Func<StateMap, String> onStateEnd, Cons<ParameterMap> initVariables){
         this.onStateEnd = onStateEnd;

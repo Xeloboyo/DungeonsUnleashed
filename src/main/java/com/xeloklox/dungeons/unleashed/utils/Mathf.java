@@ -37,6 +37,12 @@ public class Mathf{
         float s1z = sqrt(1-z*z);
         cons.get(s1z* cos(t),s1z* sin(t),z);
     }
+    public static float sinDeg(float deg){
+        return MathHelper.sin(deg*RADIANS_PER_DEGREE);
+    }
+    public static float cosDeg(float deg){
+        return MathHelper.cos(deg*RADIANS_PER_DEGREE);
+    }
 
     public static float getHorzAngle(Vec3f vec){
         return (float)Math.toDegrees(MathHelper.atan2(vec.getZ(),vec.getX()))+90;

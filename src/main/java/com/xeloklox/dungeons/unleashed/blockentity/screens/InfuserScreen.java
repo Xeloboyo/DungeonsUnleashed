@@ -35,11 +35,19 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
 
     public InfuserScreen(InfuserScreenHandler handler, PlayerInventory inventory, Text title){
         super(handler, inventory, title,50,
-        stateMap -> {
+
+        pmap -> {
+            pmap.add("alpha",0f);
+            pmap.add("rotation",5f);
+            pmap.add("tab",0f);
+            pmap.add("frame",0);
+            pmap.add("glowalpha",0f);
+        });
+
+        stateMap.onStateEnd = stateMap -> {
             if(stateMap.getCurrent()==null){
                 return STATE_OPENING;
             }
-            System.out.println("old state: "+stateMap.getCurrent().getName());
             switch(stateMap.getCurrent().getName()){
                 case STATE_IDLE_POWERINGDOWN:
                     return STATE_IDLE_UNPOWERED;
@@ -49,7 +57,7 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
                     return STATE_IDLE_POWERED;
                 case STATE_WINDINGDOWN:
                 case STATE_OPENING:
-                    if(handler.propertyDelegate.get(InfuserEntity.D_POWERSTATUS)>0){
+                    if(isPowered()){
                         if(handler.propertyDelegate.get(InfuserEntity.D_TOTAL)>0){
                             return STATE_WINDINGUP;
                         }else{
@@ -58,19 +66,13 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
                     }
                     return STATE_IDLE_POWERINGDOWN;
                 default:
-                    if(handler.propertyDelegate.get(InfuserEntity.D_POWERSTATUS)>0){
+                    if(isPowered()){
                         return STATE_IDLE_POWERINGUP;
                     }
                     return STATE_IDLE_POWERINGDOWN;
             }
-        },
-        pmap -> {
-            pmap.add("alpha",0f);
-            pmap.add("rotation",5f);
-            pmap.add("tab",0f);
-            pmap.add("frame",0);
-            pmap.add("glowalpha",0f);
-        });
+        };
+
         stateMap.addState(AnimationState.get(STATE_OPENING).loops(false).onInit(pmap -> {
             pmap.f("x_offset",-50);
             pmap.addInterpolator(InterpolateType.EXPONENTIAL,5f,"x_offset",new FloatInterpolate(),0f);
@@ -178,7 +180,7 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
             drawTexture(matrices, 88, 39, 218, 48, 28, 31);
         }
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
-
+        drawArc(matrices,146,90,8,2,0,360f*getEnergy(),240,29,4,2);
 
         RenderSystem.setShaderTexture(0, RING);
         matrices.push();
@@ -207,7 +209,7 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
 
     @Override
     public void updateLogic(){
-        if(this.getScreenHandler().getSyncedInt(InfuserEntity.D_POWERSTATUS)>0){
+        if(isPowered()){
             if(stateMap.isState(STATE_IDLE_POWERINGDOWN)||stateMap.isState(STATE_IDLE_UNPOWERED)){
                 stateMap.requestState(STATE_IDLE_POWERINGUP);
             }
@@ -247,13 +249,25 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
         }
 
     }
+
+    int get(int index){
+        return this.getScreenHandler().getSyncedInt(index);
+    }
+
+    boolean isPowered(){
+        return get(InfuserEntity.D_POWERSTATUS)>0||get(InfuserEntity.D_CHARGELEVEL)>0;
+    }
+    float getEnergy(){
+        return get(InfuserEntity.D_CHARGELEVEL)/100f;
+    }
+
     float getProgress(){
-        int t = this.getScreenHandler().getSyncedInt(InfuserEntity.D_TOTAL);
+        int t = get(InfuserEntity.D_TOTAL);
         if(t==0){return 0;}
-        return this.getScreenHandler().getSyncedInt(InfuserEntity.D_PROGRESS) / (float)this.getScreenHandler().getSyncedInt(InfuserEntity.D_TOTAL);
+        return get(InfuserEntity.D_PROGRESS) / (float)get(InfuserEntity.D_TOTAL);
     }
     int getPowerStatusIndex(){
-        int p = this.getScreenHandler().getSyncedInt(InfuserEntity.D_POWERSTATUS);
+        int p = get(InfuserEntity.D_POWERSTATUS);
         if(p==0){return 0;}
         if(p==1){return 1;}
         if(p<5){return 2;}
