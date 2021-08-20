@@ -20,8 +20,8 @@ import org.jetbrains.annotations.*;
 public class BasicBlock extends Block{
     //Super.class.isAssignableFrom(Sub.class)
 
-    public BasicBlock(Material material, Func<FabricBlockSettings,FabricBlockSettings> func){
-        super(func.get(FabricBlockSettings.of(material)));
+    public BasicBlock(Material material, Func<FabricBlockSettings,FabricBlockSettings> settingsfunc){
+        super(settingsfunc.get(FabricBlockSettings.of(material)));
     }
 
 

@@ -1,5 +1,6 @@
 package com.xeloklox.dungeons.unleashed.utils;
 
+import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.*;
@@ -23,13 +24,33 @@ public class RegisteredBlock extends Registerable<Block>{
     LootTableJson drops;
     private Settings settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS), new FabricItemSettings());
     private BlockStateBuilder bsb;
-    // public RegisteredBlock(String id, Block registration,RenderLayerOptions renderlayer, Func2<String,BlockItem,RegisteredItem> blockitem, Settings settings, BlockStateBuilder bsb, Func<LootTableJson,LootTableJson> lt
+
+
+
+
     public RegisteredBlock(String id, Block registration, BlockStateBuilder bsb, Cons<RegisteredBlock> builder){
         super(id, registration, bootQuery(() -> Registry.BLOCK),RegisterEnvironment.CLIENT_AND_SERVER);
-        renderlayer = new BlockRenderLayerRegistration(this,RenderLayerOptions.NORMAL);
-        settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS),new FabricItemSettings());
-        blockStateConfig = new BlockStateJson(this, bsb);
+
+
         builder.get(this);
+
+
+    }
+    public RegisteredBlock(String id){
+        super(id, null, bootQuery(() -> Registry.BLOCK),RegisterEnvironment.CLIENT_AND_SERVER);
+    }
+
+    public void finalise(){
+        if(bsb==null || (registration==null && Globals.bootStrapped)){
+            throw new IllegalStateException("Youve done fucked up a block called "+id);
+        }
+        blockStateConfig = new BlockStateJson(this, bsb);
+        if(settings==null){ // somehow
+            settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS),new FabricItemSettings());
+        }
+        if(renderlayer==null){
+            this.renderlayer = new BlockRenderLayerRegistration(this, RenderLayerOptions.NORMAL);
+        }
         if(blockitem==null){
             blockitem = new RegisteredItem(id, new BlockItem(registration, settings),model->model);
         }
@@ -43,23 +64,17 @@ public class RegisteredBlock extends Registerable<Block>{
                 );
             drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
         }
-        if(renderlayer==null){
-            this.renderlayer = new BlockRenderLayerRegistration(this, RenderLayerOptions.NORMAL);
-        }
+
     }
 
-    public RegisteredBlock setId(String id){
-        this.id = id;
-        return this;
-    }
-
-    public RegisteredBlock setRegistration(Block registration){
+    public RegisteredBlock setBlock(Block registration){
         this.registration = registration;
         return this;
     }
 
+
     public RegisteredBlock setRenderlayer(RenderLayerOptions renderlayer){
-        this.renderlayer.layer=renderlayer.get();
+        this.renderlayer= new BlockRenderLayerRegistration(this, renderlayer);
         return this;
     }
 
@@ -73,7 +88,7 @@ public class RegisteredBlock extends Registerable<Block>{
         return this;
     }
 
-    public RegisteredBlock setBsb(BlockStateBuilder bsb){
+    public RegisteredBlock setBlockState(BlockStateBuilder bsb){
         this.bsb = bsb;
         return this;
     }

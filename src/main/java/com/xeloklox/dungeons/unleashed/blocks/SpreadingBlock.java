@@ -28,7 +28,7 @@ public abstract class SpreadingBlock extends BasicBlock{
     public abstract void decay(BlockState state, ServerWorld world, BlockPos pos);
     public abstract boolean canGrow(BlockState state, ServerWorld world, BlockPos pos);
     public abstract boolean spreadTo(BlockState state, ServerWorld world, BlockPos from, BlockPos to);
-
+    public abstract boolean grow(BlockState state, ServerWorld world, BlockPos pos);
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
@@ -37,6 +37,7 @@ public abstract class SpreadingBlock extends BasicBlock{
             return;
         }
         if(canGrow(state,world,pos)){
+            grow(state,world,pos);
             for(int i = 0;i<spreadattempts;i++){
                 BlockPos blockPos = pos.add(random.nextInt(spreadX*2+1) - spreadX, random.nextInt(spreadY*2+1) - spreadY, random.nextInt(spreadZ*2+1) - spreadZ);
                 spreadTo(state, world, pos, blockPos);

@@ -10,11 +10,13 @@ import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.RegisteredBlock.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.fabricmc.fabric.api.screenhandler.v1.*;
 import net.fabricmc.fabric.api.tool.attribute.v1.*;
 import net.minecraft.block.*;
 import net.minecraft.client.model.*;
 import net.minecraft.item.*;
+import net.minecraft.item.Item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
 import net.minecraft.state.property.*;
@@ -26,7 +28,14 @@ import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.LootPoolEntryType.*;
 
 public class ModBlocks{
-    public static final RegisteredBlock END_SOIL,ENDERSEED_SOIL,END_GRASS,LEYDEN_JAR,INFUSER,END_WOOD_PLANKS;
+    public static final RegisteredBlock
+    END_SOIL = new RegisteredBlock("end_soil"),
+    END_WOOD_PLANKS = new RegisteredBlock("end_wood_planks"),
+    ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil"),
+    PATCHY_END_GRASS = new RegisteredBlock("end_grass_patchy"),
+    END_GRASS = new RegisteredBlock("end_grass"),
+    LEYDEN_JAR,
+    INFUSER;
 
     public static final RegisteredBlockEntity<InfuserEntity> INFUSER_ENTITY;
     public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
@@ -34,54 +43,57 @@ public class ModBlocks{
 
     static {
         LootPoolCondition silktouch = (matches_tool(filter->filter.setEnchantments("minecraft:silk_touch , [1,-]")));
-        //region BLOCKS
-        //A simple inert block
-        final String END_SOIL_model = BlockModelPresetBuilder.allSidesSame("end_soil","block/end_soil");
-        END_SOIL = new RegisteredBlock("end_soil",
-            Globals.bootQuery(() ->
-                    new BasicBlock(Material.SOIL, settings ->
-                    settings
+
+        Func<FabricBlockSettings,FabricBlockSettings> dirtSettings =
+                settings -> settings
                     .breakByHand(true)
                     .breakByTool(FabricToolTags.SHOVELS)
                     .sounds(BlockSoundGroup.SOUL_SOIL)
                     .hardness(0.5f)
-                    .resistance(0.6f)
-                    )
-                )
-            ,
-            BlockStateBuilder.create().noState(randomRotationVariants(END_SOIL_model)),
-        block-> { }
-        );
+                    .resistance(0.6f);
+
+        Func<FabricBlockSettings,FabricBlockSettings> woodSettings =
+                settings -> settings
+                    .breakByHand(true)
+                    .breakByTool(FabricToolTags.AXES)
+                    .sounds(BlockSoundGroup.WOOD)
+                    .hardness(2f)
+                    .resistance(3f);
+
+        //settings overloading settings?
+        Func<FabricBlockSettings,FabricBlockSettings> grassSettings =
+                    settings ->
+                    dirtSettings.get(settings)
+                    .sounds(BlockSoundGroup.GRASS)
+                    .hardness(0.6f)
+                    .ticksRandomly();
+
+        //region BLOCKS
+
+        /* A simple inert block*/
+        final String END_SOIL_model = BlockModelPresetBuilder.allSidesSame("end_soil","block/end_soil");
+        END_SOIL.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.SOIL, dirtSettings)));
+        END_SOIL.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_SOIL_model)));
+        END_SOIL.finalise();
 
         final String END_WOOD_PLANKS_model = BlockModelPresetBuilder.allSidesSame("end_wood_planks","block/end_wood_planks");
-        END_WOOD_PLANKS = new RegisteredBlock("end_wood_planks",
-                Globals.bootQuery(() ->
-                        new BasicBlock(Material.WOOD, settings ->
-                                settings
-                                        .breakByHand(true)
-                                        .breakByTool(FabricToolTags.AXES)
-                                        .sounds(BlockSoundGroup.WOOD)
-                                        .hardness(2f)
-                                        .resistance(3f)
-                        )
-                )
-                ,
-                BlockStateBuilder.create().noState(oneVariant(END_WOOD_PLANKS_model)),
-                block-> { }
-        );
+        END_WOOD_PLANKS.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, woodSettings)));
+        END_WOOD_PLANKS.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_WOOD_PLANKS_model)));
+        END_WOOD_PLANKS.finalise();
 
-        //---------------------------------------------------------------------
-        //A more complex block with 4 variants and a more advanced ore-like loot table.
+        /*
+        ---------------------------------------------------------------------
+        A more complex block with 4 variants and a more advanced ore-like loot table.
+        */
 
-        final String[] ENDERSEED_SOIL_model = {
+        final String[] ENDERSEED_SOIL_models = {
             BlockModelPresetBuilder.allSidesSame("enderseed_soil","block/enderseed_soil1"),
             BlockModelPresetBuilder.allSidesSame("enderseed_soil2","block/enderseed_soil2"),
             BlockModelPresetBuilder.allSidesSame("enderseed_soil3","block/enderseed_soil3"),
             BlockModelPresetBuilder.allSidesSame("enderseed_soil4","block/enderseed_soil4")
         };
 
-        ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil",
-        Globals.bootQuery(() ->
+        ENDERSEED_SOIL.setBlock(Globals.bootQuery(() ->
             new BasicBlock(Material.SOIL, settings ->
                 settings
                 .breakByHand(true)
@@ -89,70 +101,70 @@ public class ModBlocks{
                 .sounds(BlockSoundGroup.SOUL_SOIL)
                 .hardness(0.7f)
                 .resistance(0.8f)
-                )
-            ),BlockStateBuilder.create().noState(
-                variants -> variants
-                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[0]))
-                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[1]))
-                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[2]))
-                .addModel(model -> model.setModel(ENDERSEED_SOIL_model[3]))
-            ),block-> {
-                block.setDrops(lootTable ->
-                    lootTable.addPool(pool -> //chance of dropping a ender pearl if mined by a hoe
-                        pool.addEntry(item, entry ->
-                            entry.setOutput("minecraft:ender_pearl")
-                                .condition(droprate_with_enchantment(
-                                "minecraft:fortune",
-                                25 /* <- no enchant % */, 50, 60, 75, 90 // <- max lvl fortune %
-                                ))
-                        ).condition(survives_explosion())
-                        .condition(matches_tool(filter -> filter.setTag("fabric:hoes")))
-                        .condition(invert(silktouch))
-                    ).addPool(pool -> //always drop the dirt if no silk touch
-                            pool.addEntry(item, entry ->
-                                entry.setOutput(MODID + ":end_soil")
-                            ).condition(survives_explosion())
-                            .condition(invert(silktouch))
-                    ).addPool(pool -> //otherwise drop the original block
-                            pool.addEntry(item, entry ->
-                                entry.setOutput(MODID + ":enderseed_soil")
-                            ).condition(survives_explosion())
-                            .condition(silktouch)
-                    )
-                );
-            }
+            )
+        ));
+        ENDERSEED_SOIL.setBlockState(BlockStateBuilder.create().noState(modelVariants(ENDERSEED_SOIL_models)));
+        ENDERSEED_SOIL.setDrops(lootTable ->
+            lootTable.addPool(pool -> //chance of dropping a ender pearl if mined by a hoe
+                pool.addEntry(item, entry ->
+                    entry.setOutput("minecraft:ender_pearl")
+                        .condition(droprate_with_enchantment(
+                        "minecraft:fortune",
+                        25 /* <- no enchant % */, 50, 60, 75, 90 // <- max lvl fortune %
+                        ))
+                ).condition(survives_explosion())
+                .condition(matches_tool(filter -> filter.setTag("fabric:hoes")))
+                .condition(invert(silktouch))
+            ).addPool(pool -> //always drop the dirt if no silk touch
+                    pool.addEntry(item, entry ->
+                        entry.setOutput(MODID + ":end_soil")
+                    ).condition(survives_explosion())
+                    .condition(invert(silktouch))
+            ).addPool(pool -> //otherwise drop the original block
+                    pool.addEntry(item, entry ->
+                        entry.setOutput(MODID + ":enderseed_soil")
+                    ).condition(survives_explosion())
+                    .condition(silktouch)
+            )
         );
-
-
+        ENDERSEED_SOIL.finalise();
         //---------------------------------------------------------------------
         //A block with custom behaviour and a different kind of model.
+        final RegisteredBlock[] grassProgression = {END_SOIL,PATCHY_END_GRASS,END_GRASS};
+
+        final String PATCHY_END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass_patchy","block/end_grass_patchy","block/end_soil","block/end_soil");
+        PATCHY_END_GRASS.setBlock(Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, grassProgression, 3, grassSettings)));
+        PATCHY_END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(PATCHY_END_GRASS_model)));
+        PATCHY_END_GRASS.setDrops(lootTable ->
+            lootTable.addPool(pool ->
+                pool.addEntry(item, entry ->
+                    entry.setOutput(MODID + ":end_soil")
+                         .condition(invert(silktouch))
+                ).addEntry(item, entry ->
+                    entry.setOutput(MODID + ":end_grass_patchy")
+                         .condition(silktouch)
+                )
+            )
+        );
+        PATCHY_END_GRASS.finalise();
+
+
 
         final String END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
-        END_GRASS = new RegisteredBlock("end_grass",
-            Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, END_SOIL.get(), 2,
-                settings ->
-                settings.breakByHand(true)
-                .breakByTool(FabricToolTags.SHOVELS)
-                .sounds(BlockSoundGroup.SOUL_SOIL)
-                .hardness(0.6f)
-                .resistance(0.6f)
-                .ticksRandomly())
-            ),
-            BlockStateBuilder.create().noState(randomRotationVariants(END_GRASS_model)),
-            block -> {
-                block.setDrops(lootTable ->
-                    lootTable.addPool(pool ->
-                        pool.addEntry(item, entry ->
-                            entry.setOutput(MODID + ":end_soil")
-                                 .condition(invert(silktouch))
-                        ).addEntry(item, entry ->
-                            entry.setOutput(MODID + ":end_grass")
-                                 .condition(silktouch)
-                        )
-                    )
-                );
-            }
+        END_GRASS.setBlock(Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, grassProgression, 5, grassSettings)));
+        END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_GRASS_model)));
+        END_GRASS.setDrops(lootTable ->
+            lootTable.addPool(pool ->
+                pool.addEntry(item, entry ->
+                    entry.setOutput(MODID + ":end_soil")
+                         .condition(invert(silktouch))
+                ).addEntry(item, entry ->
+                    entry.setOutput(MODID + ":end_grass")
+                         .condition(silktouch)
+                )
+            )
         );
+        END_GRASS.finalise();
 
         //---------------------------------------------------------------------
         //A multipart complex block with custom behaviour and 5 states, where items persist block state
@@ -253,17 +265,17 @@ public class ModBlocks{
 
         //end region
         //region ENTITIES
-        INFUSER_ENTITY = new RegisteredBlockEntity<InfuserEntity>("infuser_entity",InfuserEntity::new,INFUSER);
+        INFUSER_ENTITY = new RegisteredBlockEntity<>("infuser_entity", InfuserEntity::new, INFUSER);
         INFUSER_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(()->INFUSER_ENTITY.get(), InfuserRenderer::new);
         INFUSER_SCREEN =
-                Globals.bootQuery( ()->
-                                new RegisteredScreenHandler<>(
-                                        "infuserscreen",
-                                        ScreenHandlerRegistry.registerSimple(INFUSER.getIdentifier(), InfuserScreenHandler::new),
-                                        InfuserScreen::new
-                                ),
-                        null
-                );
+            Globals.bootQuery( ()->
+                new RegisteredScreenHandler<>(
+                    "infuserscreen",
+                    ScreenHandlerRegistry.registerSimple(INFUSER.getIdentifier(), InfuserScreenHandler::new),
+                    InfuserScreen::new
+                ),
+            null
+            );
          Globals.bootRun(()->{try{Class.forName(InfuserRenderer.class.getName());}catch(ClassNotFoundException ignored){}});
         //end region
 
@@ -271,6 +283,7 @@ public class ModBlocks{
 
     }
 
+    // :)
     static DirectionProperty HORIZONTAL_FACING(){
         return Globals.bootQuery(()->Properties.HORIZONTAL_FACING,  DirectionProperty.of("facing"));
     }
@@ -289,6 +302,15 @@ public class ModBlocks{
         //rotated randomly when placed like dirt
         variants->variants
         .addModel(model->model.setModel(modelStr));
+    }
+    static Func<ModelVariantList, ModelVariantList> modelVariants(String... modelStr){
+        return
+        variants-> {
+            for(String s:modelStr){
+                variants.addModel(model -> model.setModel(s));
+            }
+            return variants;
+        };
     }
 
 
