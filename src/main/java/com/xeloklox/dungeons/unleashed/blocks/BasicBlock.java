@@ -24,7 +24,6 @@ public class BasicBlock extends Block{
         super(settingsfunc.get(FabricBlockSettings.of(material)));
     }
 
-
     public <T extends BlockEntity> Class<T> getEntityClass(){
         return null;
     }

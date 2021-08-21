@@ -30,10 +30,9 @@ public class RegisteredBlock extends Registerable<Block>{
 
     public RegisteredBlock(String id, Block registration, BlockStateBuilder bsb, Cons<RegisteredBlock> builder){
         super(id, registration, bootQuery(() -> Registry.BLOCK),RegisterEnvironment.CLIENT_AND_SERVER);
-
-
+        this.bsb=bsb;
         builder.get(this);
-
+        finalise();
 
     }
     public RegisteredBlock(String id){

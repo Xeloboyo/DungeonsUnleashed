@@ -40,8 +40,6 @@ public class InfuserRenderer extends BlockEntityRendererBase<InfuserEntity>{
 
     public InfuserRenderer(Context ctx){
         super(ctx);
-        connector.init(ctx);
-        ring.init(ctx);
     }
 
 

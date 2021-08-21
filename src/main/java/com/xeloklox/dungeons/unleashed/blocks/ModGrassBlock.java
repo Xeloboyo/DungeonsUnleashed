@@ -9,13 +9,14 @@ import net.minecraft.util.math.*;
 
 public class ModGrassBlock extends SpreadingBlock{
     RegisteredBlock[] stages;
-    int minlightLevel;
+    int minlightLevel, growlightLevel;
     float growchance = 0.3f;
 
-    public ModGrassBlock(Material material, RegisteredBlock[] stages, int minlightLevel, Func<FabricBlockSettings, FabricBlockSettings> func){
+    public ModGrassBlock(Material material, RegisteredBlock[] stages, int minlightLevel, int growlightLevel, Func<FabricBlockSettings, FabricBlockSettings> func){
         super(material, func);
         this.stages = stages;
         this.minlightLevel = minlightLevel;
+        this.growlightLevel=growlightLevel;
     }
 
     private int stage = -1;
@@ -38,13 +39,18 @@ public class ModGrassBlock extends SpreadingBlock{
     }
 
     @Override
+    public boolean surviveCheck(BlockState state, ServerWorld world, BlockPos pos){
+        return super.surviveCheck(state, world, pos) && world.getLightLevel(pos.up())>=minlightLevel;
+    }
+
+    @Override
     public boolean canGrow(BlockState state, ServerWorld world, BlockPos pos){
-        return (world.getLightLevel(pos.up()) >= minlightLevel);
+        return (world.getLightLevel(pos.up()) >= growlightLevel);
     }
 
     @Override
     public boolean spreadTo(BlockState state, ServerWorld world, BlockPos from, BlockPos to){
-        if (world.getBlockState(to).isOf(stages[0].get()) && surviveCheck.get(state,world,to)) {
+        if (world.getBlockState(to).isOf(stages[0].get()) && surviveCheck(state,world,to)) {
             world.setBlockState(to, stages[1].get().getDefaultState());
         }
         return false;

@@ -12,12 +12,6 @@ import java.util.*;
 public abstract class SpreadingBlock extends BasicBlock{
 
     //if block is covered up, die.
-    protected BlockCons<Boolean> surviveCheck = (state, world, pos) -> {
-        BlockPos blockPos = pos.up();
-        BlockState blockState = world.getBlockState(blockPos);
-        int i = ChunkLightProvider.getRealisticOpacity(world, state, pos, blockState, blockPos, Direction.UP, blockState.getOpacity(world, blockPos));
-        return i < world.getMaxLightLevel();
-    };
     public int spreadattempts = 4;
     public int spreadX = 1,spreadY = 2,spreadZ = 1;
 
@@ -26,13 +20,19 @@ public abstract class SpreadingBlock extends BasicBlock{
     }
 
     public abstract void decay(BlockState state, ServerWorld world, BlockPos pos);
+    public boolean surviveCheck(BlockState state, ServerWorld world, BlockPos pos){
+        BlockPos blockPos = pos.up();
+        BlockState blockState = world.getBlockState(blockPos);
+        int i = ChunkLightProvider.getRealisticOpacity(world, state, pos, blockState, blockPos, Direction.UP, blockState.getOpacity(world, blockPos));
+        return i < world.getMaxLightLevel();
+    }
     public abstract boolean canGrow(BlockState state, ServerWorld world, BlockPos pos);
     public abstract boolean spreadTo(BlockState state, ServerWorld world, BlockPos from, BlockPos to);
     public abstract boolean grow(BlockState state, ServerWorld world, BlockPos pos);
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if(!surviveCheck.get(state,world,pos)){
+        if(!surviveCheck(state,world,pos)){
             decay(state,world,pos);
             return;
         }
