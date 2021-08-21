@@ -35,7 +35,14 @@ public class ModBlocks{
     PATCHY_END_GRASS = new RegisteredBlock("end_grass_patchy"),
     END_GRASS = new RegisteredBlock("end_grass"),
     LEYDEN_JAR = new RegisteredBlock("leyden_jar"),
-    INFUSER = new RegisteredBlock("infuser");
+    INFUSER = new RegisteredBlock("infuser"),
+    END_WOOD = new RegisteredBlock("end_wood"),
+    END_ROCK = new RegisteredBlock("end_rock"),
+    END_ROCK_PILLAR = new RegisteredBlock("end_rock_pillar"),
+    END_SCALES = new RegisteredBlock("end_scales"),
+    END_LEAVES = new RegisteredBlock("end_leaves"),
+    BEDROCK_PILLAR = new RegisteredBlock("bedrock_pillar");
+
 
     public static final RegisteredBlockEntity<InfuserEntity> INFUSER_ENTITY;
     public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
@@ -68,6 +75,29 @@ public class ModBlocks{
                     .hardness(0.6f)
                     .ticksRandomly();
 
+        Func<FabricBlockSettings,FabricBlockSettings> logSettings =
+                settings ->
+                        woodSettings.get(settings)
+                                .hardness(2f)
+                                .resistance(2f);
+
+        Func<FabricBlockSettings,FabricBlockSettings> stoneSettings =
+                settings -> settings
+                        .breakByHand(false)
+                        .breakByTool(FabricToolTags.PICKAXES)
+                        .sounds(BlockSoundGroup.STONE)
+                        .hardness(1.5f)
+                        .resistance(6f);
+
+        Func<FabricBlockSettings,FabricBlockSettings> leafSettings =
+                settings -> settings
+                        .breakByHand(true)
+                        .breakByTool(FabricToolTags.SHEARS)
+                        .sounds(BlockSoundGroup.GRASS)
+                        .hardness(0.2f)
+                        .resistance(0.2f)
+                        .nonOpaque();
+
         //region BLOCKS
 
         /* A simple inert block*/
@@ -79,7 +109,38 @@ public class ModBlocks{
         final String END_WOOD_PLANKS_model = BlockModelPresetBuilder.allSidesSame("end_wood_planks","block/end_wood_planks");
         END_WOOD_PLANKS.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, woodSettings)));
         END_WOOD_PLANKS.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_WOOD_PLANKS_model)));
-        END_WOOD_PLANKS.finalise();
+        END_WOOD_PLANKS.finalise(); //todo -> WOOD NEEDS FLAMMABILITY AND LOGS NEED ROTATION
+
+        final String END_WOOD_model = BlockModelPresetBuilder.TopBottomSide("end_wood","block/end_wood_top","block/end_wood_side","block/end_wood_top");
+        END_WOOD.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, logSettings)));
+        END_WOOD.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_WOOD_model)));
+        END_WOOD.finalise(); //todo -> WOOD NEEDS FLAMMABILITY
+
+        final String END_ROCK_model = BlockModelPresetBuilder.allSidesSame("end_rock","block/end_rock");
+        END_ROCK.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
+        END_ROCK.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_ROCK_model)));
+        END_ROCK.finalise();
+
+        final String END_ROCK_PILLAR_model = BlockModelPresetBuilder.TopBottomSide("end_rock_pillar","block/end_rock_pillar_top","block/end_rock_pillar_side","block/end_rock_pillar_top");
+        END_ROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
+        END_ROCK_PILLAR.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_ROCK_PILLAR_model)));
+        END_ROCK_PILLAR.finalise();
+
+        final String END_SCALES_model = BlockModelPresetBuilder.allSidesSame("end_scales","block/end_scales");
+        END_SCALES.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
+        END_SCALES.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_SCALES_model)));
+        END_SCALES.finalise();
+
+        final String END_LEAVES_model = BlockModelPresetBuilder.allSidesSame("end_leaves","block/end_leaves");
+        END_LEAVES.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.LEAVES, leafSettings)));
+        END_LEAVES.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_LEAVES_model)));
+        END_LEAVES.setRenderlayer(RenderLayerOptions.CUTOUT);
+        END_LEAVES.finalise(); //todo -> LEAVES BLOCK NEEDS BLOCK STATES, FLAMMABILITY AND NEEDS TO NOT BE OBTAINED WITH HAND BREAK
+
+        final String BEDROCK_PILLAR_model = BlockModelPresetBuilder.TopBottomSide("bedrock_pillar","block/bedrock_pillar_top","block/bedrock_pillar_side","block/bedrock_pillar_top");
+        BEDROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
+        BEDROCK_PILLAR.setBlockState(BlockStateBuilder.create().noState(oneVariant(BEDROCK_PILLAR_model)));
+        BEDROCK_PILLAR.finalise(); //todo -> MAKE BEDROCK PILLAR UNBREAKABLE AND ROTATE LIKE WOOD LOGS
 
         /*
         ---------------------------------------------------------------------

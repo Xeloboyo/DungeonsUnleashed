@@ -1,0 +1,9 @@
+{
+    "credit": "autogen",
+    "parent": "minecraft:block/cube_bottom_top",
+    "textures": {
+        "bottom": "dungeonunleash:block/bedrock_pillar_top",
+        "side": "dungeonunleash:block/bedrock_pillar_side",
+        "top": "dungeonunleash:block/bedrock_pillar_top"
+    }
+}
