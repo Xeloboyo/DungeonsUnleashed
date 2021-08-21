@@ -130,7 +130,10 @@ public class BlockStateBuilder{
             addModel(model->model.setModel(modelstr).setY(y));
             return this;
         }
-
+        public ModelVariantList addModel(String modelstr,int x,int y){
+            addModel(model->model.setModel(modelstr).setX(x).setY(y));
+            return this;
+        }
         public void eachModelVariant(Cons<ModelVariant> c){
             for(ModelVariant d:list){
                 c.get(d);

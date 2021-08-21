@@ -220,7 +220,7 @@ public class LootTableJson extends JsonConfiguration{
         public static class C_alternative extends LootPoolCondition{
             public LootPoolCondition[] term;
             C_alternative(LootPoolCondition... terms){
-                super("minecraft:inverted");
+                super("minecraft:alternative");
                 this.term=terms;
                 try{
                     JSONArray jsonArray = new JSONArray();
@@ -232,6 +232,18 @@ public class LootTableJson extends JsonConfiguration{
             }
         }
         public static C_alternative anyOf(LootPoolCondition... c){return new C_alternative(c);}
+
+        public static class C_random_chance extends LootPoolCondition{
+
+            C_random_chance(float probability){
+                super("minecraft:random_chance");
+                try{
+                    base.put("chance",probability*0.01f);
+                }catch(JSONException ignored){}
+            }
+        }
+        public static C_random_chance droprate(float probability){return new C_random_chance(probability);}
+
 
         public static class C_table_bonus extends LootPoolCondition{
 
@@ -282,6 +294,16 @@ public class LootTableJson extends JsonConfiguration{
                 public ItemPredicateBuilder setTag(String Tag){
                     try{
                         output.put("tag", Tag);
+                    }catch(Exception ignored){}
+                    return this;
+                }
+                public ItemPredicateBuilder setItems(String... items){
+                    try{
+                        JSONArray jsonArray = new JSONArray();
+                        for(String lt: items){
+                            jsonArray.put(lt);
+                        }
+                        output.put("items", jsonArray);
                     }catch(Exception ignored){}
                     return this;
                 }

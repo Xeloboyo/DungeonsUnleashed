@@ -3,6 +3,7 @@ package com.xeloklox.dungeons.unleashed;
 import com.xeloklox.dungeons.unleashed.utils.Registerable.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.*;
+import net.fabricmc.fabric.api.registry.*;
 
 public class DungeonsUnleashed implements ModInitializer {
     public static final String MODID = "dungeonunleash";

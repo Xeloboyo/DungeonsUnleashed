@@ -7,6 +7,7 @@ import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.*;
 import net.fabricmc.fabric.api.item.v1.*;
+import net.fabricmc.fabric.api.registry.*;
 import net.minecraft.block.*;
 import net.minecraft.client.render.*;
 import net.minecraft.item.*;
@@ -24,7 +25,7 @@ public class RegisteredBlock extends Registerable<Block>{
     LootTableJson drops;
     private Settings settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS), new FabricItemSettings());
     private BlockStateBuilder bsb;
-
+    FlammablilityConfig flammablilityConfig;
 
 
 
@@ -92,13 +93,33 @@ public class RegisteredBlock extends Registerable<Block>{
         return this;
     }
 
+    public RegisteredBlock setFlammablility(int flammability, int encouragement){
+        this.flammablilityConfig = new FlammablilityConfig(flammability,encouragement);
+        return this;
+    }
+
     public RegisteredBlock setDrops(Func<LootTableJson, LootTableJson> lt){
         this.drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
         return this;
     }
 
 
+    public static class FlammablilityConfig{
+        public int flammability, encouragement;
 
+        public FlammablilityConfig(int flammability, int encouragement){
+            this.flammability = flammability;
+            this.encouragement = encouragement;
+        }
+    }
+
+    @Override
+    public void register(){
+        super.register();
+        if(flammablilityConfig!=null){
+            FlammableBlockRegistry.getDefaultInstance().add(get(), flammablilityConfig.flammability, flammablilityConfig.encouragement);
+        }
+    }
 
     public enum RenderLayerOptions{
         NORMAL(()->null),CUTOUT(()->RenderLayer.getCutout()),TRANSLUCENT(()->RenderLayer.getTranslucent());

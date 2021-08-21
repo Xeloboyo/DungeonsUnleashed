@@ -36,15 +36,6 @@ public class InfuserBlock extends BasicBlock implements BlockEntityProvider{
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-        stateManager.add(Properties.HORIZONTAL_FACING);
-    }
-
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing());
-    }
-
-    @Override
     public void onDisturbed(BlockState state, World world, BlockPos pos){
         recalcJarAttachment(world,pos,state);
     }

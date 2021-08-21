@@ -16,11 +16,11 @@ import net.fabricmc.fabric.api.tool.attribute.v1.*;
 import net.minecraft.block.*;
 import net.minecraft.client.model.*;
 import net.minecraft.item.*;
-import net.minecraft.item.Item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
 import net.minecraft.state.property.*;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.blocks.LeydenJarBlock.MAX_CHARGE;
@@ -78,8 +78,8 @@ public class ModBlocks{
         Func<FabricBlockSettings,FabricBlockSettings> logSettings =
                 settings ->
                         woodSettings.get(settings)
-                                .hardness(2f)
-                                .resistance(2f);
+                        .hardness(2f)
+                        .resistance(2f);
 
         Func<FabricBlockSettings,FabricBlockSettings> stoneSettings =
                 settings -> settings
@@ -88,6 +88,11 @@ public class ModBlocks{
                         .sounds(BlockSoundGroup.STONE)
                         .hardness(1.5f)
                         .resistance(6f);
+        Func<FabricBlockSettings,FabricBlockSettings> bedrockSettings =
+                        settings ->
+                        stoneSettings.get(settings)
+                        .hardness(-1)
+                        .resistance(36000000);
 
         Func<FabricBlockSettings,FabricBlockSettings> leafSettings =
                 settings -> settings
@@ -100,21 +105,25 @@ public class ModBlocks{
 
         //region BLOCKS
 
-        /* A simple inert block*/
+        /* Simple inert blocks*/
+
         final String END_SOIL_model = BlockModelPresetBuilder.allSidesSame("end_soil","block/end_soil");
         END_SOIL.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.SOIL, dirtSettings)));
-        END_SOIL.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_SOIL_model)));
+        END_SOIL.setBlockState(BlockStateBuilder.create().noState(randomHorizontalRotationVariants(END_SOIL_model)));
         END_SOIL.finalise();
 
         final String END_WOOD_PLANKS_model = BlockModelPresetBuilder.allSidesSame("end_wood_planks","block/end_wood_planks");
-        END_WOOD_PLANKS.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, woodSettings)));
-        END_WOOD_PLANKS.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_WOOD_PLANKS_model)));
-        END_WOOD_PLANKS.finalise(); //todo -> WOOD NEEDS FLAMMABILITY AND LOGS NEED ROTATION
+        END_WOOD_PLANKS.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, woodSettings )));
+        END_WOOD_PLANKS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_WOOD_PLANKS_model)));
+        END_WOOD_PLANKS.setFlammablility(5,5);
+        END_WOOD_PLANKS.finalise(); //todo ->  LOGS NEED ROTATION
 
         final String END_WOOD_model = BlockModelPresetBuilder.TopBottomSide("end_wood","block/end_wood_top","block/end_wood_side","block/end_wood_top");
+        BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
         END_WOOD.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, logSettings)));
-        END_WOOD.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_WOOD_model)));
-        END_WOOD.finalise(); //todo -> WOOD NEEDS FLAMMABILITY
+        END_WOOD.setBlockState(axisStates(END_WOOD_model));
+        END_WOOD.setFlammablility(5,5);
+        END_WOOD.finalise();
 
         final String END_ROCK_model = BlockModelPresetBuilder.allSidesSame("end_rock","block/end_rock");
         END_ROCK.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
@@ -135,12 +144,29 @@ public class ModBlocks{
         END_LEAVES.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.LEAVES, leafSettings)));
         END_LEAVES.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_LEAVES_model)));
         END_LEAVES.setRenderlayer(RenderLayerOptions.CUTOUT);
-        END_LEAVES.finalise(); //todo -> LEAVES BLOCK NEEDS BLOCK STATES, FLAMMABILITY AND NEEDS TO NOT BE OBTAINED WITH HAND BREAK
+        END_LEAVES.setFlammablility(30,60);
+        END_LEAVES.setDrops(lootTable->
+            lootTable.addPool(pool->
+                pool.addEntry(item, entry->
+                    entry.setOutput("minecraft:stick")
+                    .condition(droprate(10)) //10% chance
+                    .condition(invert(silktouch))
+                ).addEntry(item, entry->
+                    entry.setOutput(END_LEAVES.getJSONID())
+                    .condition(anyOf(
+                        silktouch,
+                        matches_tool(tool->tool.setItems("minecraft:shears"))
+                    ))
+                )
+            )
+        );
+        END_LEAVES.finalise(); //todo -> LEAVES BLOCK NEEDS BLOCK STATES
 
         final String BEDROCK_PILLAR_model = BlockModelPresetBuilder.TopBottomSide("bedrock_pillar","block/bedrock_pillar_top","block/bedrock_pillar_side","block/bedrock_pillar_top");
-        BEDROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
-        BEDROCK_PILLAR.setBlockState(BlockStateBuilder.create().noState(oneVariant(BEDROCK_PILLAR_model)));
-        BEDROCK_PILLAR.finalise(); //todo -> MAKE BEDROCK PILLAR UNBREAKABLE AND ROTATE LIKE WOOD LOGS
+        BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
+        BEDROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, bedrockSettings)));
+        BEDROCK_PILLAR.setBlockState(axisStates(BEDROCK_PILLAR_model));
+        BEDROCK_PILLAR.finalise(); //todo -> MAKE BEDROCK PILLAR ROTATE LIKE WOOD LOGS
 
         /*
         ---------------------------------------------------------------------
@@ -193,9 +219,9 @@ public class ModBlocks{
         //A block with custom behaviour and a different kind of model.
         final RegisteredBlock[] grassProgression = {END_SOIL,PATCHY_END_GRASS,END_GRASS};
 
-        final String PATCHY_END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass_patchy","block/end_grass_patchy","block/end_soil","block/end_soil");
+        final String PATCHY_END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass_patchy","block/end_grass_patchy","block/end_grass_patchy_side","block/end_soil");
         PATCHY_END_GRASS.setBlock(Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, grassProgression, 0, 4,grassSettings)));
-        PATCHY_END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(PATCHY_END_GRASS_model)));
+        PATCHY_END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomHorizontalRotationVariants(PATCHY_END_GRASS_model)));
         PATCHY_END_GRASS.setDrops(lootTable ->
             lootTable.addPool(pool ->
                 pool.addEntry(item, entry ->
@@ -213,7 +239,7 @@ public class ModBlocks{
 
         final String END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
         END_GRASS.setBlock(Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, grassProgression, 4, 8,grassSettings)));
-        END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_GRASS_model)));
+        END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomHorizontalRotationVariants(END_GRASS_model)));
         END_GRASS.setDrops(lootTable ->
             lootTable.addPool(pool ->
                 pool.addEntry(item, entry ->
@@ -258,6 +284,7 @@ public class ModBlocks{
         ));
         LEYDEN_JAR.setBlockState(LEYDEN_JAR_STATE);
         LEYDEN_JAR.setRenderlayer(RenderLayerOptions.CUTOUT);
+        LEYDEN_JAR.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.BUILDING_BLOCKS).maxCount(8)));
         LEYDEN_JAR.setBlockitem((id, bitem) ->
             new RegisteredItem(id, bitem,
                 model -> {
@@ -277,8 +304,6 @@ public class ModBlocks{
                 })
             )
         );
-
-        LEYDEN_JAR.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.BUILDING_BLOCKS).maxCount(8)));
         LEYDEN_JAR.setDrops(lootTable ->
             lootTable.addPool(pool ->
                 pool.addEntry(item, entry ->
@@ -292,6 +317,7 @@ public class ModBlocks{
         //---------------------------------------------------------------------
         //A complex block with custom behaviour, a inventory, ui and block entity
         final String INFUSER_model = BlockModelPresetBuilder.customTemplate("block/custom/infuser", "infuser", "block/custom/infuser");
+        BasicBlock.selectedPlacementConfig=BasicBlock.HORIZONTAL_FACING_PLAYER_PLACEMENT;
         INFUSER.setBlock(Globals.bootQuery(() -> new InfuserBlock(Material.STONE,
             settings ->
             settings.breakByHand(false)
@@ -333,8 +359,14 @@ public class ModBlocks{
     static DirectionProperty HORIZONTAL_FACING(){
         return Globals.bootQuery(()->Properties.HORIZONTAL_FACING,  DirectionProperty.of("facing"));
     }
+    static DirectionProperty FACING(){
+            return Globals.bootQuery(()->Properties.FACING,  DirectionProperty.of("facing"));
+        }
+    static EnumProperty<Direction.Axis> AXIS(){
+        return Globals.bootQuery(()->Properties.AXIS,  EnumProperty.of("axis",Direction.Axis.class));
+    }
 
-    static Func<ModelVariantList, ModelVariantList> randomRotationVariants(String modelStr){
+    static Func<ModelVariantList, ModelVariantList> randomHorizontalRotationVariants(String modelStr){
         return
         //rotated randomly when placed like dirt
         variants->variants
@@ -343,6 +375,34 @@ public class ModBlocks{
         .addModel(model->model.setModel(modelStr).setY(180))
         .addModel(model->model.setModel(modelStr).setY(270));
     }
+    static Func<ModelVariantList, ModelVariantList> randomRotationVariants(String modelStr){
+        return
+        variants->variants
+        .addModel(model->model.setModel(modelStr).setY(0))
+        .addModel(model->model.setModel(modelStr).setX(90).setY(90).setZ(90))
+        .addModel(model->model.setModel(modelStr).setX(180).setY(180).setZ(180))
+        .addModel(model->model.setModel(modelStr).setX(270).setY(270).setZ(270));
+    }
+
+    static BlockStateBuilder directionalStates(String modelStr){
+        return
+            BlockStateBuilder.create()
+            .addStateVariant(FACING(), Direction.UP,variant->variant.addModel(modelStr,0))
+            .addStateVariant(FACING(), Direction.DOWN,variant->variant.addModel(modelStr,180,0))
+            .addStateVariant(FACING(), Direction.NORTH,variant->variant.addModel(modelStr,90,0))
+            .addStateVariant(FACING(), Direction.EAST,variant->variant.addModel(modelStr,90,90))
+            .addStateVariant(FACING(), Direction.SOUTH,variant->variant.addModel(modelStr,90,180))
+            .addStateVariant(FACING(), Direction.WEST,variant->variant.addModel(modelStr,90,270));
+    }
+
+    static BlockStateBuilder axisStates(String modelStr){
+        return
+            BlockStateBuilder.create()
+            .addStateVariant(AXIS(), Axis.Y,variant->variant.addModel(modelStr,0))
+            .addStateVariant(AXIS(), Axis.X,variant->variant.addModel(modelStr,90,90))
+            .addStateVariant(AXIS(), Axis.Z,variant->variant.addModel(modelStr,90,0));
+    }
+
     static Func<ModelVariantList, ModelVariantList> oneVariant(String modelStr){
         return
         //rotated randomly when placed like dirt
