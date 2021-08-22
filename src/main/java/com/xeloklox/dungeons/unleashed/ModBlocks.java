@@ -10,6 +10,7 @@ import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.RegisteredBlock.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.Cons.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.fabricmc.fabric.api.screenhandler.v1.*;
 import net.fabricmc.fabric.api.tool.attribute.v1.*;
@@ -37,8 +38,12 @@ public class ModBlocks{
     LEYDEN_JAR = new RegisteredBlock("leyden_jar"),
     INFUSER = new RegisteredBlock("infuser"),
     END_WOOD = new RegisteredBlock("end_wood"),
-    END_ROCK = new RegisteredBlock("end_rock"),
-    END_ROCK_PILLAR = new RegisteredBlock("end_rock_pillar"),
+    VOID_ROCK = new RegisteredBlock("void_rock"),
+    VOID_ROCK_SOILED = new RegisteredBlock("void_rock_soiled"),
+    VOID_SHALE = new RegisteredBlock("void_shale"),
+    VOID_ROCK_TILE = new RegisteredBlock("void_rock_tile"),
+    VOID_ROCK_SMOOTH = new RegisteredBlock("void_rock_smooth"),
+    END_STONE_PILLAR = new RegisteredBlock("end_stone_pillar"),
     END_SCALES = new RegisteredBlock("end_scales"),
     END_LEAVES = new RegisteredBlock("end_leaves"),
     BEDROCK_PILLAR = new RegisteredBlock("bedrock_pillar");
@@ -103,9 +108,38 @@ public class ModBlocks{
                         .resistance(0.2f)
                         .nonOpaque();
 
+        //yes im very lazy
+        Cons2<RegisteredBlock,Prov<BasicBlock>> genericBlockBuilder = (block ,blk) -> {
+            final String model = BlockModelPresetBuilder.allSidesSame(block.id,"block/"+block.id);
+            block.setBlock(Globals.bootQuery(blk));
+            block.setBlockState(BlockStateBuilder.create().noState(oneVariant(model)));
+
+        };
         //region BLOCKS
 
         /* Simple inert blocks*/
+        genericBlockBuilder.get(VOID_ROCK,() -> new BasicBlock(Material.STONE, stoneSettings)); VOID_ROCK.finalise();
+
+        genericBlockBuilder.get(VOID_SHALE,() -> new BasicBlock(Material.STONE, stoneSettings));
+        VOID_SHALE.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
+        VOID_SHALE.finalise();
+
+
+        genericBlockBuilder.get(VOID_ROCK_TILE,() -> new BasicBlock(Material.STONE, stoneSettings));
+        VOID_ROCK_TILE.setName("Void Stone Tile");
+        VOID_ROCK_TILE.finalise();
+
+        genericBlockBuilder.get(VOID_ROCK_SMOOTH,() -> new BasicBlock(Material.STONE, stoneSettings));
+        VOID_ROCK_SMOOTH.setName("Smooth Void Stone");
+        VOID_ROCK_SMOOTH.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
+        VOID_ROCK_SMOOTH.finalise();
+
+        genericBlockBuilder.get(VOID_ROCK_SOILED,() -> new BasicBlock(Material.STONE, stoneSettings));
+        VOID_ROCK_SOILED.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
+        VOID_ROCK_SOILED.finalise();
+
+        genericBlockBuilder.get(END_SCALES,() -> new BasicBlock(Material.STONE, stoneSettings));
+        END_SCALES.finalise();
 
         final String END_SOIL_model = BlockModelPresetBuilder.allSidesSame("end_soil","block/end_soil");
         END_SOIL.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.SOIL, dirtSettings)));
@@ -125,20 +159,12 @@ public class ModBlocks{
         END_WOOD.setFlammablility(5,5);
         END_WOOD.finalise();
 
-        final String END_ROCK_model = BlockModelPresetBuilder.allSidesSame("end_rock","block/end_rock");
-        END_ROCK.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
-        END_ROCK.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_ROCK_model)));
-        END_ROCK.finalise();
-
         final String END_ROCK_PILLAR_model = BlockModelPresetBuilder.TopBottomSide("end_rock_pillar","block/end_rock_pillar_top","block/end_rock_pillar_side","block/end_rock_pillar_top");
-        END_ROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
-        END_ROCK_PILLAR.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_ROCK_PILLAR_model)));
-        END_ROCK_PILLAR.finalise();
-
-        final String END_SCALES_model = BlockModelPresetBuilder.allSidesSame("end_scales","block/end_scales");
-        END_SCALES.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
-        END_SCALES.setBlockState(BlockStateBuilder.create().noState(oneVariant(END_SCALES_model)));
-        END_SCALES.finalise();
+        BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
+        END_STONE_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, stoneSettings)));
+        END_STONE_PILLAR.setBlockState(axisStates(END_ROCK_PILLAR_model));
+        END_STONE_PILLAR.setName("End stone pillar");
+        END_STONE_PILLAR.finalise();
 
         final String END_LEAVES_model = BlockModelPresetBuilder.allSidesSame("end_leaves","block/end_leaves");
         END_LEAVES.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.LEAVES, leafSettings)));
@@ -222,17 +248,8 @@ public class ModBlocks{
         final String PATCHY_END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass_patchy","block/end_grass_patchy","block/end_grass_patchy_side","block/end_soil");
         PATCHY_END_GRASS.setBlock(Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, grassProgression, 0, 4,grassSettings)));
         PATCHY_END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomHorizontalRotationVariants(PATCHY_END_GRASS_model)));
-        PATCHY_END_GRASS.setDrops(lootTable ->
-            lootTable.addPool(pool ->
-                pool.addEntry(item, entry ->
-                    entry.setOutput(MODID + ":end_soil")
-                         .condition(invert(silktouch))
-                ).addEntry(item, entry ->
-                    entry.setOutput(MODID + ":end_grass_patchy")
-                         .condition(silktouch)
-                )
-            )
-        );
+        PATCHY_END_GRASS.setName("Patchy end grass");
+        PATCHY_END_GRASS.dropsUnlessSilktouched(END_SOIL.getJSONID());
         PATCHY_END_GRASS.finalise();
 
 
@@ -240,17 +257,7 @@ public class ModBlocks{
         final String END_GRASS_model = BlockModelPresetBuilder.TopBottomSide("end_grass","block/end_grass_top","block/end_grass_side","block/end_soil");
         END_GRASS.setBlock(Globals.bootQuery(() -> new ModGrassBlock(Material.SOLID_ORGANIC, grassProgression, 4, 8,grassSettings)));
         END_GRASS.setBlockState(BlockStateBuilder.create().noState(randomHorizontalRotationVariants(END_GRASS_model)));
-        END_GRASS.setDrops(lootTable ->
-            lootTable.addPool(pool ->
-                pool.addEntry(item, entry ->
-                    entry.setOutput(MODID + ":end_soil")
-                         .condition(invert(silktouch))
-                ).addEntry(item, entry ->
-                    entry.setOutput(MODID + ":end_grass")
-                         .condition(silktouch)
-                )
-            )
-        );
+        END_GRASS.dropsUnlessSilktouched(END_SOIL.getJSONID());
         END_GRASS.finalise();
 
         //---------------------------------------------------------------------
@@ -355,7 +362,8 @@ public class ModBlocks{
 
     }
 
-    // :)
+    // convenience stuff:
+
     static DirectionProperty HORIZONTAL_FACING(){
         return Globals.bootQuery(()->Properties.HORIZONTAL_FACING,  DirectionProperty.of("facing"));
     }
@@ -417,13 +425,5 @@ public class ModBlocks{
             }
             return variants;
         };
-    }
-
-
-    public static TexturedModelData test() {
-        ModelData modelData = new ModelData();
-        ModelPartData modelPartData = modelData.getRoot();
-        modelPartData.addChild("cube", ModelPartBuilder.create().uv(0, 0).cuboid(-6F, 12F, -6F, 12F, 12F, 12F), ModelTransform.pivot(0F, 0F, 0F));
-        return TexturedModelData.of(modelData, 64, 64);
     }
 }

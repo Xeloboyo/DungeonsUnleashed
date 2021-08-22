@@ -1,6 +1,7 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
+import com.xeloklox.dungeons.unleashed.utils.*;
 import org.mini2Dx.gdx.utils.*;
 
 import java.io.*;
@@ -30,6 +31,7 @@ public class AssetGenerator{
                 e.printStackTrace();
             }
         });
+        IHasName.generateLang(Paths.modResource+"lang/en_us.json");
 
 
     }

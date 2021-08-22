@@ -17,9 +17,9 @@ public class ModItems{
     new UnstableItem(
          getSettings(
                 s->
-                        s.group(ItemGroup.MISC)
-                         .rarity(Rarity.UNCOMMON)
-                         .maxCount(16)
+                    s.group(ItemGroup.MISC)
+                     .rarity(Rarity.UNCOMMON)
+                     .maxCount(16)
                 ),
                 explosion->
                     explosion.setDelay(250)

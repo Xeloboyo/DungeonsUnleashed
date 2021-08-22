@@ -24,8 +24,7 @@ public class DungeonsUnleashed implements ModInitializer {
         }
 
         Globals.registerAll(RegisterEnvironment.CLIENT_AND_SERVER);
-
-        //TheEndBiomes.
+        //
 	}
 
 }

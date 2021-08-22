@@ -3,6 +3,7 @@ package com.xeloklox.dungeons.unleashed.utils;
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.*;
+import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 import com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.*;
@@ -13,11 +14,13 @@ import net.minecraft.client.render.*;
 import net.minecraft.item.*;
 import net.minecraft.item.Item.*;
 import net.minecraft.util.registry.*;
+import org.apache.commons.lang3.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.Globals.bootQuery;
+import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 
-public class RegisteredBlock extends Registerable<Block>{
+public class RegisteredBlock extends Registerable<Block> implements IHasName{
     boolean createBlockItem = true;
     public RegisteredItem blockitem = null;//= (id2, item) -> new RegisteredItem(id2, item, model -> model)
     public BlockRenderLayerRegistration renderlayer;
@@ -26,18 +29,12 @@ public class RegisteredBlock extends Registerable<Block>{
     private Settings settings = bootQuery(() -> new FabricItemSettings().group(ItemGroup.BUILDING_BLOCKS), new FabricItemSettings());
     private BlockStateBuilder bsb;
     FlammablilityConfig flammablilityConfig;
+    String name = null;
 
-
-
-    public RegisteredBlock(String id, Block registration, BlockStateBuilder bsb, Cons<RegisteredBlock> builder){
-        super(id, registration, bootQuery(() -> Registry.BLOCK),RegisterEnvironment.CLIENT_AND_SERVER);
-        this.bsb=bsb;
-        builder.get(this);
-        finalise();
-
-    }
     public RegisteredBlock(String id){
         super(id, null, bootQuery(() -> Registry.BLOCK),RegisterEnvironment.CLIENT_AND_SERVER);
+        name = StringUtils.capitalize(id.replace("_"," "));
+        IHasName.names.add(this);
     }
 
     public void finalise(){
@@ -53,6 +50,7 @@ public class RegisteredBlock extends Registerable<Block>{
         }
         if(blockitem==null){
             blockitem = new RegisteredItem(id, new BlockItem(registration, settings),model->model);
+            blockitem.setName(name);
         }
         if(drops==null){
             Func<LootTableJson,LootTableJson> lt = lootTable->
@@ -101,6 +99,38 @@ public class RegisteredBlock extends Registerable<Block>{
     public RegisteredBlock setDrops(Func<LootTableJson, LootTableJson> lt){
         this.drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
         return this;
+    }
+    public RegisteredBlock dropsUnlessSilktouched(String item){
+        LootPoolCondition silktouch = (matches_tool(filter->filter.setEnchantments("minecraft:silk_touch , [1,-]")));
+        Func<LootTableJson,LootTableJson> lt = lootTable->
+            lootTable.addPool(pool->
+                pool.addEntry(LootPoolEntryType.item,entry->
+                    entry.setOutput(MODID+":"+id)
+                         .condition(silktouch)
+                ).addEntry(LootPoolEntryType.item,entry->
+                    entry.setOutput(item)
+                         .condition(invert(silktouch))
+                ).condition(LootPool.survives_explosion())
+
+            );
+        drops = lt.get(new LootTableJson(LootType.block,"blocks/"+id+".json"));
+        return this;
+    }
+
+
+    public RegisteredBlock setName(String name){
+        this.name=name;
+        return this;
+    }
+
+    @Override
+    public String getName(){
+        return name;
+    }
+
+    @Override
+    public String getNameID(){
+        return "block."+MODID+"."+id;
     }
 
 

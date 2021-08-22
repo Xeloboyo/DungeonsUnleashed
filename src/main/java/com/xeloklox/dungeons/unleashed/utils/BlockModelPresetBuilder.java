@@ -13,7 +13,7 @@ public class BlockModelPresetBuilder{
     public static String allSidesSame(String name, String texture){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","block/cube_all");
+            jo.put("template","block/templates/cube_all");
             jo.put("tex_all",texture);
             jo.put("name",name);
         }catch(JSONException e){
@@ -25,7 +25,7 @@ public class BlockModelPresetBuilder{
     public static String cappedTopBottom(String name, String texture){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","block/cube_capped");
+            jo.put("template","block/templates/cube_capped");
             jo.put("tex_0",texture);
             jo.put("tex_particle",texture);
             jo.put("name",name);
@@ -37,7 +37,7 @@ public class BlockModelPresetBuilder{
     public static String TopBottomSide(String name, String top, String side, String bottom){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","block/cube_bottom_top");
+            jo.put("template","block/templates/cube_bottom_top");
             jo.put("tex_top",top);
             jo.put("tex_bottom",bottom);
             jo.put("tex_side",side);
