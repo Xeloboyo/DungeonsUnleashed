@@ -116,7 +116,7 @@ public class ModBlocks{
         END_WOOD_PLANKS.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.WOOD, woodSettings )));
         END_WOOD_PLANKS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_WOOD_PLANKS_model)));
         END_WOOD_PLANKS.setFlammablility(5,5);
-        END_WOOD_PLANKS.finalise(); //todo ->  LOGS NEED ROTATION
+        END_WOOD_PLANKS.finalise();
 
         final String END_WOOD_model = BlockModelPresetBuilder.TopBottomSide("end_wood","block/end_wood_top","block/end_wood_side","block/end_wood_top");
         BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
@@ -166,7 +166,7 @@ public class ModBlocks{
         BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
         BEDROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, bedrockSettings)));
         BEDROCK_PILLAR.setBlockState(axisStates(BEDROCK_PILLAR_model));
-        BEDROCK_PILLAR.finalise(); //todo -> MAKE BEDROCK PILLAR ROTATE LIKE WOOD LOGS
+        BEDROCK_PILLAR.finalise();
 
         /*
         ---------------------------------------------------------------------

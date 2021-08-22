@@ -1,9 +1,17 @@
 {
-  "block.dungeonunleash.end_wood_planks": "End Wood Planks",
+  "block.dungeonunleash.end_wood_planks": "End Wood Planks (TEMP)",
   "block.dungeonunleash.end_soil": "End Soil",
   "block.dungeonunleash.end_grass": "End Grass",
   "block.dungeonunleash.infuser": "Infuser",
   "block.dungeonunleash.enderseed_soil": "Enderseed Soil",
   "block.dungeonunleash.leyden_jar": "Leyden Jar",
+  "block.dungeonunleash.bedrock_pillar": "Bedrock Pillar",
+  "block.dungeonunleash.end_wood": "End Wood (TEMP)",
+  "block.dungeonunleash.end_scales": "End Scales (TEMP)",
+  "block.dungeonunleash.end_rock": "End Rock (TEMP)",
+  "block.dungeonunleash.end_leaves": "End Leaves (TEMP)",
+  "block.dungeonunleash.end_rock_pillar": "End Rock Pillar (TEMP)",
+  "block.dungeonunleash.end_grass_patchy": "Patchy End Grass",
+
   "item.dungeonunleash.unstable_ender_pearl": "Unstable Ender Pearl"
 }

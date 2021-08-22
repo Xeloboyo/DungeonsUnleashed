@@ -1,1 +1,16 @@
-{"variants": {"": [{"model": "dungeonunleash:block/end_wood"}]}}
+{"variants": {
+    "axis=x": [{
+        "model": "dungeonunleash:block/end_wood",
+        "x": 90,
+        "y": 90
+    }],
+    "axis=y": [{
+        "model": "dungeonunleash:block/end_wood",
+        "y": 0
+    }],
+    "axis=z": [{
+        "model": "dungeonunleash:block/end_wood",
+        "x": 90,
+        "y": 0
+    }]
+}}

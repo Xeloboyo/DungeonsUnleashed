@@ -1,1 +1,16 @@
-{"variants": {"": [{"model": "dungeonunleash:block/bedrock_pillar"}]}}
+{"variants": {
+    "axis=x": [{
+        "model": "dungeonunleash:block/bedrock_pillar",
+        "x": 90,
+        "y": 90
+    }],
+    "axis=y": [{
+        "model": "dungeonunleash:block/bedrock_pillar",
+        "y": 0
+    }],
+    "axis=z": [{
+        "model": "dungeonunleash:block/bedrock_pillar",
+        "x": 90,
+        "y": 0
+    }]
+}}
