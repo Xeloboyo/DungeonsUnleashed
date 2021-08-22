@@ -1,7 +1,7 @@
 {
     "pools": [{
         "bonus_rolls": 0,
-        "conditions": [],
+        "conditions": [{"condition": "minecraft:survives_explosion"}],
         "entries": [{
             "name": "dungeonunleash:infuser",
             "type": "minecraft:item"
