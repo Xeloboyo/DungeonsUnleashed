@@ -54,6 +54,7 @@ public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, 
         }
     }
 
+
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random){
         super.randomDisplayTick(state, world, pos, random);

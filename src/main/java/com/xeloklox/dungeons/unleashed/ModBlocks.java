@@ -8,6 +8,8 @@ import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.gen.BlockStateBuilder.*;
 import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.models.*;
+import com.xeloklox.dungeons.unleashed.utils.models.ModelProvider.*;
 import com.xeloklox.dungeons.unleashed.utils.RegisteredBlock.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.Cons.*;
@@ -15,7 +17,6 @@ import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.fabricmc.fabric.api.screenhandler.v1.*;
 import net.fabricmc.fabric.api.tool.attribute.v1.*;
 import net.minecraft.block.*;
-import net.minecraft.client.model.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
@@ -43,6 +44,7 @@ public class ModBlocks{
     VOID_SHALE = new RegisteredBlock("void_shale"),
     VOID_ROCK_TILE = new RegisteredBlock("void_rock_tile"),
     VOID_ROCK_SMOOTH = new RegisteredBlock("void_rock_smooth"),
+    BORDERED_END_STONE = new RegisteredBlock("bordered_end_stone"),
     END_STONE_PILLAR = new RegisteredBlock("end_stone_pillar"),
     END_SCALES = new RegisteredBlock("end_scales"),
     END_LEAVES = new RegisteredBlock("end_leaves"),
@@ -137,6 +139,11 @@ public class ModBlocks{
         genericBlockBuilder.get(VOID_ROCK_SOILED,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_SOILED.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
         VOID_ROCK_SOILED.finalise();
+
+        genericBlockBuilder.get(BORDERED_END_STONE,()->new BasicBlock(Material.STONE, stoneSettings));
+        ConnectedTextureBlockModel bordered_end_stoneCBTM = new ConnectedTextureBlockModel(Utils.getSprite("block/bordered_end_stone"),"bordered_end_stone",block -> block.getBlock().equals(BORDERED_END_STONE.get()));
+        BORDERED_END_STONE.setBlockState(BlockStateBuilder.create().noState(oneVariant(BlockModelPresetBuilder.generated(bordered_end_stoneCBTM))));
+        BORDERED_END_STONE.finalise();
 
         genericBlockBuilder.get(END_SCALES,() -> new BasicBlock(Material.STONE, stoneSettings));
         END_SCALES.finalise();
@@ -358,7 +365,7 @@ public class ModBlocks{
          }catch(ClassNotFoundException ignored){}});
         //end region
 
-        new JsonModelProvider(); // yes
+        new RegisteredModelProvider("modelProvider",new ModelProvider()); // yes
 
     }
 

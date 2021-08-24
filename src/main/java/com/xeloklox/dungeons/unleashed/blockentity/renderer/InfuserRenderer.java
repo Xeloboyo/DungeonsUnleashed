@@ -5,6 +5,7 @@ import com.xeloklox.dungeons.unleashed.blocks.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.*;
+import com.xeloklox.dungeons.unleashed.utils.models.*;
 import net.minecraft.block.*;
 import net.minecraft.client.*;
 import net.minecraft.client.model.*;
@@ -13,7 +14,6 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory.*;
 import net.minecraft.client.render.model.json.*;
 import net.minecraft.client.util.math.*;
 import net.minecraft.item.*;
-import net.minecraft.particle.*;
 import net.minecraft.state.property.*;
 import net.minecraft.util.math.*;
 

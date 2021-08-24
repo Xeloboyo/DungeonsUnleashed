@@ -8,7 +8,7 @@ import java.io.*;
 
 public class AssetGenerator{
     public static final Array<Generator> generators = new Array<>();
-    public static boolean isGenerated(String path){
+    public static boolean isQueued(String path){
         for(int i = 0;i<generators.size;i++){
             if(generators.get(i).getPath().equals(path)){
                 return true;

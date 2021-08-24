@@ -1,6 +1,7 @@
-package com.xeloklox.dungeons.unleashed.utils;
+package com.xeloklox.dungeons.unleashed.utils.models;
 
 import com.xeloklox.dungeons.unleashed.gen.*;
+import com.xeloklox.dungeons.unleashed.utils.*;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.*;

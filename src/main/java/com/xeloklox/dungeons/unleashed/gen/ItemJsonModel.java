@@ -3,6 +3,7 @@ package com.xeloklox.dungeons.unleashed.gen;
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import com.xeloklox.dungeons.unleashed.utils.models.*;
 import net.minecraft.item.*;
 import org.apache.commons.io.*;
 import org.json.*;
@@ -42,7 +43,7 @@ public class ItemJsonModel extends JsonConfiguration{
             json.put("parent", format(modelParent.key,item.id));
             if(item.get() instanceof BlockItem){
                 String modelpath = Paths.blockModel+item.id+".json";
-                if(!AssetGenerator.isGenerated(modelpath)){
+                if(!AssetGenerator.isQueued(modelpath) && !ModelProvider.hasModel("block/"+item.id)){
                     File cust = new File(Paths.blockModel+"custom/"+item.id+".json");
                     if(!cust.exists()){
                         System.out.println("[WARNING] Block model for BlockItem "+item.id+" was not found!");
@@ -98,7 +99,7 @@ public class ItemJsonModel extends JsonConfiguration{
             }
         }
         for(ItemModelOverride override:overrides){
-            if(!AssetGenerator.isGenerated(Paths.models+override.model)){
+            if(!AssetGenerator.isQueued(Paths.models+override.model)){
                 new ItemJsonModel(item,override.model,new String[]{override.model});
             }
         }

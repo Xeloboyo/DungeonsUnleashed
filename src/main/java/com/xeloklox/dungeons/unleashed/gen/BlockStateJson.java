@@ -16,7 +16,7 @@ public class BlockStateJson extends JsonConfiguration{
     BlockStateBuilder stateConfig;
     private final Array<String> modelsToCheck = new Array<>();
     private final ObjectMap<String, String> formatted = new ObjectMap<>();
-    Array<ModelJson> generatedModels = new Array<>();
+    Array<ModelJson> generatedJSONModels = new Array<>();
 
     public BlockStateJson(RegisteredBlock block, BlockStateBuilder preset){
         super(Paths.blockState + block.id + ".json", new JSONObject());
@@ -37,8 +37,11 @@ public class BlockStateJson extends JsonConfiguration{
             for(String model : modelsToCheck){
                 if(model.startsWith("@@")){
                     JSONObject config = new JSONObject(model.substring(2));
-                    JSONObject template = BlockModelPresetBuilder.getTemplate(config.getString("template"));
-                    generatedModels.add(new ModelJson("block/"+config.getString("name"), template, config));
+                    String templateName = config.getString("template");
+                    if(!templateName.equals("dynamic")){
+                        JSONObject template = BlockModelPresetBuilder.getTemplate(templateName);
+                        generatedJSONModels.add(new ModelJson("block/" + config.getString("name"), template, config));
+                    }
                     formatted.put(model, MODID + ":block/" + config.getString("name"));
 
                 }else{
@@ -47,7 +50,7 @@ public class BlockStateJson extends JsonConfiguration{
                         System.out.println("[WARNING] Unable to find model " + file + ", replacing with placeholder...");
                         JSONObject config = new JSONObject(BlockModelPresetBuilder.allSidesSame(model, "default").substring(2));
                         JSONObject template = BlockModelPresetBuilder.getTemplate(config.getString("template"));
-                        generatedModels.add(new ModelJson("block/"+model, template, config));
+                        generatedJSONModels.add(new ModelJson("block/"+model, template, config));
                     }
                     formatted.put(model, MODID + ":block/" + model);
                 }

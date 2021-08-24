@@ -1,6 +1,7 @@
 package com.xeloklox.dungeons.unleashed.blocks;
 
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.Cons.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
@@ -25,7 +26,8 @@ public abstract class BlockGraph{
             this.graph = graph;
         }
         //what positions you can connect to
-        abstract boolean canConnectTo(World world, BlockPos to, BlockPos from);
+        abstract boolean canConnectTo(World world, BlockPos from, BlockPos to);
+        abstract BlockPos[] getConnectionPoints(World world, BlockPos from);
     }
 
     public static class ConnectConfigManager{
@@ -37,13 +39,18 @@ public abstract class BlockGraph{
         <T extends BlockGraph> GraphConnectConfig<T> get(Class<T> clazz){
             return connectionConfig.get(clazz);
         }
+        void each(Cons2<Class, GraphConnectConfig> cons){
+            connectionConfig.forEach(e->{
+                cons.get(e.key,e.value);
+            });
+        }
         // can a BlockGraphConnector connect to you?
     }
 
-    public abstract static class GraphConnectingBLock extends BasicBlock{
+    public abstract static class GraphConnectingBlock extends BasicBlock implements BlockEntityProvider{
         public ConnectConfigManager connectionConfig;
 
-        public GraphConnectingBLock(Material material, Func<ConnectConfigManager, ConnectConfigManager> connectionConfigFunc, Func<FabricBlockSettings, FabricBlockSettings> settingsfunc){
+        public GraphConnectingBlock(Material material, Func<ConnectConfigManager, ConnectConfigManager> connectionConfigFunc, Func<FabricBlockSettings, FabricBlockSettings> settingsfunc){
             super(material, settingsfunc);
             connectionConfig = connectionConfigFunc.get(new ConnectConfigManager());
         }
@@ -57,6 +64,20 @@ public abstract class BlockGraph{
         }
 
         public abstract void intialiseGraphs();
+        public void connect(){
+            final World world = this.world;
+            BlockPos bp = this.pos;
+            if(world.getBlockState(bp).getBlock() instanceof GraphConnectingBlock graphBlock){
+                graphBlock.connectionConfig.each((cls,config)->{
+                    BlockPos[] cpoints = config.getConnectionPoints(world,bp);
+                    for(BlockPos rbp:cpoints){
+                        if(world.getBlockState(rbp).getBlock() instanceof GraphConnectingBlock externalGraphBlock){
+                            //if(externalGraphBlock.connectionConfig.)
+                        }
+                    }
+                });
+            }
+        }
     }
 
     public static class GraphConnectionManager{
@@ -67,6 +88,11 @@ public abstract class BlockGraph{
 
         <T extends BlockGraph> GraphConnector<T> get(Class<T> clazz){
             return connectionConfig.get(clazz);
+        }
+        void each(Cons2<Class, GraphConnector> cons){
+            connectionConfig.forEach(e->{
+                cons.get(e.key,e.value);
+            });
         }
     }
 

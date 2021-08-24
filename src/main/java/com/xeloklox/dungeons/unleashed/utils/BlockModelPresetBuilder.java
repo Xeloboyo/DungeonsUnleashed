@@ -1,6 +1,7 @@
 package com.xeloklox.dungeons.unleashed.utils;
 
 import com.xeloklox.dungeons.unleashed.*;
+import com.xeloklox.dungeons.unleashed.utils.models.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
 
@@ -10,6 +11,19 @@ import java.util.stream.*;
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 
 public class BlockModelPresetBuilder{
+
+    public static String generated(GeneratedModel generatedModel){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template","dynamic");
+            jo.put("name",generatedModel.name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        return "@@"+jo.toString();
+    }
+
     public static String allSidesSame(String name, String texture){
         JSONObject jo = new JSONObject();
         try{

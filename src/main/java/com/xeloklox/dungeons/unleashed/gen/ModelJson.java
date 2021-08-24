@@ -14,7 +14,7 @@ import java.io.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 
-public class ModelJson extends JsonConfiguration implements JsonModelWrapper{
+public class ModelJson extends JsonConfiguration{
     public JSONObject config;
     public Array<String> textureList = new Array<>();
     public Identifier id;
@@ -64,36 +64,6 @@ public class ModelJson extends JsonConfiguration implements JsonModelWrapper{
                 }
             }
         }
-    }
-
-    @Override
-    public Identifier getIdentifier(){
-        return id;
-    }
-
-    @Override
-    public void setIdentifier(Identifier i){
-        id=i;
-    }
-
-    @Override
-    public JsonUnbakedModel getUnbaked(){
-        return jsonUnbakedModel;
-    }
-
-    @Override
-    public void setUnbaked(JsonUnbakedModel i){
-        jsonUnbakedModel=i;
-    }
-
-    @Override
-    public BakedModel getBaked(){
-        return model;
-    }
-
-    @Override
-    public void setBaked(BakedModel i){
-        model=i;
     }
 
     public String getName(){
