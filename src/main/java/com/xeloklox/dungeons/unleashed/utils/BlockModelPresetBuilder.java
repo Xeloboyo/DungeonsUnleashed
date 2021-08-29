@@ -62,10 +62,10 @@ public class BlockModelPresetBuilder{
         return "@@"+jo.toString();
     }
 
-    public static String SlabTop(String name, String top, String side, String bottom){
+    private static String TopBottomSideTemplate(String template, String name, String top, String side, String bottom){
         JSONObject jo = new JSONObject();
         try{
-            jo.put("template","block/templates/slab_top");
+            jo.put("template","block/templates/"+template);
             jo.put("tex_top",top);
             jo.put("tex_bottom",bottom);
             jo.put("tex_side",side);
@@ -75,18 +75,21 @@ public class BlockModelPresetBuilder{
         }
         return "@@"+jo.toString();
     }
+
+    public static String SlabTop(String name, String top, String side, String bottom){
+        return TopBottomSideTemplate("slab_top",name,top,side,bottom);
+    }
     public static String SlabBottom(String name, String top, String side, String bottom){
-        JSONObject jo = new JSONObject();
-        try{
-            jo.put("template","block/templates/slab");
-            jo.put("tex_top",top);
-            jo.put("tex_bottom",bottom);
-            jo.put("tex_side",side);
-            jo.put("name",name);
-        }catch(JSONException e){
-            e.printStackTrace();
-        }
-        return "@@"+jo.toString();
+        return TopBottomSideTemplate("slab",name,top,side,bottom);
+    }
+    public static String Stairs(String name, String top, String side, String bottom){
+        return TopBottomSideTemplate("stairs",name,top,side,bottom);
+    }
+    public static String StairsInner(String name, String top, String side, String bottom){
+        return TopBottomSideTemplate("stairs_inner",name,top,side,bottom);
+    }
+    public static String StairsOuter(String name, String top, String side, String bottom){
+        return TopBottomSideTemplate("stairs_outer",name,top,side,bottom);
     }
 
     //lmao idk

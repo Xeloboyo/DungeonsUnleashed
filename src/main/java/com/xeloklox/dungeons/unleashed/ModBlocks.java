@@ -26,6 +26,9 @@ import net.minecraft.sound.*;
 import net.minecraft.state.property.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.Direction.*;
+import net.minecraft.world.gen.stateprovider.*;
+
+import java.util.function.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.blocks.LeydenJarBlock.MAX_CHARGE;
@@ -46,6 +49,7 @@ public class ModBlocks{
     VOID_ROCK_TILE = new RegisteredBlock("void_rock_tile"),
     VOID_ROCK_SMOOTH = new RegisteredBlock("void_rock_smooth"),
     VOID_ROCK_SMOOTH_SLAB = new RegisteredBlock("void_rock_smooth_slab"),
+    VOID_ROCK_SMOOTH_STAIRS = new RegisteredBlock("void_rock_smooth_stairs"),
     BORDERED_END_STONE = new RegisteredBlock("bordered_end_stone"),
     END_STONE_PILLAR = new RegisteredBlock("end_stone_pillar"),
     END_SCALES = new RegisteredBlock("end_scales"),
@@ -144,6 +148,8 @@ public class ModBlocks{
 
         makeSlabFrom(VOID_ROCK,VOID_ROCK_SMOOTH_SLAB);
         VOID_ROCK_SMOOTH_SLAB.finalise();
+        makeStairsFrom(VOID_ROCK,VOID_ROCK_SMOOTH_STAIRS);
+        VOID_ROCK_SMOOTH_STAIRS.finalise();
 
         genericBlockBuilder.get(VOID_ROCK_SOILED,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_SOILED.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
@@ -202,7 +208,7 @@ public class ModBlocks{
                 )
             )
         );
-        END_LEAVES.finalise(); //todo -> LEAVES BLOCK NEEDS BLOCK STATES
+        END_LEAVES.finalise();
 
         final String BEDROCK_PILLAR_model = BlockModelPresetBuilder.TopBottomSide("bedrock_pillar","block/bedrock_pillar_top","block/bedrock_pillar_side","block/bedrock_pillar_top");
         BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
@@ -392,7 +398,6 @@ public class ModBlocks{
         CHARGE_CELL_PORT_ENTITY = new RegisteredBlockEntity<>("charge_cell_port",ChargeStoragePortEntity::new,CHARGE_CELL_PORT);
 
 
-
          Globals.bootRun(()->{try{
              Class.forName(InfuserRenderer.class.getName());
          }catch(ClassNotFoundException ignored){}});
@@ -404,49 +409,76 @@ public class ModBlocks{
 
     // convenience stuff:
 
-    static void makeSlabFrom(RegisteredBlock original, RegisteredBlock slab){
+    //I hope to fuck theres an easier way of doing this
+    static void makeSlabFrom(RegisteredBlock ORIGINAL, RegisteredBlock SLAB){
         BasicBlock.selectedPlacementConfig = BasicBlock.HALF_SLAB;
         Globals.bootRun(()->{
-            if(original.get() instanceof BasicBlock bb){
-                slab.setBlock(bb.copy());
+            if(ORIGINAL.get() instanceof BasicBlock bb){
+                SLAB.setBlock(bb.copy());
             }else{
-                slab.setBlock(new Block(AbstractBlock.Settings.copy(original.get())));
+                SLAB.setBlock(new Block(AbstractBlock.Settings.copy(ORIGINAL.get())));
             }
         });
-        String[] tex = original.getPrimaryModelTextures();
-        String top = BlockModelPresetBuilder.SlabTop(slab.id+"_top",tex[0],tex[1],tex[2]);
-        String bottom = BlockModelPresetBuilder.SlabBottom(slab.id,tex[0],tex[1],tex[2]);
-        String doubleSlab = BlockModelPresetBuilder.TopBottomSide(slab.id+"_double",tex[0],tex[1],tex[2]);
-        var modelvar = original.getPrimaryModel().getFirst();
+        String[] tex = ORIGINAL.getPrimaryModelTextures();
+        String top = BlockModelPresetBuilder.SlabTop(SLAB.id+"_top",tex[0],tex[1],tex[2]);
+        String bottom = BlockModelPresetBuilder.SlabBottom(SLAB.id,tex[0],tex[1],tex[2]);
+        String doubleSlab = BlockModelPresetBuilder.TopBottomSide(SLAB.id+"_double",tex[0],tex[1],tex[2]);
+        var modelvar = ORIGINAL.getPrimaryModel().getFirst();
         if(modelvar!=null){
             doubleSlab=modelvar.getModel();
         }
-        slab.setBlockState(slabStates(top,bottom,doubleSlab));
-        slab.setDrops(loottable->
+        SLAB.setBlockState(slabStates(top,bottom,doubleSlab));
+        SLAB.setDrops(loottable->
             loottable.addPool(pool->
                 pool.addEntry(item,entry->
-                    entry.setOutput(slab.getJSONID())
+                    entry.setOutput(SLAB.getJSONID())
                     .addFunction(
                         set_count(num_constant(2),false)
-                        .condition(state_matches(slab.getJSONID(),makeEntry(SLAB(),SlabType.DOUBLE)))
+                        .condition(state_matches(SLAB.getJSONID(),makeEntry(SLAB(),SlabType.DOUBLE)))
                     )
                 )
             )
         );
     }
 
+    static void makeStairsFrom(RegisteredBlock ORIGINAL, RegisteredBlock STAIRS){
+        BasicBlock.selectedPlacementConfig = BasicBlock.STAIRS;
+        Globals.bootRun(()->{
+            if(ORIGINAL.get() instanceof BasicBlock bb){
+                STAIRS.setBlock(bb.copy());
+            }else{
+                STAIRS.setBlock(new Block(AbstractBlock.Settings.copy(ORIGINAL.get())));
+            }
+        });
+        String[] tex = ORIGINAL.getPrimaryModelTextures();
+        String stairs = BlockModelPresetBuilder.Stairs(STAIRS.id,tex[0],tex[1],tex[2]);
+        String stairsOuter = BlockModelPresetBuilder.StairsOuter(STAIRS.id+"_outer",tex[0],tex[1],tex[2]);
+        String stairsInner = BlockModelPresetBuilder.StairsInner(STAIRS.id+"_inner",tex[0],tex[1],tex[2]);
+        STAIRS.setBlockState(stairStates(stairs,stairsInner,stairsOuter));
+
+    }
+
 
     static DirectionProperty HORIZONTAL_FACING(){
-        return Globals.bootQuery(()->Properties.HORIZONTAL_FACING,  DirectionProperty.of("facing"));
+        return Globals.bootQuery(() -> Properties.HORIZONTAL_FACING, DirectionProperty.of("facing", Type.HORIZONTAL));
     }
+
     static DirectionProperty FACING(){
-            return Globals.bootQuery(()->Properties.FACING,  DirectionProperty.of("facing"));
-        }
+        return Globals.bootQuery(() -> Properties.FACING, DirectionProperty.of("facing"));
+    }
+
     static EnumProperty<SlabType> SLAB(){
-                return Globals.bootQuery(()->Properties.SLAB_TYPE,  EnumProperty.of("type",SlabType.class));
-            }
+        return Globals.bootQuery(() -> Properties.SLAB_TYPE, EnumProperty.of("type", SlabType.class));
+    }
+    static EnumProperty<BlockHalf> HALF(){
+        return Globals.bootQuery(() -> Properties.BLOCK_HALF, EnumProperty.of("half", BlockHalf.class));
+    }
+    static EnumProperty<StairShape> STAIR(){
+        return Globals.bootQuery(() -> Properties.STAIR_SHAPE, EnumProperty.of("shape", StairShape.class));
+    }
+
     static EnumProperty<Direction.Axis> AXIS(){
-        return Globals.bootQuery(()->Properties.AXIS,  EnumProperty.of("axis",Direction.Axis.class));
+        return Globals.bootQuery(() -> Properties.AXIS, EnumProperty.of("axis", Direction.Axis.class));
     }
 
     static Func<ModelVariantList, ModelVariantList> randomHorizontalRotationVariants(String modelStr){
@@ -485,6 +517,31 @@ public class ModBlocks{
             .addStateVariant(AXIS(), Axis.Y,variant->variant.addModel(modelStr,0))
             .addStateVariant(AXIS(), Axis.X,variant->variant.addModel(modelStr,90,90))
             .addStateVariant(AXIS(), Axis.Z,variant->variant.addModel(modelStr,90,0));
+    }
+
+    static BlockStateBuilder stairStates(String stairs, String stairsInner, String stairsOuts){
+        return BlockStateBuilder.create().stateCombinations((state,modelVariant)->{
+            Direction facing = state.get(HORIZONTAL_FACING());
+            BlockHalf half = state.get(HALF());
+            StairShape shape = state.get(STAIR());
+            System.out.println(facing.getName()+","+half.name()+","+shape.name());
+            int yRot = (int)facing.rotateYClockwise().asRotation();
+            if(shape==StairShape.INNER_LEFT||shape==StairShape.OUTER_LEFT){
+                yRot+=270;
+            }
+            if(shape != StairShape.STRAIGHT && half == BlockHalf.TOP){
+                yRot+=90;
+            }
+            yRot%=360;
+            boolean uvlock = yRot!=0 || half==BlockHalf.TOP;
+            int finalYRot = yRot;
+            modelVariant.addModel(model->
+                model.setModel(shape==StairShape.STRAIGHT ? stairs : (shape==StairShape.INNER_LEFT||shape==StairShape.INNER_RIGHT? stairsInner:stairsOuts))
+                .setY(finalYRot)
+                .setX(half==BlockHalf.BOTTOM?0:180)
+                .setUVLock(uvlock)
+            );
+        },HORIZONTAL_FACING(),STAIR(),HALF());
     }
 
     static BlockStateBuilder slabStates(String slabTop, String slabBottom, String slabDouble){

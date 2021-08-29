@@ -2,23 +2,38 @@ package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.Cons.*;
 import net.minecraft.state.property.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
+
+import java.util.*;
 
 public class BlockStateBuilder{
     public ObjectMap<String, ModelList> map = new ObjectMap<>();
     boolean noState = false;
     boolean multipart = false;
 
+
     public static BlockStateBuilder create(){
         return new BlockStateBuilder();
     }
     public static BlockStateBuilder createMultipart(){
-            var b =  new BlockStateBuilder();
-            b.multipart=true;
-            return b;
+        var b =  new BlockStateBuilder();
+        b.multipart=true;
+        return b;
+    }
+
+    public BlockStateBuilder stateCombinations(Cons2<PropertyCombinator,ModelVariantList> cons, Property...properties){
+        PropertyCombinator comb = new PropertyCombinator(properties);
+        for(int i=0;i<comb.max;i++){
+            ModelVariantList ml = new ModelVariantList();
+            cons.get(comb,ml);
+            map.put(comb.getKey(), ml);
+            comb.next();
         }
+        return this;
+    }
 
     public <T extends Comparable<T>> BlockStateBuilder addStateVariant(Property<T> prop, T value, Func<ModelVariantList, ModelVariantList> func) {
         if(noState){
@@ -59,6 +74,55 @@ public class BlockStateBuilder{
 
     public ObjectMap<String, ModelList> build(){
         return map;
+    }
+
+
+    public static class PropertyCombinator{
+        ObjectMap<Property,PropertyCombinatorEntry> map = new ObjectMap<>();
+        Array<PropertyCombinatorEntry> entries = new Array<>();
+        int current=0;
+        int max = 1;
+        PropertyCombinator(Property...props){
+            for(Property p:props){
+                var pce = new PropertyCombinatorEntry(p);
+                map.put(p,pce);
+                entries.add(pce);
+                max*=pce.array.size;
+            }
+        }
+
+        public <T extends Comparable<T>> T get(Property<T> property){
+            return (T)map.get(property).get();
+        }
+        //facing=east,half=bottom,shape=outer_right
+        String getKey(){
+            final StringBuilder output =new StringBuilder();
+            map.forEach(e->{
+                output.append((output.length()==0?"":",")+e.key.getName()+"="+e.value.get().toString().toLowerCase(Locale.ROOT));
+            });
+            return output.toString();
+        }
+
+        void next(){
+            current++;
+            int relative= current;
+            for(PropertyCombinatorEntry p:entries){
+                p.current = relative%p.array.size;
+                relative/=p.array.size;
+            }
+        }
+
+
+        static class PropertyCombinatorEntry<T extends Comparable<T>>{
+            Array<T> array;
+            int current = 0;
+            PropertyCombinatorEntry(Property<T> p){
+                array = new Array<>();
+                p.getValues().forEach(a->array.add(a));
+            }
+            T get(){ return array.get(current);}
+
+        }
     }
 
 
