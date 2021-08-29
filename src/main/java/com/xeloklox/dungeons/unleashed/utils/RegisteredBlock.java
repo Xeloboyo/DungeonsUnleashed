@@ -15,6 +15,7 @@ import net.minecraft.item.*;
 import net.minecraft.item.Item.*;
 import net.minecraft.util.registry.*;
 import org.apache.commons.lang3.*;
+import org.json.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.Globals.bootQuery;
@@ -84,6 +85,50 @@ public class RegisteredBlock extends Registerable<Block> implements IHasName{
     public RegisteredBlock setSettings(Settings settings){
         this.settings = settings;
         return this;
+    }
+    public BlockStateBuilder.ModelList getPrimaryModel(){
+        if(this.bsb.map.containsKey("")){
+            return this.bsb.map.get("");
+        }
+        for(var e:bsb.map){
+            return e.value;
+        }
+        return null;
+    }
+    public String[] getPrimaryModelTextures(){
+        var modelList = getPrimaryModel();
+        final String[] output=new String[]{null,null,null};
+        modelList.eachModelVariant(variant->{
+            if(output[0]!=null){
+                return;
+            }
+            if(variant.getModel().startsWith("@@")){
+                try{
+                    JSONObject model = new JSONObject(variant.getModel().substring(2));
+                    if(model.has("tex_all")){
+                        String modelName = model.getString("tex_all");
+                        output[0] = modelName;
+                        output[1] = modelName;
+                        output[2] = modelName;
+                    }else if(model.has("tex_0")){
+                        String modelName = model.getString("tex_0");
+                        output[0] = modelName;
+                        output[1] = modelName;
+                        output[2] = modelName;
+                    }else if(model.has("tex_top")){
+                        output[0] = model.getString("tex_top");
+                        output[1] = model.getString("tex_side");
+                        output[2] = model.getString("tex_bottom");
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+        if(output[0]!=null){
+            return output;
+        }
+        return new String[]{"block/default","block/default","block/default"};
     }
 
     public RegisteredBlock setBlockState(BlockStateBuilder bsb){

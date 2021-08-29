@@ -21,22 +21,11 @@ public class InfuserRenderer extends BlockEntityRendererBase<InfuserEntity>{
     public static RenderableModel connector;
     public static RenderableModel ring;
     static{
-        String modelfile = "entity/infuser_connection";
-        ModelJson modelJson = new ModelJson(
-            "entity/infuser_con",
-            BlockModelPresetBuilder.getTemplate(modelfile),
-            BlockModelPresetBuilder.customTemplateObj(modelfile,"","entity/debug")
-        );
+        ModelJson modelJson =ModelJson.getModel("entity/infuser_connection","entity/debug");
         connector = new RenderableModel(modelJson,ModelTransform.pivot(8,2,0));
-        String ringmodelfile = "entity/infuser_ring";
-        ModelJson modelJson2 = new ModelJson(
-            "entity/infuser_ring",
-            BlockModelPresetBuilder.getTemplate(ringmodelfile),
-            BlockModelPresetBuilder.customTemplateObj(ringmodelfile,"","entity/infuser_ring")
-        );
+        ModelJson modelJson2 =ModelJson.getModel("entity/infuser_ring","entity/infuser_ring");
         ring = new RenderableModel(modelJson2,ModelTransform.pivot(8,0,8));
     }
-    ModelPart modelPart;
 
     public InfuserRenderer(Context ctx){
         super(ctx);
@@ -100,5 +89,4 @@ public class InfuserRenderer extends BlockEntityRendererBase<InfuserEntity>{
     }
 }
 
-// MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, lightAbove, overlay, matrices, vertexConsumers,0);
 

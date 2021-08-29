@@ -1,4 +1,4 @@
-package com.xeloklox.dungeons.unleashed.blockentity;
+package com.xeloklox.dungeons.unleashed.utils.block.entity;
 
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.inventory.*;
@@ -132,8 +132,8 @@ public interface SegmentedInventory extends SidedInventory,ImplementedInventory{
 
     class InventorySegment{
         SegmentedInventory inventory;
-        String name;
-        int[] slots;
+        public String name;
+        public int[] slots;
         boolean[] insertFrom = new boolean[6],extractFrom = new boolean[6];
         int maxItems=64;
         boolean syncOnChange=false;

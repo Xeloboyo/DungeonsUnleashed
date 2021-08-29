@@ -30,6 +30,15 @@ public class ModelJson extends JsonConfiguration{
     }
 
 
+    public static ModelJson getModel(String name, String tex){
+        return new ModelJson(
+            name,
+            BlockModelPresetBuilder.getTemplate(name),
+            BlockModelPresetBuilder.customTemplateObj(name,"",tex)
+        );
+    }
+
+
 
     @Override
     public void fillJSONObj(){

@@ -65,9 +65,9 @@ public class Interpolations{
       return x0 + (x1-x0)*sig;
     }
     public static class Wrapper<T> {
-      T val;
-      Wrapper(T t) {
-        val = t;
-      }
+        public T val;
+        public Wrapper(T t) {
+            val = t;
+        }
     }
 }

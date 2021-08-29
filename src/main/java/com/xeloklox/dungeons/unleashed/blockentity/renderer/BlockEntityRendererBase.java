@@ -16,17 +16,5 @@ import net.minecraft.world.*;
 import javax.swing.text.html.parser.*;
 
 public abstract class BlockEntityRendererBase <U extends BlockEntity>implements BlockEntityRenderer<U>{
-    public BlockEntityRendererBase(BlockEntityRendererFactory.Context ctx) {
-
-    }
-    /*
-    public void drawModel(BlockEntity e, BakedModel model, BlockState state,MatrixStack matrices, VertexConsumer vertexConsumers, int overlay){
-        MinecraftClient.getInstance().getBakedModelManager().getModel(new ModelIdentifier(""));
-        MinecraftClient.getInstance().getBlockRenderManager().getModelRenderer().renderFlat(e.getWorld(),model,state,e.getPos(),matrices,vertexConsumers,true,e.getWorld().random,0,overlay);
-    }*/
-
-    //VertexConsumer vertexConsumer = spriteIdentifier.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
-
-
-
+    public BlockEntityRendererBase(BlockEntityRendererFactory.Context ctx) { }
 }

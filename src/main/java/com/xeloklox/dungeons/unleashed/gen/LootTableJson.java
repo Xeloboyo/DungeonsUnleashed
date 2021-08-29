@@ -9,6 +9,8 @@ import org.apache.commons.lang3.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
 
+import java.util.*;
+
 public class LootTableJson extends JsonConfiguration{
     public LootType type;
     public Array<LootPool> pools= new Array<>();
@@ -158,15 +160,47 @@ public class LootTableJson extends JsonConfiguration{
                 item,tag,loot_table,group,alternatives,sequence,dynamic,empty;
             }
         }
+
         //region FUNCTIONS
         public static abstract class LootPoolFunction{
-           JSONObject base = new JSONObject();
+            public Array<LootPoolCondition> conditions = new Array<>();
+            JSONObject base = new JSONObject();
+
             LootPoolFunction(String name){
-               try{
-                   base.put("function", name);
-               }catch(Exception ignored){}
-           }
+                try{
+                    base.put("function", name);
+                }catch(Exception ignored){
+                }
+            }
+
+            public LootPoolFunction condition(LootPoolCondition cond){
+                try{
+                    if(!base.has("conditions")){
+                        base.put("conditions", new JSONArray());
+                    }
+                    JSONArray conditionsjson = base.getJSONArray("conditions");
+                    conditionsjson.put(cond.base);
+                    base.put("conditions", conditionsjson);
+                    conditions.add(cond);
+                }catch(Exception ignored){
+                }
+                return this;
+            }
         }
+        public static class F_set_count extends LootPoolFunction{
+            String block;
+            Property[] props;
+
+            public F_set_count(NumberProvider prov, boolean add){
+                super("minecraft:set_count");
+                this.block = block;
+                try{
+                    base.put("count", prov.base);
+                    base.put("add",add);
+                }catch(JSONException ignored){}
+            }
+        }
+        public static F_set_count set_count(NumberProvider prov, boolean add){return new F_set_count(prov,add);}
         public static class F_copy_state extends LootPoolFunction{
             String block;
             Property[] props;
@@ -244,6 +278,22 @@ public class LootTableJson extends JsonConfiguration{
         }
         public static C_random_chance droprate(float probability){return new C_random_chance(probability);}
 
+        public static class C_block_state_property extends LootPoolCondition{
+
+            C_block_state_property(String block,PropertyEntry ... entries){
+                super("minecraft:block_state_property");
+                try{
+                    base.put("block",block);
+                    if(entries.length>0){
+                        JSONObject ent = new JSONObject();
+                        for(PropertyEntry e:entries){
+                            ent.put(e.prop.getName(),e.value.toString().toLowerCase(Locale.ROOT));
+                        }
+                    }
+                }catch(JSONException ignored){}
+            }
+        }
+        public static C_block_state_property state_matches(String block,PropertyEntry ... entries){return new C_block_state_property(block,entries);}
 
         public static class C_table_bonus extends LootPoolCondition{
 
@@ -344,5 +394,38 @@ public class LootTableJson extends JsonConfiguration{
         public static C_match_tool matches_tool(Func<ItemPredicateBuilder,ItemPredicateBuilder> func){return new C_match_tool(func);}
 
         //endregion
+
+        public static abstract class NumberProvider{
+            String type;
+            JSONObject base = new JSONObject();
+            NumberProvider(String type){
+                this.type=type;
+                try{
+                   base.put("type", type);
+                }catch(Exception ignored){}
+            }
+        }
+        public static class NumberProviderConstant extends NumberProvider{
+
+            NumberProviderConstant(float value){
+                super("constant");
+                try{
+                   base.put("value", value);
+                }catch(Exception ignored){}
+            }
+        }
+        public static NumberProviderConstant num_constant(float v){return new NumberProviderConstant(v);}
+
+
+        public static class PropertyEntry<T extends Comparable<T>>{
+            Property<T> prop; T value;
+            PropertyEntry(Property<T> prop, T value){
+                this.prop=prop;
+                this.value=value;
+            }
+        }
+        public static  <T extends Comparable<T>>  PropertyEntry<T> makeEntry (Property<T> prop, T value){
+            return new PropertyEntry<>(prop,value);
+        }
     }
 }

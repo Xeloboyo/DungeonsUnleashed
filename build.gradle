@@ -24,7 +24,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:0.11.6"
 
     //Fabric api
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.37.2+1.17"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.39.1+1.17"
 
     implementation 'org.mini2Dx:gdx-collections:1.9.13'
     implementation group: 'org.json', name: 'json', version: '20090211'

@@ -62,6 +62,33 @@ public class BlockModelPresetBuilder{
         return "@@"+jo.toString();
     }
 
+    public static String SlabTop(String name, String top, String side, String bottom){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template","block/templates/slab_top");
+            jo.put("tex_top",top);
+            jo.put("tex_bottom",bottom);
+            jo.put("tex_side",side);
+            jo.put("name",name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return "@@"+jo.toString();
+    }
+    public static String SlabBottom(String name, String top, String side, String bottom){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template","block/templates/slab");
+            jo.put("tex_top",top);
+            jo.put("tex_bottom",bottom);
+            jo.put("tex_side",side);
+            jo.put("name",name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return "@@"+jo.toString();
+    }
+
     //lmao idk
     public static String custom(String name){
         return name;

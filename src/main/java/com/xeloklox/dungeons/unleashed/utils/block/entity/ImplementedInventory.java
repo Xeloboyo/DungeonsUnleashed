@@ -1,4 +1,4 @@
-package com.xeloklox.dungeons.unleashed.blockentity;
+package com.xeloklox.dungeons.unleashed.utils.block.entity;
 
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;

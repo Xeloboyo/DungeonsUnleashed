@@ -1,12 +1,12 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
+import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.state.property.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
 
 public class BlockStateBuilder{
-    // this is not a multipart....
     public ObjectMap<String, ModelList> map = new ObjectMap<>();
     boolean noState = false;
     boolean multipart = false;
@@ -66,6 +66,15 @@ public class BlockStateBuilder{
     public static abstract class ModelList{
         Array<ModelVariant> list = new Array<>();
         public abstract void eachModelVariant(Cons<ModelVariant> c);
+        public ModelVariant getFirst(){
+            final Wrapper<ModelVariant> wrapper = new Wrapper<>(null);
+            eachModelVariant(c->{
+                if(wrapper.val==null){
+                    wrapper.val = c;
+                }
+            });
+            return wrapper.val;
+        }
     }
     public static class ModelMultipart extends ModelList{
         public ModelVariant apply;
@@ -124,6 +133,10 @@ public class BlockStateBuilder{
 
         public ModelVariantList addModel(Func<ModelVariant, ModelVariant> func){
             list.add(func.get(new ModelVariant()));
+            return this;
+        }
+        public ModelVariantList addModel(String modelstr){
+            addModel(model->model.setModel(modelstr));
             return this;
         }
         public ModelVariantList addModel(String modelstr,int y){

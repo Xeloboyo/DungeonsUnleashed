@@ -19,11 +19,11 @@ public class ItemJsonModel extends JsonConfiguration{
     public ModelParent modelParent = ModelParent.ITEM_GENERATED;
     public String[] textureLayers;
     public Array<ItemModelOverride> overrides = new Array<>();
-
+    public String modelId;
 
     public ItemJsonModel(RegisteredItem item){
         this(item,"item/"+item.id,new String[]{});
-        if(item.get() instanceof BlockItem){
+        if(item.get() instanceof BlockItem bi){
             modelParent = ModelParent.BLOCK;
             textureLayers = new String[]{};
         }else{
@@ -35,23 +35,24 @@ public class ItemJsonModel extends JsonConfiguration{
         super(Paths.models + name + ".json", new JSONObject());
         this.item = item;
         this.textureLayers=textureLayers;
+        modelId = item.id;
     }
 
     @Override
     public void fillJSONObj(){
         try{
-            json.put("parent", format(modelParent.key,item.id));
+            json.put("parent", format(modelParent.key,modelId));
             if(item.get() instanceof BlockItem){
-                String modelpath = Paths.blockModel+item.id+".json";
-                if(!AssetGenerator.isQueued(modelpath) && !ModelProvider.hasModel("block/"+item.id)){
-                    File cust = new File(Paths.blockModel+"custom/"+item.id+".json");
+                String modelpath = Paths.blockModel+modelId+".json";
+                if(!AssetGenerator.isQueued(modelpath) && !ModelProvider.hasModel("block/"+modelId)){
+                    File cust = new File(Paths.blockModel+"custom/"+modelId+".json");
                     if(!cust.exists()){
-                        System.out.println("[WARNING] Block model for BlockItem "+item.id+" was not found!");
-                        JSONObject config = new JSONObject(BlockModelPresetBuilder.allSidesSame(item.id,"block/default").substring(2));
+                        System.out.println("[WARNING] Block model for BlockItem "+modelId+" was not found!");
+                        JSONObject config = new JSONObject(BlockModelPresetBuilder.allSidesSame(modelId,"block/default").substring(2));
                         JSONObject template = BlockModelPresetBuilder.getTemplate(config.getString("template"));
-                        new ModelJson("block/"+item.id,template, config);
+                        new ModelJson("block/"+modelId,template, config);
                     }else{
-                        json.put("parent", format(modelParent.key,"/custom/"+item.id));
+                        json.put("parent", format(modelParent.key,"/custom/"+modelId));
                     }
                 }
 

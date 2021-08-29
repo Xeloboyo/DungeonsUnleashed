@@ -6,6 +6,7 @@ import com.xeloklox.dungeons.unleashed.blocks.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
+import com.xeloklox.dungeons.unleashed.utils.block.entity.*;
 import net.fabricmc.fabric.api.block.entity.*;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
@@ -23,7 +24,7 @@ import net.minecraft.world.*;
 import org.jetbrains.annotations.*;
 import org.mini2Dx.gdx.utils.*;
 
-public class InfuserEntity extends BlockEntity implements BlockEntityClientSerializable,SegmentedInventory, NamedScreenHandlerFactory{
+public class InfuserEntity extends BlockEntity implements BlockEntityClientSerializable, SegmentedInventory, NamedScreenHandlerFactory, BlockEntityTicker<InfuserEntity>{
     int infuseProgress=0;
     int remainingPowerCharge = 0;
     public static final int powerPerCharge = 100;
@@ -109,7 +110,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         Inventories.readNbt(nbt, items);
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, InfuserEntity be) {
+    public void tick(World world, BlockPos pos, BlockState state, InfuserEntity be) {
         if(world.isClient){
             be.updateClient(world,pos,state);
         }else{
@@ -245,6 +246,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         return items;
     }
 
+    //received from server
     @Override
     public void fromClientTag(NbtCompound tag){
         Utils.fromIntMask(tag.getInt("attach"),jarAttach);
@@ -252,6 +254,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         processingStack = ItemStack.fromNbt(tag.getCompound("item"));
     }
 
+    //send to client
     @Override
     public NbtCompound toClientTag(NbtCompound tag){
         tag.putInt("attach",Utils.toIntMask(jarAttach));
