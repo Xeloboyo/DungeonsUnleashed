@@ -28,7 +28,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     int infuseProgress=0;
     int remainingPowerCharge = 0;
     public static final int powerPerCharge = 100;
-    int infuseDelay=2;
+    int infuseDelay=5;
     InfuserRecipe currentRecipe = null;
     boolean[] jarAttach = new boolean[InfuserBlock.connectionRelative.length];
     boolean jarUpdate = true;
