@@ -1,0 +1,8 @@
+{
+    "replace": false,
+    "values": [
+        "dungeonunleash:void_rock_tile_slab",
+        "dungeonunleash:void_rock_smooth_slab",
+        "dungeonunleash:end_wood_plank_slab"
+    ]
+}

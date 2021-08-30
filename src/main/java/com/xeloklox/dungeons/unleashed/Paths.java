@@ -4,7 +4,8 @@ import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 
 public class Paths{
     public static final String
-        modData             = "src/main/resources/data/"+MODID+"/",
+        data                = "src/main/resources/data/",
+        modData             = data+MODID+"/",
         lootTables          = modData+"loot_tables/",
         recipes             = modData+"recipes/",
         blockLootTables     = lootTables+"blocks/",

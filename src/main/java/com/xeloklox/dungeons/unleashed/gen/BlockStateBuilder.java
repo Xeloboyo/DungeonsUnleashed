@@ -152,6 +152,10 @@ public class BlockStateBuilder{
             apply = (func.get(new ModelVariant()));
             return this;
         }
+        public ModelMultipart setModel(String model){
+            apply = ((new ModelVariant()).setModel(model));
+            return this;
+        }
         public ModelMultipart OR(){
             or=true;
             return this;

@@ -49,6 +49,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     public static InfuserRecipe[] recipes = {
         new InfuserRecipe(Items.ENDER_PEARL, ModItems.UNSTABLE_ENDER_PEARL.get(), 100),
         new InfuserRecipe(Items.REDSTONE, Items.GUNPOWDER, 50),
+        new InfuserRecipe(Items.QUARTZ, Items.AMETHYST_SHARD, 200),
         new InfuserRecipe(Items.COAL, Items.DIAMOND, 500)
     };
     public static final int syncedSize = 6;

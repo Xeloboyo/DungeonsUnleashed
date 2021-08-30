@@ -8,6 +8,7 @@ import com.xeloklox.dungeons.unleashed.blocks.graph.charge.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.gen.BlockStateBuilder.*;
 import com.xeloklox.dungeons.unleashed.gen.ItemJsonModel.*;
+import com.xeloklox.dungeons.unleashed.gen.ModTag.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.block.*;
 import com.xeloklox.dungeons.unleashed.utils.models.*;
@@ -24,6 +25,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
 import net.minecraft.state.property.*;
+import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.Direction.*;
 import net.minecraft.world.gen.stateprovider.*;
@@ -39,6 +41,7 @@ public class ModBlocks{
     public static final RegisteredBlock
     END_SOIL = new RegisteredBlock("end_soil"),
     END_WOOD_PLANKS = new RegisteredBlock("end_wood_planks"),
+    END_WOOD_PLANK_SLAB = new RegisteredBlock("end_wood_plank_slab"),
     ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil"),
     PATCHY_END_GRASS = new RegisteredBlock("end_grass_patchy"),
     END_GRASS = new RegisteredBlock("end_grass"),
@@ -47,8 +50,11 @@ public class ModBlocks{
     VOID_ROCK_SOILED = new RegisteredBlock("void_rock_soiled"),
     VOID_SHALE = new RegisteredBlock("void_shale"),
     VOID_ROCK_TILE = new RegisteredBlock("void_rock_tile"),
+    VOID_ROCK_TILE_SLAB = new RegisteredBlock("void_rock_tile_slab"),
+    VOID_ROCK_TILE_STAIRS = new RegisteredBlock("void_rock_tile_stairs"),
     VOID_ROCK_SMOOTH = new RegisteredBlock("void_rock_smooth"),
     VOID_ROCK_SMOOTH_SLAB = new RegisteredBlock("void_rock_smooth_slab"),
+    VOID_ROCK_SMOOTH_WALL = new RegisteredBlock("void_rock_smooth_wall"),
     VOID_ROCK_SMOOTH_STAIRS = new RegisteredBlock("void_rock_smooth_stairs"),
     BORDERED_END_STONE = new RegisteredBlock("bordered_end_stone"),
     END_STONE_PILLAR = new RegisteredBlock("end_stone_pillar"),
@@ -65,6 +71,13 @@ public class ModBlocks{
 
     public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
     public static final RegisteredScreenHandler<InfuserScreenHandler,InfuserScreen> INFUSER_SCREEN;
+
+    //tags go here for now
+    static ModTag<Block> wallsTag = new ModTag<>(TagDomain.minecraft,"walls", TagCategory.blocks);
+    static ModTag<Block> slabsTag = new ModTag<>(TagDomain.minecraft,"slabs", TagCategory.blocks);
+    static ModTag<Block> stairsTag = new ModTag<>(TagDomain.minecraft,"stairs", TagCategory.blocks);
+
+    static ModTag<Block> planksTag = new ModTag<>(TagDomain.minecraft,"planks", TagCategory.blocks);
 
     static {
         LootPoolCondition silktouch = (matches_tool(filter->filter.setEnchantments("minecraft:silk_touch , [1,-]")));
@@ -140,16 +153,18 @@ public class ModBlocks{
         genericBlockBuilder.get(VOID_ROCK_TILE,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_TILE.setName("Void Stone Tile");
         VOID_ROCK_TILE.finalise();
+        makeSlabFrom(VOID_ROCK_TILE,VOID_ROCK_TILE_SLAB); VOID_ROCK_TILE_SLAB.finalise();
+        makeStairsFrom(VOID_ROCK_TILE,VOID_ROCK_TILE_STAIRS); VOID_ROCK_TILE_STAIRS.finalise();
+
 
         genericBlockBuilder.get(VOID_ROCK_SMOOTH,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_SMOOTH.setName("Smooth Void Stone");
         VOID_ROCK_SMOOTH.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
         VOID_ROCK_SMOOTH.finalise();
+        makeWallsFrom(VOID_ROCK_SMOOTH,VOID_ROCK_SMOOTH_WALL);VOID_ROCK_SMOOTH_WALL.finalise();
+        makeSlabFrom(VOID_ROCK_SMOOTH,VOID_ROCK_SMOOTH_SLAB);VOID_ROCK_SMOOTH_SLAB.finalise();
+        makeStairsFrom(VOID_ROCK_SMOOTH,VOID_ROCK_SMOOTH_STAIRS);VOID_ROCK_SMOOTH_STAIRS.finalise();
 
-        makeSlabFrom(VOID_ROCK,VOID_ROCK_SMOOTH_SLAB);
-        VOID_ROCK_SMOOTH_SLAB.finalise();
-        makeStairsFrom(VOID_ROCK,VOID_ROCK_SMOOTH_STAIRS);
-        VOID_ROCK_SMOOTH_STAIRS.finalise();
 
         genericBlockBuilder.get(VOID_ROCK_SOILED,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_SOILED.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
@@ -173,6 +188,8 @@ public class ModBlocks{
         END_WOOD_PLANKS.setBlockState(BlockStateBuilder.create().noState(randomRotationVariants(END_WOOD_PLANKS_model)));
         END_WOOD_PLANKS.setFlammablility(5,5);
         END_WOOD_PLANKS.finalise();
+        planksTag.add(END_WOOD_PLANKS);
+        makeSlabFrom(END_WOOD_PLANKS,END_WOOD_PLANK_SLAB); END_WOOD_PLANK_SLAB.finalise();
 
         final String END_WOOD_model = BlockModelPresetBuilder.TopBottomSide(END_WOOD.id,"block/end_wood_top","block/end_wood_side","block/end_wood_top");
         BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
@@ -404,7 +421,6 @@ public class ModBlocks{
         //endregion
 
         new RegisteredModelProvider("modelProvider",new ModelProvider()); // yes
-
     }
 
     // convenience stuff:
@@ -439,6 +455,7 @@ public class ModBlocks{
                 )
             )
         );
+        slabsTag.add(SLAB);
     }
 
     static void makeStairsFrom(RegisteredBlock ORIGINAL, RegisteredBlock STAIRS){
@@ -455,9 +472,30 @@ public class ModBlocks{
         String stairsOuter = BlockModelPresetBuilder.StairsOuter(STAIRS.id+"_outer",tex[0],tex[1],tex[2]);
         String stairsInner = BlockModelPresetBuilder.StairsInner(STAIRS.id+"_inner",tex[0],tex[1],tex[2]);
         STAIRS.setBlockState(stairStates(stairs,stairsInner,stairsOuter));
-
+        stairsTag.add(STAIRS);
     }
-
+    static void makeWallsFrom(RegisteredBlock ORIGINAL, RegisteredBlock WALL){
+        BasicBlock.selectedPlacementConfig = BasicBlock.WALLS;
+        Globals.bootRun(()->{
+            if(ORIGINAL.get() instanceof BasicBlock bb){
+                WALL.setBlock(bb.copy());
+            }else{
+                WALL.setBlock(new Block(AbstractBlock.Settings.copy(ORIGINAL.get())));
+            }
+        });
+        String[] tex = ORIGINAL.getPrimaryModelTextures();
+        String wallPost = BlockModelPresetBuilder.WallPost(WALL.id+"_post",tex[0]);
+        String wallSide = BlockModelPresetBuilder.WallSide(WALL.id+"_side",tex[0]);
+        String wallSideTall = BlockModelPresetBuilder.WallSideTall(WALL.id+"_side_tall",tex[0]);
+        ModelJson inventory = BlockModelPresetBuilder.getModelJson(BlockModelPresetBuilder.WallInventory("block/"+WALL.id+"_inventory",tex[0]));
+        WALL.setBlockState(wallStates(wallPost,wallSide,wallSideTall));
+        WALL.setBlockitem((id, bitem) ->
+            new RegisteredItem(id, bitem,
+                item->{item.modelId = WALL.id+"_inventory"; return item;}
+            )
+        );
+        wallsTag.add(WALL);
+    }
 
     static DirectionProperty HORIZONTAL_FACING(){
         return Globals.bootQuery(() -> Properties.HORIZONTAL_FACING, DirectionProperty.of("facing", Type.HORIZONTAL));
@@ -466,6 +504,27 @@ public class ModBlocks{
     static DirectionProperty FACING(){
         return Globals.bootQuery(() -> Properties.FACING, DirectionProperty.of("facing"));
     }
+
+    static BooleanProperty UP(){
+        return Globals.bootQuery(() -> Properties.UP, BooleanProperty.of("up"));
+    }
+
+    static EnumProperty<WallShape> WALL(String dir){
+        return Globals.bootQuery(() -> {
+            switch(dir){
+                default:
+                case "east":
+                    return Properties.EAST_WALL_SHAPE;
+                case "west":
+                    return Properties.WEST_WALL_SHAPE;
+                case "north":
+                    return Properties.NORTH_WALL_SHAPE;
+                case "south":
+                    return Properties.SOUTH_WALL_SHAPE;
+            }
+        }, EnumProperty.of(dir, WallShape.class));
+    }
+
 
     static EnumProperty<SlabType> SLAB(){
         return Globals.bootQuery(() -> Properties.SLAB_TYPE, EnumProperty.of("type", SlabType.class));
@@ -519,12 +578,32 @@ public class ModBlocks{
             .addStateVariant(AXIS(), Axis.Z,variant->variant.addModel(modelStr,90,0));
     }
 
+    static BlockStateBuilder wallStates(String wallPost, String wallSide, String wallSideTall){
+        String [] dirs = {"north","east","south","west"};
+        BlockStateBuilder bsb = BlockStateBuilder.createMultipart();
+        bsb.addPart(part->
+            part.setModel(wallPost)
+                .addConditions(cond->cond.set(UP(),true))
+        );
+        for(int i=0;i<4;i++){
+            int index = i;
+            bsb.addPart(part->
+                part.setModel(model->model.setModel(wallSide).setY(index*90).setUVLock(true))
+                    .addConditions(cond->cond.set(WALL(dirs[index]),WallShape.LOW))
+            );
+            bsb.addPart(part->
+                part.setModel(model->model.setModel(wallSideTall).setY(index*90).setUVLock(true))
+                    .addConditions(cond->cond.set(WALL(dirs[index]),WallShape.TALL))
+            );
+        }
+        return bsb;
+    }
+
     static BlockStateBuilder stairStates(String stairs, String stairsInner, String stairsOuts){
         return BlockStateBuilder.create().stateCombinations((state,modelVariant)->{
             Direction facing = state.get(HORIZONTAL_FACING());
             BlockHalf half = state.get(HALF());
             StairShape shape = state.get(STAIR());
-            System.out.println(facing.getName()+","+half.name()+","+shape.name());
             int yRot = (int)facing.rotateYClockwise().asRotation();
             if(shape==StairShape.INNER_LEFT||shape==StairShape.OUTER_LEFT){
                 yRot+=270;

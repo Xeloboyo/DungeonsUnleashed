@@ -1,6 +1,7 @@
 package com.xeloklox.dungeons.unleashed.utils;
 
 import com.xeloklox.dungeons.unleashed.*;
+import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.utils.models.*;
 import org.json.*;
 import org.mini2Dx.gdx.utils.*;
@@ -76,6 +77,18 @@ public class BlockModelPresetBuilder{
         return "@@"+jo.toString();
     }
 
+    private static String WallTemplate(String template, String name, String tex){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template","block/templates/"+template);
+            jo.put("tex_wall",tex);
+            jo.put("name",name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return "@@"+jo.toString();
+    }
+
     public static String SlabTop(String name, String top, String side, String bottom){
         return TopBottomSideTemplate("slab_top",name,top,side,bottom);
     }
@@ -91,12 +104,32 @@ public class BlockModelPresetBuilder{
     public static String StairsOuter(String name, String top, String side, String bottom){
         return TopBottomSideTemplate("stairs_outer",name,top,side,bottom);
     }
+    public static String WallPost(String name, String tex){
+        return WallTemplate("wall_post",name,tex);
+    }
+    public static String WallSide(String name, String tex){
+        return WallTemplate("wall_side",name,tex);
+    }
+    public static String WallSideTall(String name, String tex){
+        return WallTemplate("wall_side_tall",name,tex);
+    }
+    public static String WallInventory(String name, String tex){
+        return WallTemplate("wall_inventory",name,tex);
+    }
 
     //lmao idk
     public static String custom(String name){
         return name;
     }
-
+    public static ModelJson getModelJson(String modelstr){
+        try{
+            JSONObject jo = new JSONObject(modelstr.substring(2));
+            return new ModelJson(jo.getString("name"),getTemplate(jo.getString("template")),jo);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
     public static String customTemplate(String template,String name,String tex){
         return "@@"+customTemplateObj(template,name,tex).toString();
     }
