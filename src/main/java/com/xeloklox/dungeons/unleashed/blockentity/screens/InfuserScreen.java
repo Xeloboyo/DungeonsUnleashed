@@ -75,10 +75,10 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
 
         stateMap.addState(AnimationState.get(STATE_OPENING).loops(false).onInit(pmap -> {
             pmap.f("x_offset",-50);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL,5f,"x_offset",new FloatInterpolate(),0f);
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"alpha",new FloatInterpolate(),1f,1f,1f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 0f);
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(),
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL,5f,"x_offset",new FloatInterpolate(),0f);
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"alpha",new FloatInterpolate(),1f,1f,1f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 0f);
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(),
                 FrameState.get(5f,0.6f),
                     FrameState.get(14f,0.3f),
                     FrameState.get(12f,0.1f)
@@ -86,33 +86,33 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
         }));
         stateMap.addState(AnimationState.get(STATE_IDLE_UNPOWERED).loops(true).duration(1000).needsToComplete(false).onInit(pmap -> { }));
         stateMap.addState(AnimationState.get(STATE_IDLE_POWERINGDOWN).loops(false).needsToComplete(true).onInit(pmap -> {
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 0f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(), 0f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 0);
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(),
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 0f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(), 0f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 0);
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(),
                 FrameState.get(14f,0.1f),
                 FrameState.get(5f,0.9f)
             );
         }));
         stateMap.addState(AnimationState.get(STATE_IDLE_POWERINGUP).loops(false).needsToComplete(true).onInit(pmap -> {
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(),
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(),
                 FrameState.get(1f,0.1f),
                 FrameState.get(0.4f,0.9f)
             );
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(),
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(),
                 FrameState.get(14f,0.1f),
                 FrameState.get(12f,0.9f)
             );
         }));
         stateMap.addState(AnimationState.get(STATE_IDLE_POWERED).loops(true).duration(600).needsToComplete(false).onInit(pmap -> {
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(), 12f);
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(),
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"tab",new FloatInterpolate(), 12f);
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(),
             FrameState.get(0.4f,0.25f),
                 FrameState.get(0.2f,0.25f),
                 FrameState.get(0.5f,0.25f),
                 FrameState.get(0.3f,0.25f)
             );
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(),
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(),
             FrameState.get(0f,0.1f),
                 FrameState.get(-1f,0.05f),
                 FrameState.get(0f,0.12f),
@@ -126,23 +126,23 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
             );
         }));
         stateMap.addState(AnimationState.get(STATE_WORKING).loops(true).duration(30).needsToComplete(false).resetOnloop(false).onInit(pmap -> {
-            pmap.addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(),
+            pmap.addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(),
            FrameState.get(2f,0.25f),
                FrameState.get(1.5f,0.25f),
                FrameState.get(1.8f,0.25f),
                FrameState.get(1.2f,0.25f)
             );
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 6);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 6);
         }));
         stateMap.addState(AnimationState.get(STATE_WINDINGUP).loops(false).duration(100).needsToComplete(true).onInit(pmap -> {
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 10f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(), 1f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 0);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 10f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(), 1f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 0);
         }));
         stateMap.addState(AnimationState.get(STATE_WINDINGDOWN).loops(false).duration(100).needsToComplete(true).onInit(pmap -> {
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 0f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(), 0.4f);
-            pmap.addInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 0);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(), 0f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"glowalpha",new FloatInterpolate(), 0.4f);
+            pmap.addInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"frame",new IntInterpolate(), 0);
         }));
         backgroundWidth=203;
         backgroundHeight=200;

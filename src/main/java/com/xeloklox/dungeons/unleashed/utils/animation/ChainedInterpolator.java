@@ -2,13 +2,12 @@ package com.xeloklox.dungeons.unleashed.utils.animation;
 
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
-import org.mini2Dx.gdx.utils.compat.*;
 
 public class ChainedInterpolator<T> extends Interpolator<T>{
     FrameState<T>[] states;
     float totalWeight;
 
-    ChainedInterpolator(ParameterMap ae, InterpolateType type, float w, String key, Interpolate<T> interp, FrameState<T>... states){
+    ChainedInterpolator(ParameterMap ae, SingularInterpolateType type, float w, String key, Interpolate<T> interp, FrameState<T>... states){
         super(ae, type, w, key, interp);
         this.states = states;
         initOrigin();

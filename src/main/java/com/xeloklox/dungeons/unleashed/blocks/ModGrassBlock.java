@@ -8,6 +8,8 @@ import net.minecraft.block.*;
 import net.minecraft.server.world.*;
 import net.minecraft.util.math.*;
 
+import java.util.function.*;
+
 public class ModGrassBlock extends SpreadingBlock{
     RegisteredBlock[] stages;
     int minlightLevel, growlightLevel;

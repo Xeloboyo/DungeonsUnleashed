@@ -1,0 +1,5 @@
+{"variants": {
+    "type=bottom": [{"model": "dungeonunleash:block/void_rock_tile_slab"}],
+    "type=double": [{"model": "dungeonunleash:block/void_rock_tile"}],
+    "type=top": [{"model": "dungeonunleash:block/void_rock_tile_slab_top"}]
+}}

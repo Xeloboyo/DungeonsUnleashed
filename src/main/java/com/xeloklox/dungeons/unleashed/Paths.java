@@ -10,6 +10,7 @@ public class Paths{
         recipes             = modData+"recipes/",
         blockLootTables     = lootTables+"blocks/",
         modResource         = "src/main/resources/assets/"+MODID+"/",
+        animations          = modResource+"animation/",
         texture             = modResource+"textures/",
         models              = modResource+"models/",
         itemModel           = modResource+"models/item/",

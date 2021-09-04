@@ -6,7 +6,6 @@ import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.*;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
-import net.minecraft.block.enums.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.fluid.*;
@@ -15,21 +14,15 @@ import net.minecraft.item.*;
 import net.minecraft.screen.*;
 import net.minecraft.state.*;
 import net.minecraft.state.StateManager.*;
-import net.minecraft.state.property.*;
 import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.tag.*;
 import net.minecraft.util.*;
-import net.minecraft.util.function.*;
 import net.minecraft.util.hit.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.*;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.*;
-
 import java.lang.reflect.*;
-import java.util.*;
-import java.util.stream.*;
+import java.util.function.*;
 
 /**
  * Class that tries to cover alot of the general vanilla cases for blocks
@@ -107,7 +100,7 @@ public class BasicBlock extends Block implements Waterloggable{
             }
             return ActionResult.SUCCESS;
         }
-        return isGUI ? ActionResult.SUCCESS : ActionResult.PASS;
+        return isGUI ? ActionResult.SUCCESS : (modifier!=null?modifier.onUse(state,world,pos,player,hand,hit):ActionResult.PASS);
     }
 
 
@@ -276,6 +269,7 @@ public class BasicBlock extends Block implements Waterloggable{
     FACING_PLAYER_PLACEMENT,
     STAIRS,
     WALLS,
+    FENCE,
     HALF_SLAB;
     //i see why its at the end now
     static{
@@ -294,7 +288,9 @@ public class BasicBlock extends Block implements Waterloggable{
             WALLS = new PlacementConfig((ctx, block) -> {
                 return block.modifier.getPlacementState(ctx);
             }, WallsModifier::new,WallsModifier.UP, WallsModifier.EAST_SHAPE, WallsModifier.NORTH_SHAPE, WallsModifier.SOUTH_SHAPE, WallsModifier.WEST_SHAPE, Properties.WATERLOGGED);
-
+            FENCE = new PlacementConfig((ctx, block) -> {
+                return block.modifier.getPlacementState(ctx);
+            }, FenceModifier::new,Properties.EAST,Properties.WEST,Properties.NORTH,Properties.SOUTH, Properties.WATERLOGGED);
 
             selectedPlacementConfig = DEFAULT_PLACEMENT;
         }

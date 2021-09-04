@@ -1,0 +1,4 @@
+{
+    "parent": "minecraft:block/wall_inventory",
+    "textures": {"wall": "dungeonunleash:block/void_rock_smooth"}
+}

@@ -1,0 +1,4 @@
+{
+    "parent": "minecraft:block/wall_inventory",
+    "textures": {"wall": "dungeonunleash:block/end_wood_planks"}
+}

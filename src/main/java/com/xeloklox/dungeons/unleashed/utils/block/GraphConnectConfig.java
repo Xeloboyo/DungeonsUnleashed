@@ -16,7 +16,7 @@ public abstract class GraphConnectConfig<T extends BlockGraph>{ //list stored in
     }
 
     //what positions you can connect to
-    abstract boolean canConnectTo(World world, BlockPos from, BlockPos to);
+    public abstract boolean canConnectTo(BlockView world, BlockPos from, BlockPos to);
 
     abstract BlockPos[] getConnectionPoints(World world, BlockPos from);
 
@@ -27,7 +27,7 @@ public abstract class GraphConnectConfig<T extends BlockGraph>{ //list stored in
         }
 
         @Override
-        boolean canConnectTo(World world, BlockPos from, BlockPos to){
+        public boolean canConnectTo(BlockView world, BlockPos from, BlockPos to){
             return abs(from.getX()-to.getX())+abs(from.getY()-to.getY())+abs(from.getZ()-to.getZ())==1;
         }
 
@@ -59,7 +59,7 @@ public abstract class GraphConnectConfig<T extends BlockGraph>{ //list stored in
         }
 
         @Override
-        boolean canConnectTo(World world, BlockPos from, BlockPos to){
+        public boolean canConnectTo(BlockView world, BlockPos from, BlockPos to){
             int rx = to.getX()-from.getX();
             int ry = to.getY()-from.getY();
             int rz = to.getZ()-from.getZ();

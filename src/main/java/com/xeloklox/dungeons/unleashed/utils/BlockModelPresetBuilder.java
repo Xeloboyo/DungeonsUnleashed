@@ -88,6 +88,17 @@ public class BlockModelPresetBuilder{
         }
         return "@@"+jo.toString();
     }
+    private static String FenceTemplate(String template, String name, String tex){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template","block/templates/"+template);
+            jo.put("tex_texture",tex);
+            jo.put("name",name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return "@@"+jo.toString();
+    }
 
     public static String SlabTop(String name, String top, String side, String bottom){
         return TopBottomSideTemplate("slab_top",name,top,side,bottom);
@@ -116,6 +127,15 @@ public class BlockModelPresetBuilder{
     public static String WallInventory(String name, String tex){
         return WallTemplate("wall_inventory",name,tex);
     }
+    public static String FencePost(String name, String tex){
+           return FenceTemplate("fence_post",name,tex);
+       }
+    public static String FenceSide(String name, String tex){
+       return FenceTemplate("fence_side",name,tex);
+   }
+    public static String FenceInventory(String name, String tex){
+            return FenceTemplate("fence_inventory",name,tex);
+        }
 
     //lmao idk
     public static String custom(String name){
@@ -157,6 +177,9 @@ public class BlockModelPresetBuilder{
             }
         }
         String s = Strings.resourceAsString(Paths.models+name+".json");
+        if(s==null){
+            s = Strings.resourceAsString(Paths.models+name+".model");
+        }
 
         try{
             templateMap.put(name,s);

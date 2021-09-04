@@ -5,13 +5,13 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "ItemEntityMixin",
-    "LightningEntityMixin"
+    "LightningEntityMixin",
+    "RenderLayerMixin",
+    "RenderPhaseMixin"
   ],
   "client": [
-
   ],
   "server": [
-
   ],
   "injectors": {
     "defaultRequire": 1

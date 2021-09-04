@@ -39,4 +39,7 @@ public abstract class BasicBlockModifier{
     public abstract VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context);
     public abstract VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context);
     public abstract BlockState getPlacementState(ItemPlacementContext ctx);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        return ActionResult.PASS;
+    }
 }

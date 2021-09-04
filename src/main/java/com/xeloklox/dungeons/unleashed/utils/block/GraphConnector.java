@@ -21,6 +21,7 @@ public abstract class GraphConnector<T extends BlockGraph>{
     }
 
     public void connectWith(GraphConnector<T> connector){
+        if(connector==this){return;}
         if(connector.getClass().equals(this.getClass())){
             connections.add(connector);
             connector.connections.add(this);
@@ -50,7 +51,10 @@ public abstract class GraphConnector<T extends BlockGraph>{
     public void disconnect(){
         for(int i=0;i<connections.size;i++){
             connections.get(i).connections.removeValue(this,true);
+            connections.get(i).blockEntity.onDisconnect(this);
+            blockEntity.onDisconnect(connections.get(i));
         }
+
     }
 
     public abstract T newGraph();
@@ -77,5 +81,17 @@ public abstract class GraphConnector<T extends BlockGraph>{
                 cons.get(e.key,e.value);
             }
         }
+    }
+
+    @Override
+    public String toString(){
+        return "GraphConnector {" +
+        "  allowsOutgoingConnection=" + allowsOutgoingConnection +
+        ", id=" + id +
+        ", blockEntity=" + blockEntity +
+        ", graph=" + graph.name() + ":" + graph.id + "," +  graph.connected.size +
+        ", needsReconnect=" + needsReconnect +
+        ", connections=" + connections.size +
+        '}';
     }
 }

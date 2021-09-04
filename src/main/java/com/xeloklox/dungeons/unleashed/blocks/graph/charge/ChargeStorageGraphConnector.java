@@ -5,7 +5,6 @@ import com.xeloklox.dungeons.unleashed.utils.block.*;
 public class ChargeStorageGraphConnector extends GraphConnector<ChargeStorageGraph>{
     int chargeCapacity;
     int tempCharge;
-    //temp charge..
 
     public ChargeStorageGraphConnector(GraphConnectingEntity blockEntity, int chargeCapacity){
         super(blockEntity,graphConnector -> {
@@ -24,7 +23,7 @@ public class ChargeStorageGraphConnector extends GraphConnector<ChargeStorageGra
         graph.maxCharge+=this.chargeCapacity;
         graph.charge += tempCharge;
         tempCharge = 0;
-        System.out.println("Graph charge is now: "+graph.maxCharge);
+        System.out.println("Graph charge is now: "+graph.charge+"/"+graph.maxCharge);
     }
 
     @Override
@@ -33,6 +32,7 @@ public class ChargeStorageGraphConnector extends GraphConnector<ChargeStorageGra
         if(graph.charge> graph.maxCharge){
             tempCharge = graph.charge-graph.maxCharge;
             graph.charge = graph.maxCharge;
+
         }
     }
 }

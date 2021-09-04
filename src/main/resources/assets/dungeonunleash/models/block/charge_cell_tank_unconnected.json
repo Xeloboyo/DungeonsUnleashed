@@ -1,0 +1,251 @@
+{
+    "credit": "Made with Blockbench",
+    "display": {
+        "firstperson_lefthand": {
+            "rotation": [
+                0,
+                225,
+                0
+            ],
+            "scale": [
+                0.4,
+                0.4,
+                0.4
+            ]
+        },
+        "firstperson_righthand": {
+            "rotation": [
+                0,
+                45,
+                0
+            ],
+            "scale": [
+                0.4,
+                0.4,
+                0.4
+            ]
+        },
+        "fixed": {"scale": [
+            0.5,
+            0.5,
+            0.5
+        ]},
+        "ground": {
+            "scale": [
+                0.25,
+                0.25,
+                0.25
+            ],
+            "translation": [
+                0,
+                3,
+                0
+            ]
+        },
+        "gui": {
+            "rotation": [
+                30,
+                225,
+                0
+            ],
+            "scale": [
+                0.625,
+                0.625,
+                0.625
+            ]
+        },
+        "thirdperson_lefthand": {
+            "rotation": [
+                75,
+                45,
+                0
+            ],
+            "scale": [
+                0.375,
+                0.375,
+                0.375
+            ],
+            "translation": [
+                0,
+                2.5,
+                0
+            ]
+        },
+        "thirdperson_righthand": {
+            "rotation": [
+                75,
+                45,
+                0
+            ],
+            "scale": [
+                0.375,
+                0.375,
+                0.375
+            ],
+            "translation": [
+                0,
+                2.5,
+                0
+            ]
+        }
+    },
+    "elements": [
+        {
+            "faces": {
+                "down": {
+                    "texture": "#0",
+                    "uv": [
+                        0,
+                        8,
+                        8,
+                        16
+                    ]
+                },
+                "east": {
+                    "texture": "#0",
+                    "uv": [
+                        0,
+                        8,
+                        8,
+                        16
+                    ]
+                },
+                "north": {
+                    "texture": "#0",
+                    "uv": [
+                        0,
+                        8,
+                        8,
+                        16
+                    ]
+                },
+                "south": {
+                    "texture": "#0",
+                    "uv": [
+                        0,
+                        8,
+                        8,
+                        16
+                    ]
+                },
+                "up": {
+                    "texture": "#0",
+                    "uv": [
+                        0,
+                        8,
+                        8,
+                        16
+                    ]
+                },
+                "west": {
+                    "texture": "#0",
+                    "uv": [
+                        0,
+                        8,
+                        8,
+                        16
+                    ]
+                }
+            },
+            "from": [
+                0,
+                0,
+                0
+            ],
+            "to": [
+                16,
+                16,
+                16
+            ]
+        },
+        {
+            "faces": {
+                "down": {
+                    "texture": "#0",
+                    "uv": [
+                        11,
+                        0,
+                        14,
+                        3
+                    ]
+                },
+                "east": {
+                    "texture": "#0",
+                    "uv": [
+                        8,
+                        0,
+                        11,
+                        8
+                    ]
+                },
+                "north": {
+                    "texture": "#0",
+                    "uv": [
+                        8,
+                        0,
+                        11,
+                        8
+                    ]
+                },
+                "south": {
+                    "texture": "#0",
+                    "uv": [
+                        8,
+                        0,
+                        11,
+                        8
+                    ]
+                },
+                "up": {
+                    "texture": "#0",
+                    "uv": [
+                        11,
+                        0,
+                        14,
+                        3
+                    ]
+                },
+                "west": {
+                    "texture": "#0",
+                    "uv": [
+                        8,
+                        0,
+                        11,
+                        8
+                    ]
+                }
+            },
+            "from": [
+                5,
+                1,
+                5
+            ],
+            "to": [
+                11,
+                15,
+                11
+            ]
+        }
+    ],
+    "groups": [{
+        "children": [
+            0,
+            1
+        ],
+        "color": 0,
+        "name": "group",
+        "origin": [
+            0,
+            0,
+            0
+        ]
+    }],
+    "texture_size": [
+        32,
+        32
+    ],
+    "textures": {
+        "0": "dungeonunleash:block/custom/charge_cell_tank",
+        "particle": "dungeonunleash:block/custom/charge_cell_tank"
+    }
+}

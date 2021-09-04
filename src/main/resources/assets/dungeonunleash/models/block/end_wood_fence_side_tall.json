@@ -1,0 +1,75 @@
+{
+    "credit": "Made with Blockbench",
+    "elements": [{
+        "faces": {
+            "down": {
+                "texture": "#0",
+                "uv": [
+                    7,
+                    7,
+                    13,
+                    16
+                ]
+            },
+            "east": {
+                "texture": "#0",
+                "uv": [
+                    0,
+                    0,
+                    8,
+                    16
+                ]
+            },
+            "north": {
+                "texture": "#0",
+                "uv": [
+                    7,
+                    4,
+                    13,
+                    16
+                ]
+            },
+            "south": {
+                "texture": "#0",
+                "uv": [
+                    0,
+                    0,
+                    0,
+                    0
+                ]
+            },
+            "up": {
+                "texture": "#0",
+                "uv": [
+                    7,
+                    8,
+                    13,
+                    16
+                ]
+            },
+            "west": {
+                "texture": "#0",
+                "uv": [
+                    8,
+                    0,
+                    0,
+                    16
+                ]
+            }
+        },
+        "from": [
+            5,
+            0,
+            0
+        ],
+        "to": [
+            11,
+            16,
+            8
+        ]
+    }],
+    "textures": {
+        "0": "dungeonunleash:block/custom/end_wood_fence_side_tall",
+        "particle": "dungeonunleash:block/custom/end_wood_fence_side_tall"
+    }
+}

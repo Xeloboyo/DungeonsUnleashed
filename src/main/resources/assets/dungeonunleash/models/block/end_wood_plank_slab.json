@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/slab",
+    "textures": {
+        "bottom": "dungeonunleash:block/end_wood_planks",
+        "side": "dungeonunleash:block/end_wood_planks",
+        "top": "dungeonunleash:block/end_wood_planks"
+    }
+}

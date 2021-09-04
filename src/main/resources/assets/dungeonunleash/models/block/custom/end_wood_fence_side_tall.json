@@ -1,0 +1,21 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "block/end_wood_side_tall",
+		"particle": "block/end_wood_side_tall"
+	},
+	"elements": [
+		{
+			"from": [5, 0, 0],
+			"to": [11, 16, 8],
+			"faces": {
+				"north": {"uv": [7, 4, 13, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 8, 16], "texture": "#0"},
+				"south": {"uv": [0, 0, 0, 0], "texture": "#0"},
+				"west": {"uv": [8, 0, 0, 16], "texture": "#0"},
+				"up": {"uv": [7, 8, 13, 16], "texture": "#0"},
+				"down": {"uv": [7, 7, 13, 16], "texture": "#0"}
+			}
+		}
+	]
+}

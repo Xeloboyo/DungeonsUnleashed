@@ -28,6 +28,10 @@ public abstract class BlockGraph{
     public abstract void readFromNbt(NbtCompound nbtCompound);
 
     public void addConnector(GraphConnector gc){
+        if(gc.graph==this){
+            System.out.println("already added?...");
+            return;
+        }
         gc.graph = this;
         connected.add(gc);
         gc.onAdd();
@@ -63,6 +67,7 @@ public abstract class BlockGraph{
     public void remove(GraphConnector gc){
         int index = connected.indexOf(gc,true);
         if(index==-1){
+            System.out.println("wasnt actually connected... weird");
             return;
         }
         if(gc.connections.size==1){
@@ -89,6 +94,7 @@ public abstract class BlockGraph{
             connected.get(i).graph=null;
             connected.get(i).needsReconnect=true;
         }
+        connected.clear();
     }
     //used for deletions, can be e x p e n s i v e, maybe? idk
     public void rebuildFromCore(){

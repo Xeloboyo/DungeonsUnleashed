@@ -90,3 +90,6 @@ task generateJson(type:JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+loom {
+	accessWidener = file("src/main/resources/dungeonunleash.accesswidener")
+}

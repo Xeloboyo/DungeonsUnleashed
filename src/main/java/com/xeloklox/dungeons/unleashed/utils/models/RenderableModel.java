@@ -2,12 +2,10 @@ package com.xeloklox.dungeons.unleashed.utils.models;
 
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.*;
-import net.minecraft.client.texture.*;
-import net.minecraft.client.util.*;
 import net.minecraft.client.util.math.*;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import org.json.*;
@@ -16,42 +14,172 @@ import org.mini2Dx.gdx.utils.*;
 import java.util.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.utils.Utils.pixels;
 
 public class RenderableModel{
     ModelJson modelJson;
-    SpriteIdentifier sprite;
-    RenderLayer renderlayer;
+    Func<Identifier,RenderLayer> renderlayer;
+    Identifier texture;
     public TexturedModelData texturedModelData;
     public RegisteredEntityModelLayer modelLayer;
     ModelTransform pivot;
-    public Array<Quad> quads = new Array<>(); // :D
+    public Array<Quad> quads = new Array<>(); // :D todo convert this to bones later.
+
+    public ObjectMap<String,Bone> bonemap = new ObjectMap<>();
+    public Array<Bone> topLevelBones = new Array<>(); // :D
 
     public RenderableModel(ModelJson modelJson,ModelTransform pivot){
+        this(modelJson,pivot,RenderLayer::getEntityCutoutNoCull);
+    }
+
+    public RenderableModel(ModelJson modelJson, ModelTransform pivot, Func<Identifier,RenderLayer> renderlayer){
         this.pivot=pivot;
         this.modelJson = modelJson;
         modelLayer = new RegisteredEntityModelLayer(modelJson.getName(),()->{
             try{
                 return this.get();
-            }catch(JSONException e){ }
+            }catch(JSONException e){
+                System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + e.getLocalizedMessage()+ Arrays.toString(e.getStackTrace()));
+            }
             return null;
         });
         try{
-            renderlayer = RenderLayer.getEntityCutoutNoCull(new Identifier(MODID,"textures/"+modelJson.config.getString("tex_0")+".png"));
+            texture = new Identifier(MODID,"textures/"+modelJson.config.getString("tex_0")+".png");
         }catch(JSONException e){ }
+        this.renderlayer = renderlayer;
     }
 
 
     public TexturedModelData get() throws JSONException{
+        modelJson.fillJSONObj();
         JSONObject model = modelJson.getJson();
-        JSONObject textures = model.getJSONObject("textures");
-        Iterator<String> it = textures.keys();
-        while(it.hasNext()){
-            String p = it.next();
-            if(p.equals("particle")){continue;}
-            sprite= new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE,new Identifier(MODID,textures.getString(p)));
-            break;
+
+        if(modelJson.isBedrock){
+            return loadFromBedrockModel(model);
+        }else{
+            return loadFromJavaModel(model);
+        }
+    }
+
+    public ObjectMap<String, BoneTranslationParameters> getParamMap(){
+        ObjectMap<String, BoneTranslationParameters> map = new ObjectMap<>();
+        bonemap.forEach(e->{
+            map.put(e.key,new BoneTranslationParameters());
+        });
+        return map;
+    }
+    public Vector4f color = new Vector4f(1,1,1,1);
+
+
+    public void setAlpha(float alpha){
+        alpha = MathHelper.clamp(alpha,0,1);
+        color.set(color.getX(),color.getY(),color.getZ(),alpha);
+    }
+
+    public void render(MatrixStack matrices,VertexConsumerProvider vertexConsumerProvider, int light, int overlay){
+        VertexConsumer vc = vertexConsumerProvider.getBuffer(renderlayer.get(texture));
+        if(modelJson.isBedrock){
+            for(Bone b:topLevelBones){
+                b.render(matrices,vc,light,overlay,color.getX(),color.getY(),color.getZ(),color.getW());
+            }
+        }else{
+            MatrixStack.Entry entry = matrices.peek();
+            for(int i = 0; i < quads.size; i++){
+                renderQuad(entry, vc, quads.get(i), light, overlay,color.getX(),color.getY(),color.getZ(),color.getW());
+            }
+        }
+    }
+    public void render(MatrixStack matrices,VertexConsumerProvider vertexConsumerProvider, int light, int overlay, ObjectMap<String, BoneTranslationParameters> boneTranslationProvider){
+        VertexConsumer vc = vertexConsumerProvider.getBuffer(renderlayer.get(texture));
+        if(modelJson.isBedrock){
+            for(Bone b:topLevelBones){
+                b.render(matrices,vc,light,overlay,boneTranslationProvider,color.getX(),color.getY(),color.getZ(),color.getW());
+            }
+        }
+    }
+
+    public TexturedModelData loadFromBedrockModel(JSONObject modelOuter) throws JSONException{
+        JSONObject model = modelOuter.getJSONArray("minecraft:geometry").getJSONObject(0);
+        if(model==null){
+            System.err.println(modelJson.getName()+" is empty bedrock model?????");
+            return null;
+        }
+        JSONObject description = model.getJSONObject("description");
+        int tw = description.has("texture_width")? description.getInt("texture_width"):16;
+        int th = description.has("texture_height")? description.getInt("texture_height"):16;
+
+        JSONArray bones = model.getJSONArray("bones");
+        for(int i =0;i<bones.length();i++){
+            JSONObject bonejson = bones.getJSONObject(i);
+
+            float[] pivot = Utils.floatArray(bonejson.getJSONArray("pivot"));
+
+            Bone bone = new Bone(bonejson.getString("name"),new Vec3f(pixels(pivot[0]),pixels(pivot[1]),pixels(pivot[2])));
+            if(bonejson.has("rotation")){
+                float[] rotation = Utils.floatArray(bonejson.getJSONArray("rotation"));
+                bone.rotation.set(rotation[0],-rotation[1],-rotation[2]);
+            }
+            if(bonejson.has("cubes")){
+                JSONArray cubes = bonejson.getJSONArray("cubes");
+                for(int c =0;c<cubes.length();c++){
+                    JSONObject cubejson = cubes.getJSONObject(c);
+                    float[] pos = Utils.floatArray(cubejson.getJSONArray("origin"));
+                    float[] size = Utils.floatArray(cubejson.getJSONArray("size"));
+                    float[] rotation = {0,0,0};
+                    if(cubejson.has("rotation")){
+                        rotation = Utils.floatArray(cubejson.getJSONArray("rotation"));
+                    }
+                    float[] cubepivot = {0,0,0};
+                    if(cubejson.has("pivot")){
+                        cubepivot = Utils.floatArray(cubejson.getJSONArray("pivot"));
+                    }
+                    float [][] uvs = new float[6][4];
+                    JSONObject facesUV = cubejson.getJSONObject("uv");
+                    for(int d=0;d<6;d++){
+                        Direction dr = Direction.byId(d);
+                        JSONObject face = facesUV.getJSONObject(dr.getName());
+                        JSONArray uv = face.getJSONArray("uv");
+                        JSONArray uvsize = face.getJSONArray("uv_size");
+                        if(d!=Direction.EAST.getId() && d!=Direction.WEST.getId()){
+                            uvs[d][0] = uv.getInt(0);
+                            uvs[d][2] = uvsize.getInt(0) + uv.getInt(0);
+                            uvs[d][1] = uvsize.getInt(1) + uv.getInt(1);
+                            uvs[d][3] = uv.getInt(1);
+                        }else{
+                            uvs[d][0] = uvsize.getInt(0) + uv.getInt(0);
+                            uvs[d][2] = uv.getInt(0);
+                            uvs[d][1] = uvsize.getInt(1) + uv.getInt(1);
+                            uvs[d][3] = uv.getInt(1);
+                        }
+
+                    }
+                    OrientedCuboid orientedCuboid = new OrientedCuboid(pos[0]-cubepivot[0],pos[1]-cubepivot[1],-((pos[2]+size[2])-cubepivot[2]),size[0],size[1],size[2],uvs,tw,th);
+                    orientedCuboid.rotation.set(rotation[0],-rotation[1],-rotation[2]);
+                    orientedCuboid.pivot.set(pixels(cubepivot[0]),pixels(cubepivot[1]),pixels(-cubepivot[2]));
+                    bone.cubes.add(orientedCuboid);
+                }
+            }
+            bonemap.put(bone.name,bone);
+            if(bonejson.has("parent")){
+                bonemap.get(bonejson.getString("parent")).children.add(bone);
+            }else{
+                this.topLevelBones.add(bone);
+            }
         }
 
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+        ModelPartBuilder builder = new ModelPartBuilder();
+        builder.uv(0,0);
+        builder.cuboid(0,0,0,1,1,1);
+        modelPartData.addChild("base",builder, ModelTransform.pivot(0,0,0));
+        texturedModelData =TexturedModelData.of(modelData, tw, th);
+        if(texturedModelData==null)
+            System.err.println("TMD iS NULL");
+        return texturedModelData;
+    }
+
+    public TexturedModelData loadFromJavaModel(JSONObject model) throws JSONException{
         float textureW=16, textureH=16;
         if(model.has("texture_size")){
             JSONArray texture_size = model.getJSONArray("texture_size");
@@ -66,7 +194,7 @@ public class RenderableModel{
         JSONArray elements = model.getJSONArray("elements");
         for(int i =0;i<elements.length();i++){
             JSONObject element = elements.getJSONObject(i);
-            builder.uv(0,0);//todo Blockmodel ->  ModelData format UVs
+            builder.uv(0,0);
             JSONArray from = element.getJSONArray("from");
             int farr[] = {from.getInt(0),from.getInt(1),from.getInt(2)};
             JSONArray to = element.getJSONArray("to");
@@ -77,6 +205,9 @@ public class RenderableModel{
             JSONObject facesUV = element.getJSONObject("faces");
             for(int d=0;d<6;d++){
                 Direction dr = Direction.byId(d);
+                if(!facesUV.has(dr.getName())){
+                    continue;
+                }
                 JSONObject face = facesUV.getJSONObject(dr.getName());
                 JSONArray uv = face.getJSONArray("uv");
                 uvs[d][0] = uv.getInt(0);
@@ -99,19 +230,88 @@ public class RenderableModel{
         return texturedModelData;
     }
 
-    public void render(MatrixStack matrices,VertexConsumerProvider vertexConsumerProvider, int light, int overlay){
-        MatrixStack.Entry entry = matrices.peek();
-        VertexConsumer vc = vertexConsumerProvider.getBuffer(renderlayer);
-        for(int i=0;i<quads.size;i++){
-            renderQuad(entry, vc,quads.get(i),light,overlay);
-        }
-    }
-
 
 
     ///PAIN and suffering below
 
+    public static class BoneTranslationParameters{
+        public Vec3f rotation= new Vec3f(0,0,0);
+        public Vec3f offset= new Vec3f(0,0,0);
+        public Vec3f scale = new Vec3f(1,1,1);
 
+        @Override
+        public String toString(){
+            return "BoneTranslationParameters{" +
+            "rotation=" + rotation +
+            ", offset=" + offset +
+            ", scale=" + scale +
+            '}';
+        }
+    }
+
+    public static class Bone{
+        public Vec3f pivot;
+        public String name;
+        public Bone parent;
+        Array<Bone> children = new Array<>(false,4);
+        Array<OrientedCuboid> cubes = new Array<>(false,4);
+
+        public Vec3f rotation= new Vec3f(0,0,0);
+        public Vec3f offset= new Vec3f(0,0,0);
+        public Vec3f scale = new Vec3f(1,1,1);
+
+        public Bone( String name,Vec3f pivot){
+            this.pivot = pivot;
+            this.name = name;
+        }
+
+        public void render(MatrixStack matrices, VertexConsumer vc, int light, int overlay , ObjectMap<String, BoneTranslationParameters> boneTranslationProvider, float red, float green, float blue, float alpha){
+            BoneTranslationParameters parameters = boneTranslationProvider.get(name);
+            matrices.push();
+            matrices.translate(parameters.offset.getX()+offset.getX()+pivot.getX(), parameters.offset.getY()+offset.getY()+pivot.getY(),parameters.offset.getZ()+offset.getZ()+pivot.getZ());
+            matrices.scale(parameters.scale.getX()*scale.getX(),parameters.scale.getY()*scale.getY(),parameters.scale.getZ()*scale.getZ());
+            matrices.multiply(Mathf.fromEulerDegXYZ(rotation.getX()+parameters.rotation.getX(),rotation.getY()+parameters.rotation.getY(),rotation.getZ()+parameters.rotation.getZ()));
+            matrices.translate(-pivot.getX(), -pivot.getY(),-pivot.getZ());
+            for(OrientedCuboid cube: cubes){
+                cube.render(matrices,vc,light,overlay,red, green, blue, alpha);
+            }
+            for(Bone bone: children){
+                bone.render(matrices,vc,light,overlay,boneTranslationProvider,red, green, blue, alpha);
+            }
+            matrices.pop();
+        }
+        public void render(MatrixStack matrices, VertexConsumer vc, int light, int overlay , float red, float green, float blue, float alpha){
+            matrices.push();
+            matrices.translate(offset.getX(), offset.getY(),offset.getZ());
+            matrices.multiply(Quaternion.method_35823(rotation));
+            for(OrientedCuboid cube: cubes){
+                cube.render(matrices,vc,light,overlay,red, green, blue, alpha);
+            }
+            for(Bone bone: children){
+                bone.render(matrices,vc,light,overlay,red, green, blue, alpha);
+            }
+            matrices.pop();
+        }
+    }
+
+    public static class OrientedCuboid extends Cuboid{
+        public Vec3f pivot = new Vec3f();
+        public Vec3f rotation = new Vec3f(); //euler?
+
+        public OrientedCuboid(float x, float y, float z, float sizeX, float sizeY, float sizeZ, float[][] uvs, float textureWidth, float textureHeight){
+            super(x, y, z, sizeX, sizeY, sizeZ, uvs, textureWidth, textureHeight);
+        }
+
+        public void render(MatrixStack matrices,VertexConsumer vc, int light, int overlay, float red, float green, float blue, float alpha){
+            matrices.push();
+            matrices.translate(pivot.getX(), pivot.getY(),pivot.getZ());
+            matrices.multiply(Quaternion.method_35823(rotation));
+            for(int i=0;i<sides.length;i++){
+                renderQuad(matrices.peek(), vc,sides[i],light,overlay,red, green, blue, alpha);
+            }
+            matrices.pop();
+        }
+    }
     public static class Cuboid{
         final Quad[] sides = new Quad[6];
         public Cuboid(float x, float y, float z, float sizeX, float sizeY, float sizeZ, float[][] uvs,float textureWidth, float textureHeight) {
@@ -138,10 +338,11 @@ public class RenderableModel{
     }
 
 
-    public void renderQuad(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Quad quad,int light, int overlay){
+    public static void renderQuad(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Quad quad,int light, int overlay){
         renderQuad(entry,vertexConsumer,quad,light,overlay,1f,1f,1f,1f);
     }
-    public void renderQuad(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Quad quad,int light, int overlay, float red, float green, float blue, float alpha){
+    public static void renderQuad(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Quad quad,int light, int overlay, float red, float green, float blue, float alpha){
+        if(quad.invisible){return;}
         Matrix4f matrix4f = entry.getModel();
         Matrix3f normal = entry.getNormal();
         Vec3f dirvec = quad.direction.copy();
@@ -156,17 +357,20 @@ public class RenderableModel{
             vertexPos.transform(matrix4f);
             vertexConsumer.vertex(vertexPos.getX(), vertexPos.getY(), vertexPos.getZ(), red, green, blue, alpha, vertices[index][3], vertices[index][4], overlay, light, nx, ny, nz);
         }
-
     }
 
     static class Quad{
         public Vertex[] vertices;
         public Vec3f direction;
         public float[][] calc = new float[4][5]; // 4 * (x y z u v)
+        boolean invisible = false;
 
 
         public Quad(Vertex[] vertices, float u1, float v1, float u2, float v2, float squishU, float squishV, boolean flip, Direction direction){
             this.vertices = vertices;
+            if(u1 == u2 && v1 == v2){
+                invisible = true;
+            }
             vertices[0] = vertices[0].setUV(u2 / squishU, v1 / squishV);
             vertices[1] = vertices[1].setUV(u1 / squishU, v1 / squishV);
             vertices[2] = vertices[2].setUV(u1 / squishU, v2 / squishV);

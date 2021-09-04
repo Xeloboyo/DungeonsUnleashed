@@ -1,0 +1,20 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"connecttop": {
+			"animation_length": 0.54167,
+			"bones": {
+				"cap": {
+					"scale": {
+						"0.0": [0, 1, 0],
+						"0.125": {
+							"post": [1, 1, 1],
+							"lerp_mode": "catmullrom"
+						},
+						"0.3333": [1, 1, 1]
+					}
+				}
+			}
+		}
+	}
+}

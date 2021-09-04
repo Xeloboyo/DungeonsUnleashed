@@ -36,6 +36,7 @@ public abstract class GraphConnectingBlock extends BasicBlock implements BlockEn
 
     @Override
     public void onDestroyed(BlockState state, World world, BlockPos pos){
+        System.out.println("block at "+pos+" died");
         ((GraphConnectingEntity) world.getBlockEntity(pos)).disconnect();
     }
 }

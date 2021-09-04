@@ -11,6 +11,9 @@ public class Strings{
     public static String resourceAsString(String uri){
         String format = uri.replace("src/main/resources","");
         System.out.println(format);
+        if(Strings.class.getResource(format)==null){
+            return null;
+        }
         InputStream in = Strings.class.getResourceAsStream(format);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder sb = new StringBuilder();

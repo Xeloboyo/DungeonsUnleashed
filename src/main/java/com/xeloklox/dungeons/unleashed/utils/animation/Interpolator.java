@@ -4,13 +4,13 @@ import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
 
 public class Interpolator<T>{
     ParameterMap ae;
-    InterpolateType type;
+    SingularInterpolateType type;
     float w;
     String key;
     Interpolate<T> interp;
     T o1, o2;
 
-    public Interpolator(ParameterMap ae, InterpolateType type, float w, String key, Interpolate<T> interp, T targ){
+    public Interpolator(ParameterMap ae, SingularInterpolateType type, float w, String key, Interpolate<T> interp, T targ){
         this.ae = ae;
         this.type = type;
         this.w = w;
@@ -20,7 +20,7 @@ public class Interpolator<T>{
         o2 = targ;
     }
 
-    protected Interpolator(ParameterMap ae, InterpolateType type, float w, String key, Interpolate<T> interp){
+    protected Interpolator(ParameterMap ae, SingularInterpolateType type, float w, String key, Interpolate<T> interp){
         this.ae = ae;
         this.type = type;
         this.w = w;

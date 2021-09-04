@@ -25,21 +25,6 @@ public class WallsModifier extends BasicBlockModifier{
     }
     @Override
     public boolean canReplace(BlockState state, ItemPlacementContext context){
-        ItemStack itemStack = context.getStack();
-       SlabType slabType = state.get(Properties.SLAB_TYPE);
-       if(slabType != SlabType.DOUBLE && itemStack.isOf(parent.asItem())){
-           if(context.canReplaceExisting()){
-               boolean bl = context.getHitPos().y - (double)context.getBlockPos().getY() > 0.5D;
-               Direction direction = context.getSide();
-               if(slabType == SlabType.BOTTOM){
-                   return direction == Direction.UP || bl && direction.getAxis().isHorizontal();
-               }else{
-                   return direction == Direction.DOWN || !bl && direction.getAxis().isHorizontal();
-               }
-           }else{
-               return true;
-           }
-       }
        return false;
     }
 

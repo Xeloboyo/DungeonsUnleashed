@@ -35,7 +35,7 @@ public abstract class GraphConnectingEntity extends BlockEntity implements Block
         connections.each((cls, con) -> {
             if(con.graph.core==this){
                 NbtCompound subnbt = new NbtCompound();
-                con.graph.readFromNbt(subnbt);
+                con.graph.writeToNbt(subnbt);
                 nbt.put(con.graph.name(),subnbt);
             }
         });
@@ -91,14 +91,20 @@ public abstract class GraphConnectingEntity extends BlockEntity implements Block
                 if(connector.isConnectedWith(entity.connections.get(cls))){
                     return;
                 }
+
                 connector.connectWith(entity.connections.get(cls));
                 BlockGraph bgExternal = entity.getGraph(cls);
                 if(bgExternal!=connector.graph){
                     connector.graph.mergeWith(bgExternal);
                 }
+                onConnect(entity.connections.get(cls));
+                entity.connections.get(cls).blockEntity.onConnect(connector);
             });
         });
     }
+
+    public void onConnect(GraphConnector bg){};
+    public void onDisconnect(GraphConnector bg){};
 
     //maybe cache these connections ... later
     public <T extends BlockGraph> void eachConnected(Class<T> cls, GraphConnectConfig<T> config, Cons<GraphConnectingEntity> cons){
@@ -107,13 +113,10 @@ public abstract class GraphConnectingEntity extends BlockEntity implements Block
         BlockPos[] cpoints = config.getConnectionPoints(world, bp);
         //For all connection points this block can connect to via this graph
         //if external block can connect back, merge this graph with external graph
-        System.out.println("from: "+this.pos.toString());
-        System.out.println("each connected: "+Arrays.toString(cpoints));
         for(BlockPos rbp : cpoints){
             if(world.getBlockState(rbp).getBlock() instanceof GraphConnectingBlock externalGraphBlock){
                 GraphConnectConfig externalconfig = externalGraphBlock.connectionConfig.get(cls);
                 if(externalconfig != null && externalconfig.canConnectTo(world, rbp, bp)){
-                    System.out.println("connected to: "+rbp);
                     GraphConnectingEntity external = (GraphConnectingEntity)world.getBlockEntity(rbp);
                     cons.get(external);
                 }
@@ -124,14 +127,14 @@ public abstract class GraphConnectingEntity extends BlockEntity implements Block
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GraphConnectingEntity blockEntity){
         if(!world.isClient){
-            serverTick(world,pos,state,blockEntity);
+            serverUpdate(world,pos,state,blockEntity);
         }else{
-
+            clientUpdate(world,pos,state,blockEntity);
         }
 
     }
-
-    public void serverTick(World world, BlockPos pos, BlockState state, GraphConnectingEntity blockEntity){
+    public void clientUpdate(World world, BlockPos pos, BlockState state, GraphConnectingEntity blockEntity){}
+    public void serverUpdate(World world, BlockPos pos, BlockState state, GraphConnectingEntity blockEntity){
         if(!initialised){
             initalise();
         }

@@ -78,11 +78,11 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
             animation[i] = new ParameterMap();
             animation[i].add("rotation",0f);
             animation[i].add("extend",Utils.pixels(-5));
-            animation[i].addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(),
+            animation[i].addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(),
                 FrameState.get(0f,0.6f),
                 FrameState.get(180f,0.4f)
             );
-            animation[i].addChainedInterpolator(InterpolateType.EXPONENTIAL2,0.2f,"extend",new FloatInterpolate(),
+            animation[i].addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"extend",new FloatInterpolate(),
                 FrameState.get(0f,0.6f),
                 FrameState.get(0f,0.4f)
             );

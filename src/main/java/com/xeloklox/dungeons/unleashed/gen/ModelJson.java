@@ -2,7 +2,6 @@ package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
-import net.minecraft.client.model.*;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.render.model.json.*;
 import net.minecraft.util.*;
@@ -21,6 +20,7 @@ public class ModelJson extends JsonConfiguration{
     JsonUnbakedModel jsonUnbakedModel;
     BakedModel model;
     String name;
+    public boolean isBedrock = false;
 
     public ModelJson(String name, JSONObject template, JSONObject config){
         super(Paths.models + name + ".json", template);
@@ -43,6 +43,12 @@ public class ModelJson extends JsonConfiguration{
     @Override
     public void fillJSONObj(){
         try{
+            if(json.has("minecraft:geometry")){
+                //bedrock model.
+                isBedrock = true;
+                json.put("textures",config);
+                return;
+            }
             JSONObject textures = json.getJSONObject("textures");
             Array<String> keys = new Array<>();
             textures.keys().forEachRemaining(c -> {

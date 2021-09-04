@@ -9,6 +9,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.chunk.light.*;
 
 import java.util.*;
+import java.util.function.*;
 
 public abstract class SpreadingBlock extends BasicBlock{
 

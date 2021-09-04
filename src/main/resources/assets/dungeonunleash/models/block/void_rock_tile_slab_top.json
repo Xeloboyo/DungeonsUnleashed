@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/slab_top",
+    "textures": {
+        "bottom": "dungeonunleash:block/void_rock_tile",
+        "side": "dungeonunleash:block/void_rock_tile",
+        "top": "dungeonunleash:block/void_rock_tile"
+    }
+}

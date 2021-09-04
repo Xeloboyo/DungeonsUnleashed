@@ -68,8 +68,30 @@ public class Mathf{
     public static Vec3i vec3i(Vec3f v){
         return new Vec3i(v.getX(),v.getY(),v.getZ());
     }
+    public static float lerp(float t, float x,float x2){return t*(x2-x) + x;}
     public static float map(float r, float rmin,float rmax, float mapmin,float mapmax){
         return mapmin + (mapmax-mapmin)*(r-rmin)/(rmax-rmin);
     }
+    public static float catmull(float t, float x,float x2,float m1,float m2){
+        float t2 = t*t;
+        float t3 = t2*t;
+        return  (2*t3 - 3*t2 + 1)*x + (t3 - 2*t2 + t)*m1 + (-2*t3 + 3*t2)*x2 + (t3-t2)*m2;
+    }
+    public static float catmullNorm(float t,float m1,float m2){
+        float t2 = t*t;
+        float t3 = t2*t;
+        return  (t3 - 2*t2 + t)*m1 + (-2*t3 + 3*t2) + (t3-t2)*m2;
+    }
+    public static Quaternion fromEulerDegXYZ(float x,float y,float z){
+        return Quaternion.method_35825(x*MathConstants.RADIANS_PER_DEGREE,y*MathConstants.RADIANS_PER_DEGREE,z*MathConstants.RADIANS_PER_DEGREE);
+    }
+
+
+
+
+    public static float approach(float x, float target,float speed){
+        return x+(target>=x?Math.min(speed,target-x):-Math.min(speed,x-target));
+    }
+
 
 }

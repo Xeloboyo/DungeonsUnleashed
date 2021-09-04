@@ -24,24 +24,20 @@ import net.minecraft.block.enums.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
-import net.minecraft.state.property.*;
-import net.minecraft.util.*;
 import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.*;
-import net.minecraft.world.gen.stateprovider.*;
-
-import java.util.function.*;
 
 import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
 import static com.xeloklox.dungeons.unleashed.blocks.LeydenJarBlock.MAX_CHARGE;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.LootPoolEntryType.*;
+import static com.xeloklox.dungeons.unleashed.utils.block.BlockStatePresets.*;
 
 public class ModBlocks{
     public static final RegisteredBlock
     END_SOIL = new RegisteredBlock("end_soil"),
     END_WOOD_PLANKS = new RegisteredBlock("end_wood_planks"),
     END_WOOD_PLANK_SLAB = new RegisteredBlock("end_wood_plank_slab"),
+    END_WOOD_FENCE = new RegisteredBlock("end_wood_fence"),
     ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil"),
     PATCHY_END_GRASS = new RegisteredBlock("end_grass_patchy"),
     END_GRASS = new RegisteredBlock("end_grass"),
@@ -63,20 +59,25 @@ public class ModBlocks{
     BEDROCK_PILLAR = new RegisteredBlock("bedrock_pillar"),
     LEYDEN_JAR = new RegisteredBlock("leyden_jar"),
     INFUSER = new RegisteredBlock("infuser"),
-    CHARGE_CELL_PORT = new RegisteredBlock("charge_cell_port");
+    CHARGE_CELL_PORT = new RegisteredBlock("charge_cell_port"),
+    CHARGE_CELL_TANK = new RegisteredBlock("charge_cell_tank");
 
 
     public static final RegisteredBlockEntity<InfuserEntity> INFUSER_ENTITY;
     public static final RegisteredBlockEntity<ChargeStoragePortEntity> CHARGE_CELL_PORT_ENTITY;
+    public static final RegisteredBlockEntity<ChargeStorageTankEntity> CHARGE_CELL_STORAGE_ENTITY;
 
     public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
+    public static final RegisteredBlockEntityRenderer<ChargeStoragePortEntity> CHARGE_CELL_PORT_ENTITY_RENDERER;
+    public static final RegisteredBlockEntityRenderer<ChargeStorageTankEntity> CHARGE_CELL_TANK_ENTITY_RENDERER;
+
     public static final RegisteredScreenHandler<InfuserScreenHandler,InfuserScreen> INFUSER_SCREEN;
 
     //tags go here for now
     static ModTag<Block> wallsTag = new ModTag<>(TagDomain.minecraft,"walls", TagCategory.blocks);
     static ModTag<Block> slabsTag = new ModTag<>(TagDomain.minecraft,"slabs", TagCategory.blocks);
     static ModTag<Block> stairsTag = new ModTag<>(TagDomain.minecraft,"stairs", TagCategory.blocks);
-
+    static ModTag<Block> fencesTag = new ModTag<>(TagDomain.minecraft,"fences", TagCategory.blocks);
     static ModTag<Block> planksTag = new ModTag<>(TagDomain.minecraft,"planks", TagCategory.blocks);
 
     static {
@@ -156,7 +157,6 @@ public class ModBlocks{
         makeSlabFrom(VOID_ROCK_TILE,VOID_ROCK_TILE_SLAB); VOID_ROCK_TILE_SLAB.finalise();
         makeStairsFrom(VOID_ROCK_TILE,VOID_ROCK_TILE_STAIRS); VOID_ROCK_TILE_STAIRS.finalise();
 
-
         genericBlockBuilder.get(VOID_ROCK_SMOOTH,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_SMOOTH.setName("Smooth Void Stone");
         VOID_ROCK_SMOOTH.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
@@ -164,7 +164,6 @@ public class ModBlocks{
         makeWallsFrom(VOID_ROCK_SMOOTH,VOID_ROCK_SMOOTH_WALL);VOID_ROCK_SMOOTH_WALL.finalise();
         makeSlabFrom(VOID_ROCK_SMOOTH,VOID_ROCK_SMOOTH_SLAB);VOID_ROCK_SMOOTH_SLAB.finalise();
         makeStairsFrom(VOID_ROCK_SMOOTH,VOID_ROCK_SMOOTH_STAIRS);VOID_ROCK_SMOOTH_STAIRS.finalise();
-
 
         genericBlockBuilder.get(VOID_ROCK_SOILED,() -> new BasicBlock(Material.STONE, stoneSettings));
         VOID_ROCK_SOILED.dropsUnlessSilktouched(VOID_ROCK.getJSONID());
@@ -190,6 +189,9 @@ public class ModBlocks{
         END_WOOD_PLANKS.finalise();
         planksTag.add(END_WOOD_PLANKS);
         makeSlabFrom(END_WOOD_PLANKS,END_WOOD_PLANK_SLAB); END_WOOD_PLANK_SLAB.finalise();
+        String END_WOOD_FENCE_SIDE_model = BlockModelPresetBuilder.customTemplate("block/custom/end_wood_fence_side","end_wood_fence_side","block/custom/end_wood_fence_side");
+        String END_WOOD_FENCE_SIDE_TALL_model = BlockModelPresetBuilder.customTemplate("block/custom/end_wood_fence_side_tall","end_wood_fence_side_tall","block/custom/end_wood_fence_side_tall");
+        makeWallsFrom(END_WOOD_PLANKS,END_WOOD_FENCE,null,END_WOOD_FENCE_SIDE_model,END_WOOD_FENCE_SIDE_TALL_model,null); END_WOOD_FENCE.finalise();
 
         final String END_WOOD_model = BlockModelPresetBuilder.TopBottomSide(END_WOOD.id,"block/end_wood_top","block/end_wood_side","block/end_wood_top");
         BasicBlock.selectedPlacementConfig=BasicBlock.PILLAR_PLACEMENT;
@@ -413,10 +415,53 @@ public class ModBlocks{
         CHARGE_CELL_PORT.finalise();
 
         CHARGE_CELL_PORT_ENTITY = new RegisteredBlockEntity<>("charge_cell_port",ChargeStoragePortEntity::new,CHARGE_CELL_PORT);
+        CHARGE_CELL_PORT_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(CHARGE_CELL_PORT_ENTITY::get, ChargePortRenderer::new);
 
+
+
+        final String CHARGE_CELL_TANK_model = BlockModelPresetBuilder.customTemplate("block/custom/charge_cell_tank_middle", "charge_cell_tank_middle", "block/custom/charge_cell_tank");
+        final String CHARGE_CELL_TANK_TOP_model = BlockModelPresetBuilder.customTemplate("block/custom/charge_cell_tank_top", "charge_cell_tank_top", "block/custom/charge_cell_tank");
+        final String CHARGE_CELL_TANK_BOTTOM_model = BlockModelPresetBuilder.customTemplate("block/custom/charge_cell_tank_bottom", "charge_cell_tank_bottom", "block/custom/charge_cell_tank");
+        final String CHARGE_CELL_TANK_SINGULAR_model = BlockModelPresetBuilder.customTemplate("block/custom/charge_cell_tank_unconnected", "charge_cell_tank_unconnected", "block/custom/charge_cell_tank");
+        CHARGE_CELL_TANK.setBlock(Globals.bootQuery(() -> new ChargeStorageTankBlock(Material.GLASS,
+            settings->
+            settings.breakByHand(false)
+            .breakByTool(FabricToolTags.PICKAXES)
+            .sounds(BlockSoundGroup.GLASS)
+            .hardness(2f)
+            .resistance(10f)
+            .nonOpaque()
+        )));
+        CHARGE_CELL_TANK.setBlockState(BlockStateBuilder.create().stateCombinations((comb,variantList)->{
+            boolean up = comb.get(ChargeStorageTankBlock.UP);
+            boolean down = comb.get(ChargeStorageTankBlock.DOWN);
+            if(up&&down){
+                variantList.addModel(CHARGE_CELL_TANK_model);
+            }else if(down){
+                variantList.addModel(CHARGE_CELL_TANK_TOP_model);
+            }else if(up){
+                variantList.addModel(CHARGE_CELL_TANK_BOTTOM_model);
+            }else{
+                variantList.addModel(CHARGE_CELL_TANK_SINGULAR_model);
+            }
+        },ChargeStorageTankBlock.UP,ChargeStorageTankBlock.DOWN));
+        CHARGE_CELL_TANK.setRenderlayer(RenderLayerOptions.CUTOUT);
+        CHARGE_CELL_TANK.setName("Small Charge Tank");
+        CHARGE_CELL_TANK.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.DECORATIONS)));
+        CHARGE_CELL_TANK.setBlockitem((id, bitem) ->
+            new RegisteredItem(id, bitem,
+                item->{item.modelId = "charge_cell_tank_unconnected"; return item;}
+            )
+        );
+        CHARGE_CELL_TANK.finalise();
+
+        CHARGE_CELL_STORAGE_ENTITY = new RegisteredBlockEntity<>("charge_cell_tank",ChargeStorageTankEntity::new,CHARGE_CELL_TANK);
+        CHARGE_CELL_TANK_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(CHARGE_CELL_STORAGE_ENTITY::get, ChargeTankRenderer::new);
 
          Globals.bootRun(()->{try{
              Class.forName(InfuserRenderer.class.getName());
+             Class.forName(ChargePortRenderer.class.getName());
+             Class.forName(ChargeTankRenderer.class.getName());
          }catch(ClassNotFoundException ignored){}});
         //endregion
 
@@ -426,15 +471,20 @@ public class ModBlocks{
     // convenience stuff:
 
     //I hope to fuck theres an easier way of doing this
-    static void makeSlabFrom(RegisteredBlock ORIGINAL, RegisteredBlock SLAB){
-        BasicBlock.selectedPlacementConfig = BasicBlock.HALF_SLAB;
+
+    static void copyBlock(RegisteredBlock from,RegisteredBlock to){
         Globals.bootRun(()->{
-            if(ORIGINAL.get() instanceof BasicBlock bb){
-                SLAB.setBlock(bb.copy());
+            if(from.get() instanceof BasicBlock bb){
+                to.setBlock(bb.copy());
             }else{
-                SLAB.setBlock(new Block(AbstractBlock.Settings.copy(ORIGINAL.get())));
+                to.setBlock(new Block(AbstractBlock.Settings.copy(from.get())));
             }
         });
+    }
+
+    static void makeSlabFrom(RegisteredBlock ORIGINAL, RegisteredBlock SLAB){
+        BasicBlock.selectedPlacementConfig = BasicBlock.HALF_SLAB;
+        copyBlock(ORIGINAL,SLAB);
         String[] tex = ORIGINAL.getPrimaryModelTextures();
         String top = BlockModelPresetBuilder.SlabTop(SLAB.id+"_top",tex[0],tex[1],tex[2]);
         String bottom = BlockModelPresetBuilder.SlabBottom(SLAB.id,tex[0],tex[1],tex[2]);
@@ -460,13 +510,7 @@ public class ModBlocks{
 
     static void makeStairsFrom(RegisteredBlock ORIGINAL, RegisteredBlock STAIRS){
         BasicBlock.selectedPlacementConfig = BasicBlock.STAIRS;
-        Globals.bootRun(()->{
-            if(ORIGINAL.get() instanceof BasicBlock bb){
-                STAIRS.setBlock(bb.copy());
-            }else{
-                STAIRS.setBlock(new Block(AbstractBlock.Settings.copy(ORIGINAL.get())));
-            }
-        });
+        copyBlock(ORIGINAL,STAIRS);
         String[] tex = ORIGINAL.getPrimaryModelTextures();
         String stairs = BlockModelPresetBuilder.Stairs(STAIRS.id,tex[0],tex[1],tex[2]);
         String stairsOuter = BlockModelPresetBuilder.StairsOuter(STAIRS.id+"_outer",tex[0],tex[1],tex[2]);
@@ -475,19 +519,16 @@ public class ModBlocks{
         stairsTag.add(STAIRS);
     }
     static void makeWallsFrom(RegisteredBlock ORIGINAL, RegisteredBlock WALL){
+        makeWallsFrom(ORIGINAL,WALL,null,null,null,null);
+    }
+    static void makeWallsFrom(RegisteredBlock ORIGINAL, RegisteredBlock WALL, String postModel, String sideModel, String sideTallModel, String inventorymodel){
         BasicBlock.selectedPlacementConfig = BasicBlock.WALLS;
-        Globals.bootRun(()->{
-            if(ORIGINAL.get() instanceof BasicBlock bb){
-                WALL.setBlock(bb.copy());
-            }else{
-                WALL.setBlock(new Block(AbstractBlock.Settings.copy(ORIGINAL.get())));
-            }
-        });
+        copyBlock(ORIGINAL,WALL);
         String[] tex = ORIGINAL.getPrimaryModelTextures();
-        String wallPost = BlockModelPresetBuilder.WallPost(WALL.id+"_post",tex[0]);
-        String wallSide = BlockModelPresetBuilder.WallSide(WALL.id+"_side",tex[0]);
-        String wallSideTall = BlockModelPresetBuilder.WallSideTall(WALL.id+"_side_tall",tex[0]);
-        ModelJson inventory = BlockModelPresetBuilder.getModelJson(BlockModelPresetBuilder.WallInventory("block/"+WALL.id+"_inventory",tex[0]));
+        String wallPost = postModel==null?BlockModelPresetBuilder.WallPost(WALL.id+"_post",tex[0]):postModel;
+        String wallSide = sideModel==null?BlockModelPresetBuilder.WallSide(WALL.id+"_side",tex[0]):sideModel;
+        String wallSideTall = sideTallModel==null?BlockModelPresetBuilder.WallSideTall(WALL.id+"_side_tall",tex[0]):sideTallModel;
+        ModelJson inventory = BlockModelPresetBuilder.getModelJson(inventorymodel==null?BlockModelPresetBuilder.WallInventory("block/"+WALL.id+"_inventory",tex[0]):inventorymodel);
         WALL.setBlockState(wallStates(wallPost,wallSide,wallSideTall));
         WALL.setBlockitem((id, bitem) ->
             new RegisteredItem(id, bitem,
@@ -496,49 +537,27 @@ public class ModBlocks{
         );
         wallsTag.add(WALL);
     }
-
-    static DirectionProperty HORIZONTAL_FACING(){
-        return Globals.bootQuery(() -> Properties.HORIZONTAL_FACING, DirectionProperty.of("facing", Type.HORIZONTAL));
+    static void makeFenceFrom(RegisteredBlock ORIGINAL, RegisteredBlock FENCE){
+        makeFenceFrom(ORIGINAL,FENCE,null,null,null);
     }
 
-    static DirectionProperty FACING(){
-        return Globals.bootQuery(() -> Properties.FACING, DirectionProperty.of("facing"));
-    }
-
-    static BooleanProperty UP(){
-        return Globals.bootQuery(() -> Properties.UP, BooleanProperty.of("up"));
-    }
-
-    static EnumProperty<WallShape> WALL(String dir){
-        return Globals.bootQuery(() -> {
-            switch(dir){
-                default:
-                case "east":
-                    return Properties.EAST_WALL_SHAPE;
-                case "west":
-                    return Properties.WEST_WALL_SHAPE;
-                case "north":
-                    return Properties.NORTH_WALL_SHAPE;
-                case "south":
-                    return Properties.SOUTH_WALL_SHAPE;
-            }
-        }, EnumProperty.of(dir, WallShape.class));
+    static void makeFenceFrom(RegisteredBlock ORIGINAL, RegisteredBlock FENCE, String postModel, String sideModel, String inventorymodel){
+        BasicBlock.selectedPlacementConfig = BasicBlock.FENCE;
+        copyBlock(ORIGINAL,FENCE);
+        String[] tex = ORIGINAL.getPrimaryModelTextures();
+        String fencePost = postModel==null?BlockModelPresetBuilder.FencePost(FENCE.id+"_post",tex[0]):postModel;
+        String fenceSide = sideModel==null?BlockModelPresetBuilder.FenceSide(FENCE.id+"_side",tex[0]):sideModel;
+        ModelJson inventory = BlockModelPresetBuilder.getModelJson(inventorymodel==null?BlockModelPresetBuilder.FenceInventory("block/"+FENCE.id+"_inventory",tex[0]):inventorymodel);
+        FENCE.setBlockState(fenceStates(fencePost,fenceSide));
+        FENCE.setBlockitem((id, bitem) ->
+            new RegisteredItem(id, bitem,
+                item->{item.modelId = FENCE.id+"_inventory"; return item;}
+            )
+        );
+        fencesTag.add(FENCE);
     }
 
 
-    static EnumProperty<SlabType> SLAB(){
-        return Globals.bootQuery(() -> Properties.SLAB_TYPE, EnumProperty.of("type", SlabType.class));
-    }
-    static EnumProperty<BlockHalf> HALF(){
-        return Globals.bootQuery(() -> Properties.BLOCK_HALF, EnumProperty.of("half", BlockHalf.class));
-    }
-    static EnumProperty<StairShape> STAIR(){
-        return Globals.bootQuery(() -> Properties.STAIR_SHAPE, EnumProperty.of("shape", StairShape.class));
-    }
-
-    static EnumProperty<Direction.Axis> AXIS(){
-        return Globals.bootQuery(() -> Properties.AXIS, EnumProperty.of("axis", Direction.Axis.class));
-    }
 
     static Func<ModelVariantList, ModelVariantList> randomHorizontalRotationVariants(String modelStr){
         return
@@ -558,78 +577,10 @@ public class ModBlocks{
         .addModel(model->model.setModel(modelStr).setX(270).setY(270).setZ(270));
     }
 
-    static BlockStateBuilder directionalStates(String modelStr){
-        return
-            BlockStateBuilder.create()
-            .addStateVariant(FACING(), Direction.UP,variant->variant.addModel(modelStr,0))
-            .addStateVariant(FACING(), Direction.DOWN,variant->variant.addModel(modelStr,180,0))
-            .addStateVariant(FACING(), Direction.NORTH,variant->variant.addModel(modelStr,90,0))
-            .addStateVariant(FACING(), Direction.EAST,variant->variant.addModel(modelStr,90,90))
-            .addStateVariant(FACING(), Direction.SOUTH,variant->variant.addModel(modelStr,90,180))
-            .addStateVariant(FACING(), Direction.WEST,variant->variant.addModel(modelStr,90,270));
-    }
 
 
-    static BlockStateBuilder axisStates(String modelStr){
-        return
-            BlockStateBuilder.create()
-            .addStateVariant(AXIS(), Axis.Y,variant->variant.addModel(modelStr,0))
-            .addStateVariant(AXIS(), Axis.X,variant->variant.addModel(modelStr,90,90))
-            .addStateVariant(AXIS(), Axis.Z,variant->variant.addModel(modelStr,90,0));
-    }
 
-    static BlockStateBuilder wallStates(String wallPost, String wallSide, String wallSideTall){
-        String [] dirs = {"north","east","south","west"};
-        BlockStateBuilder bsb = BlockStateBuilder.createMultipart();
-        bsb.addPart(part->
-            part.setModel(wallPost)
-                .addConditions(cond->cond.set(UP(),true))
-        );
-        for(int i=0;i<4;i++){
-            int index = i;
-            bsb.addPart(part->
-                part.setModel(model->model.setModel(wallSide).setY(index*90).setUVLock(true))
-                    .addConditions(cond->cond.set(WALL(dirs[index]),WallShape.LOW))
-            );
-            bsb.addPart(part->
-                part.setModel(model->model.setModel(wallSideTall).setY(index*90).setUVLock(true))
-                    .addConditions(cond->cond.set(WALL(dirs[index]),WallShape.TALL))
-            );
-        }
-        return bsb;
-    }
 
-    static BlockStateBuilder stairStates(String stairs, String stairsInner, String stairsOuts){
-        return BlockStateBuilder.create().stateCombinations((state,modelVariant)->{
-            Direction facing = state.get(HORIZONTAL_FACING());
-            BlockHalf half = state.get(HALF());
-            StairShape shape = state.get(STAIR());
-            int yRot = (int)facing.rotateYClockwise().asRotation();
-            if(shape==StairShape.INNER_LEFT||shape==StairShape.OUTER_LEFT){
-                yRot+=270;
-            }
-            if(shape != StairShape.STRAIGHT && half == BlockHalf.TOP){
-                yRot+=90;
-            }
-            yRot%=360;
-            boolean uvlock = yRot!=0 || half==BlockHalf.TOP;
-            int finalYRot = yRot;
-            modelVariant.addModel(model->
-                model.setModel(shape==StairShape.STRAIGHT ? stairs : (shape==StairShape.INNER_LEFT||shape==StairShape.INNER_RIGHT? stairsInner:stairsOuts))
-                .setY(finalYRot)
-                .setX(half==BlockHalf.BOTTOM?0:180)
-                .setUVLock(uvlock)
-            );
-        },HORIZONTAL_FACING(),STAIR(),HALF());
-    }
-
-    static BlockStateBuilder slabStates(String slabTop, String slabBottom, String slabDouble){
-        return
-            BlockStateBuilder.create()
-            .addStateVariant(SLAB(), SlabType.TOP,variant->variant.addModel(slabTop))
-            .addStateVariant(SLAB(), SlabType.BOTTOM,variant->variant.addModel(slabBottom))
-            .addStateVariant(SLAB(), SlabType.DOUBLE,variant->variant.addModel(slabDouble));
-    }
 
     static Func<ModelVariantList, ModelVariantList> oneVariant(String modelStr){
         return

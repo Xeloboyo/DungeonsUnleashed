@@ -40,18 +40,18 @@ public class ParameterMap{
         vals.put(name, new Wrapper<T>(value));
     }
 
-    public <T> void addInterpolator(InterpolateType type, float w, String key, Interpolate<T> interp, T target){
+    public <T> void addInterpolator(SingularInterpolateType type, float w, String key, Interpolate<T> interp, T target){
         interops.add(new Interpolator<T>(this, type, w, key, interp, target));
     }
 
-    public<T> void addChainedInterpolator(InterpolateType type, float w, String key, Interpolate<T> interp, T... target){
+    public<T> void addChainedInterpolator(SingularInterpolateType type, float w, String key, Interpolate<T> interp, T... target){
         FrameState<T>[] fs = new FrameState[target.length];
         for(int i = 0; i < target.length; i++){
             fs[i] = new FrameState<>(target[i]);
         }
         interops.add(new ChainedInterpolator<T>(this, type, w, key, interp, fs));
     }
-    public<T> void addChainedInterpolator(InterpolateType type, float w, String key, Interpolate<T> interp, FrameState<T>... fs){
+    public<T> void addChainedInterpolator(SingularInterpolateType type, float w, String key, Interpolate<T> interp, FrameState<T>... fs){
        interops.add(new ChainedInterpolator<>(this, type, w, key, interp, fs));
    }
 

@@ -1,0 +1,64 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.c",
+				"texture_width": 32,
+				"texture_height": 32,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "group2",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "group3",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "group4",
+					"pivot": [8, 0, -8]
+				},
+				{
+					"name": "group",
+					"pivot": [8, 0, -8]
+				},
+				{
+					"name": "legs",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "thicklegsbase",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "thicklegs",
+					"parent": "thicklegsbase",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "cap",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{
+							"origin": [-5, 13, -5],
+							"size": [10, 3, 10],
+							"uv": {
+								"north": {"uv": [16, 26], "uv_size": [10, 3]},
+								"east": {"uv": [16, 26], "uv_size": [10, 3]},
+								"south": {"uv": [16, 26], "uv_size": [10, 3]},
+								"west": {"uv": [16, 26], "uv_size": [10, 3]},
+								"up": {"uv": [26, 26], "uv_size": [-10, -10]},
+								"down": {"uv": [26, 26], "uv_size": [-10, -10]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -3,7 +3,7 @@
         "bonus_rolls": 0,
         "conditions": [{"condition": "minecraft:survives_explosion"}],
         "entries": [{
-            "name": "dungeonunleash:end_rock_pillar",
+            "name": "dungeonunleash:end_stone_pillar",
             "type": "minecraft:item"
         }],
         "functions": [],

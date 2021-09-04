@@ -3,7 +3,7 @@
         "bonus_rolls": 0,
         "conditions": [{"condition": "minecraft:survives_explosion"}],
         "entries": [{
-            "name": "dungeonunleash:end_rock",
+            "name": "dungeonunleash:end_wood_fence",
             "type": "minecraft:item"
         }],
         "functions": [],
