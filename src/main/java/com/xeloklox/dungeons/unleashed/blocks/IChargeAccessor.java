@@ -3,7 +3,7 @@ package com.xeloklox.dungeons.unleashed.blocks;
 import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 
-public interface IChargeStorage{
+public interface IChargeAccessor{
     int getCharge(World world, BlockPos pos);
     int maxCharge(World world, BlockPos pos);
     void setCharge(World world, BlockPos pos, int charge);
@@ -17,7 +17,9 @@ public interface IChargeStorage{
     }
     default boolean addCharge(World world, BlockPos pos,int charge){
         int c = getCharge(world,pos)+charge;
-        c = Math.min(maxCharge(world,pos),charge);
+        if(c>maxCharge(world,pos)){
+            return false;
+        }
         setCharge(world,pos,c);
         return true;
     }

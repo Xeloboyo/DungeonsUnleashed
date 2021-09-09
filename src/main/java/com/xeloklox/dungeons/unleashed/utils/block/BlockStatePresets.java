@@ -142,7 +142,7 @@ public class BlockStatePresets{
         .addStateVariant(SLAB(), SlabType.BOTTOM, variant -> variant.addModel(slabBottom))
         .addStateVariant(SLAB(), SlabType.DOUBLE, variant -> variant.addModel(slabDouble));
     }
-    static BlockStateBuilder directionalStates(String modelStr){
+    public static BlockStateBuilder directionalStates(String modelStr){
         return
             BlockStateBuilder.create()
             .addStateVariant(FACING(), Direction.UP,variant->variant.addModel(modelStr,0))
@@ -151,5 +151,13 @@ public class BlockStatePresets{
             .addStateVariant(FACING(), Direction.EAST,variant->variant.addModel(modelStr,90,90))
             .addStateVariant(FACING(), Direction.SOUTH,variant->variant.addModel(modelStr,90,180))
             .addStateVariant(FACING(), Direction.WEST,variant->variant.addModel(modelStr,90,270));
+    }
+
+    public static BlockStateBuilder horizontalDirectionalStates(String model){
+        return BlockStateBuilder.create()
+            .addStateVariant(HORIZONTAL_FACING(), Direction.NORTH,variant->variant.addModel(model,0))
+            .addStateVariant(HORIZONTAL_FACING(), Direction.EAST,variant->variant.addModel(model,90))
+            .addStateVariant(HORIZONTAL_FACING(), Direction.SOUTH,variant->variant.addModel(model,180))
+            .addStateVariant(HORIZONTAL_FACING(), Direction.WEST,variant->variant.addModel(model,270));
     }
 }

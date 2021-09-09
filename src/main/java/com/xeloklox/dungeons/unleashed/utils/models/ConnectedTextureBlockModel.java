@@ -3,6 +3,7 @@ package com.xeloklox.dungeons.unleashed.utils.models;
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import com.xeloklox.dungeons.unleashed.utils.lambda.Boolf.*;
 import net.fabricmc.fabric.api.renderer.v1.mesh.*;
 import net.fabricmc.fabric.api.renderer.v1.render.*;
 import net.minecraft.block.*;
@@ -53,7 +54,7 @@ public class ConnectedTextureBlockModel extends GeneratedModel{
        EAST(5, 4, 3, "east", Direction.AxisDirection.POSITIVE, Direction.Axis.X, new Vec3i(1, 0, 0));
     *
     * */
-    static final Vec3i[] offsets = {
+    static final Vec3i[] lockedRotationOffsets = {
         new Vec3i(-1,0,1), new Vec3i(-1,0,0), new Vec3i(-1,0,-1), new Vec3i(0,0,1), new Vec3i(0,0,-1),  new Vec3i(1,0,1), new Vec3i(1,0,0), new Vec3i(1,0,-1),
         new Vec3i(-1,0,1), new Vec3i(-1,0,0), new Vec3i(-1,0,-1), new Vec3i(0,0,1), new Vec3i(0,0,-1),  new Vec3i(1,0,1), new Vec3i(1,0,0), new Vec3i(1,0,-1),
         new Vec3i(-1,1,0), new Vec3i(0,1,0), new Vec3i(1,0,0), new Vec3i(-1,0,0), new Vec3i(1,0,0),  new Vec3i(-1,-1,0), new Vec3i(0,-1,0), new Vec3i(1,-1,0),
@@ -61,31 +62,67 @@ public class ConnectedTextureBlockModel extends GeneratedModel{
         new Vec3i(0,1,-1), new Vec3i(0,1,0), new Vec3i(0,1,1), new Vec3i(0,0,-1), new Vec3i(0,0,1),  new Vec3i(0,-1,-1), new Vec3i(0,-1,0), new Vec3i(0,-1,1),
         new Vec3i(0,1,-1), new Vec3i(0,1,0), new Vec3i(0,1,1), new Vec3i(0,0,-1), new Vec3i(0,0,1),  new Vec3i(0,-1,-1), new Vec3i(0,-1,0), new Vec3i(0,-1,1),
     };
-    static final Vec3i[] offsetsFront = new Vec3i[offsets.length];
+    static final Vec3i[] blockRotationOffsets = {
+        new Vec3i(-1,0,1), new Vec3i(0,0,1), new Vec3i(1,0,1), new Vec3i(-1,0,0), new Vec3i(1,0,0),  new Vec3i(-1,0,1), new Vec3i(0,0,1), new Vec3i(1,0,1),
+        new Vec3i(-1,0,-1), new Vec3i(0,0,-1), new Vec3i(1,0,-1), new Vec3i(-1,0,0), new Vec3i(1,0,0),  new Vec3i(-1,0,1), new Vec3i(0,0,1), new Vec3i(1,0,1),
+        new Vec3i(1,1,0), new Vec3i(0,1,0), new Vec3i(-1,0,0), new Vec3i(1,0,0), new Vec3i(-1,0,0),  new Vec3i(1,-1,0), new Vec3i(0,-1,0), new Vec3i(-1,-1,0),
+        new Vec3i(-1,1,0), new Vec3i(0,1,0), new Vec3i(1,0,0), new Vec3i(-1,0,0), new Vec3i(1,0,0),  new Vec3i(-1,-1,0), new Vec3i(0,-1,0), new Vec3i(1,-1,0),
+        new Vec3i(0,1,-1), new Vec3i(0,1,0), new Vec3i(0,1,1), new Vec3i(0,0,-1), new Vec3i(0,0,1),  new Vec3i(0,-1,-1), new Vec3i(0,-1,0), new Vec3i(0,-1,1),
+        new Vec3i(0,1,1), new Vec3i(0,1,0), new Vec3i(0,1,-1), new Vec3i(0,0,1), new Vec3i(0,0,-1),  new Vec3i(0,-1,1), new Vec3i(0,-1,0), new Vec3i(0,-1,-1),
+    };
 
-    static final int lockedRotationVertexOrder[][] = {
+
+    public static final int[][] lockedRotationVertexOrder = {
         {0,1,2,3},
         {1,0,3,2},
         {3,0,1,2},
         {0,3,2,1},
         {0,3,2,1},
         {3,0,1,2},
-
+    };
+    public static final int[][] blockRotationVertexOrder = {
+        {0,3,2,1},
+        {0,3,2,1},
+        {0,3,2,1},
+        {0,3,2,1},
+        {0,3,2,1},
+        {0,3,2,1},
     };
 
-    static {
-        for(int i =0;i<offsets.length;i++){
-            offsetsFront[i] = offsets[i].offset(Direction.byId(i/8));
+    public enum TextureOrientation{
+        FIXED_ROTATION(lockedRotationVertexOrder,lockedRotationOffsets),
+        BLOCK_ROTATION(blockRotationVertexOrder,blockRotationOffsets);
+        int[][] vertexOrder;
+        Vec3i[] rotationOffsets;
+
+        TextureOrientation(int[][] vertexOrder, Vec3i[] rotationOffsets){
+            this.vertexOrder = vertexOrder;
+            this.rotationOffsets = rotationOffsets;
         }
     }
 
+    public int[][] vertexOrder = lockedRotationVertexOrder;
+    Vec3i[] rotationOffsets = lockedRotationOffsets;
+    final Vec3i[] offsetsFront = new Vec3i[8*6];
+
     Boolf<BlockState> connectsTo = (b)->true;
+    Boolf3<BlockState, BlockRenderView, BlockPos> connectsToTop = (b, w, p)->!b.isOpaqueFullCube(w,p);
 
     public ConnectedTextureBlockModel(SpriteIdentifier texture, String name, Boolf<BlockState> connectsTo){
+        this(texture,name,connectsTo,(b, w, p)->!b.isOpaqueFullCube(w,p),TextureOrientation.FIXED_ROTATION);
+    }
+    public ConnectedTextureBlockModel(SpriteIdentifier texture, String name, Boolf<BlockState> connectsTo, Boolf3<BlockState, BlockRenderView, BlockPos> connectsToTop , TextureOrientation tex){
         super(new SpriteIdentifier[]{texture}, name);
         new TextureSubsitutor(Paths.texture+texture.getTextureId().getPath()+".png",Paths.texture+"block/connected_default.png");
         this.connectsTo=connectsTo;
+        this.connectsToTop=connectsToTop;
+        this.rotationOffsets = tex.rotationOffsets;
+        vertexOrder = tex.vertexOrder;
+        for(int i = 0; i< rotationOffsets.length; i++){
+            offsetsFront[i] = rotationOffsets[i].offset(Direction.byId(i/8));
+        }
     }
+
 
     @Override
     public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context){
@@ -95,11 +132,11 @@ public class ConnectedTextureBlockModel extends GeneratedModel{
             if(!blockView.getBlockState(bp).isOpaqueFullCube(blockView,bp)){
                 int index = 0;
                 int dirId = direction.getId();
-                if(dirId*8<offsets.length){
+                if(dirId*8< rotationOffsets.length){
                     for(int i =0;i<8;i++){
                         int offsetindex = dirId*8+i;
-                        if(connectsTo.get(blockView.getBlockState(pos.add(offsets[offsetindex]))) &&
-                            !blockView.getBlockState(pos.add(offsetsFront[offsetindex])).isOpaqueFullCube(blockView,pos.add(offsetsFront[offsetindex]))){
+                        if(connectsTo.get(blockView.getBlockState(pos.add(rotationOffsets[offsetindex]))) &&
+                            connectsToTop.get(blockView.getBlockState(pos.add(offsetsFront[offsetindex])),blockView,pos.add(offsetsFront[offsetindex]))){
                             index+=1<<i;
                         }
                     }
@@ -121,10 +158,10 @@ public class ConnectedTextureBlockModel extends GeneratedModel{
         emitter.square(direction, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         int dirId = direction.getId();
         getUV(index,tempf);
-        emitter.sprite(lockedRotationVertexOrder[dirId][0],0,tempf[0],tempf[1]);
-        emitter.sprite(lockedRotationVertexOrder[dirId][1],0,tempf[0]+unitTile,tempf[1]);
-        emitter.sprite(lockedRotationVertexOrder[dirId][2],0,tempf[0]+unitTile,tempf[1]+unitTile);
-        emitter.sprite(lockedRotationVertexOrder[dirId][3],0,tempf[0],tempf[1]+unitTile);
+        emitter.sprite(vertexOrder[dirId][0],0,tempf[0],tempf[1]);
+        emitter.sprite(vertexOrder[dirId][1],0,tempf[0]+unitTile,tempf[1]);
+        emitter.sprite(vertexOrder[dirId][2],0,tempf[0]+unitTile,tempf[1]+unitTile);
+        emitter.sprite(vertexOrder[dirId][3],0,tempf[0],tempf[1]+unitTile);
         emitter.spriteBake(0, sprites[0], MutableQuadView.BAKE_NORMALIZED);
         emitter.spriteColor(0, -1, -1, -1, -1);
         emitter.emit();

@@ -9,7 +9,7 @@ import net.minecraft.util.*;
 
 public class ModItems{
     public static final RegisteredItem UNSTABLE_ENDER_PEARL;
-
+    public static final RegisteredItem THUNDERSTONE,THUNDER_CORE;
     static{
         //region ITEMS
         UNSTABLE_ENDER_PEARL  = new RegisteredItem(
@@ -35,7 +35,21 @@ public class ModItems{
             ),
             item->item.addPredicate("explosion",(itemstack, world, entity, seed) -> UnstableItem.getExplosionCharge(itemstack))
         );
-
+        THUNDERSTONE = new RegisteredItem("thunderstone",
+        getSettings(
+            s->
+                s.group(ItemGroup.MISC)
+                 .rarity(Rarity.COMMON)
+            )
+        );
+        THUNDER_CORE = new RegisteredItem("thunder_core",
+        getSettings(
+            s->
+                s.group(ItemGroup.MISC)
+                 .rarity(Rarity.COMMON)
+                 .maxCount(16)
+            )
+        );
 
         //endregion
         //region HOOKS

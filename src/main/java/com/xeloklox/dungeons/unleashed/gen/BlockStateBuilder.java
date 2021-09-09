@@ -35,6 +35,28 @@ public class BlockStateBuilder{
         return this;
     }
 
+    public <T extends Comparable<T>> BlockStateBuilder addStateCombination(Property<T> property, Cons2<T, ModelVariantList> cons){
+        if(multipart){
+            throw new IllegalStateException("Multiparts dont have variant states");
+        }
+        ObjectMap<String, ModelList> newmap = new ObjectMap<>();
+        property.getValues().forEach(p->{
+            if(map.isEmpty()){
+                ModelVariantList ml = new ModelVariantList();
+                cons.get(p,ml);
+                newmap.put(property.getName()+"="+p, ml);
+            }else{
+                map.forEach(entry->{
+                    ModelVariantList ml = (ModelVariantList)entry.value.clone();
+                    cons.get(p,ml);
+                    newmap.put(property.getName()+"="+p+","+entry.key, ml);
+                });
+            }
+        });
+        map = newmap;
+        return this;
+    }
+
     public <T extends Comparable<T>> BlockStateBuilder addStateVariant(Property<T> prop, T value, Func<ModelVariantList, ModelVariantList> func) {
         if(noState){
             throw new IllegalStateException("Blocks with no BlockState cannot suddenly have a state variant.");
@@ -139,6 +161,7 @@ public class BlockStateBuilder{
             });
             return wrapper.val;
         }
+        public abstract ModelList clone();
     }
     public static class ModelMultipart extends ModelList{
         public ModelVariant apply;
@@ -148,6 +171,15 @@ public class BlockStateBuilder{
         public void eachModelVariant(Cons<ModelVariant> c){
             c.get(apply);
         }
+
+        @Override
+        public ModelList clone(){
+            ModelMultipart m = new ModelMultipart();
+            m.conditions.addAll(conditions);
+            m.or=or;
+            return m;
+        }
+
         public ModelMultipart setModel(Func<ModelVariant, ModelVariant> func){
             apply = (func.get(new ModelVariant()));
             return this;
@@ -220,6 +252,26 @@ public class BlockStateBuilder{
                 c.get(d);
             }
         }
+
+        @Override
+        public ModelList clone(){
+            ModelVariantList m = new ModelVariantList();
+            list.forEach(mv->{
+                try{
+                    m.list.add(new ModelVariant(new JSONObject(mv.data.toString())));
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            });
+            return m;
+        }
+
+        @Override
+        public String toString(){
+            return "ModelVariantList{" +
+            "list=" + list +
+            '}';
+        }
     }
 
     public static class ModelVariant{
@@ -258,11 +310,20 @@ public class BlockStateBuilder{
 
         public ModelVariant setY(int y){
             try{
-                data.put("y", y);
+                data.put("y", y%360);
             }catch(JSONException e){
             }
             return this;
         }
+        public int getY(){
+            if(!data.has("y")){return 0;}
+            try{
+                return data.getInt("y");
+            }catch(JSONException e){
+            }
+            return 0;
+        }
+
 
         public ModelVariant setZ(int z){
             try{

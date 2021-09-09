@@ -19,7 +19,7 @@ import net.minecraft.world.*;
 
 import java.util.*;
 
-public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, Oxidizable, IChargeStorage{
+public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, Oxidizable, IChargeAccessor{
     public static final int MAX_CHARGE = 4;
     public static final IntProperty CHARGE = IntProperty.of("charge",0,MAX_CHARGE);
     public LeydenJarBlock(Material material, Func<FabricBlockSettings, FabricBlockSettings> func){
@@ -52,6 +52,7 @@ public class LeydenJarBlock extends BasicBlock implements IAffectedByLightning, 
         int charge = state.get(CHARGE);
         if(charge<MAX_CHARGE){
             world.setBlockState(pos, state.with(CHARGE, charge+1));
+
         }
     }
 

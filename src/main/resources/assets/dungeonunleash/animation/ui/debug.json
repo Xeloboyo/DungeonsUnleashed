@@ -1,0 +1,16 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"debug": {
+			"animation_length": 0.5,
+			"bones": {
+				"bone": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.5": [0, 0, -5]
+					}
+				}
+			}
+		}
+	}
+}

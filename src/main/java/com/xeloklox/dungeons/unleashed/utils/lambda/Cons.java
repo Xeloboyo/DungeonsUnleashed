@@ -7,7 +7,7 @@ public interface Cons<T>{
         void get(T t,U t2);
     }
 
-    interface Cons3<T>{
-        void get(T t,T t2,T t3);
+    interface Cons3<T,U,V>{
+        void get(T t,U t2,V t3);
     }
 }

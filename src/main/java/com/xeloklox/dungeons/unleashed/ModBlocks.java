@@ -12,6 +12,7 @@ import com.xeloklox.dungeons.unleashed.gen.ModTag.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.block.*;
 import com.xeloklox.dungeons.unleashed.utils.models.*;
+import com.xeloklox.dungeons.unleashed.utils.models.ConnectedTextureBlockModel.*;
 import com.xeloklox.dungeons.unleashed.utils.models.ModelProvider.*;
 import com.xeloklox.dungeons.unleashed.utils.RegisteredBlock.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
@@ -39,6 +40,8 @@ public class ModBlocks{
     END_WOOD_PLANK_SLAB = new RegisteredBlock("end_wood_plank_slab"),
     END_WOOD_FENCE = new RegisteredBlock("end_wood_fence"),
     ENDERSEED_SOIL = new RegisteredBlock("enderseed_soil"),
+    THUNDERSTONE_ORE = new RegisteredBlock("thunderstone_ore"),
+    THUNDERSTONE_BLOCK = new RegisteredBlock("thunderstone_block"),
     PATCHY_END_GRASS = new RegisteredBlock("end_grass_patchy"),
     END_GRASS = new RegisteredBlock("end_grass"),
     END_WOOD = new RegisteredBlock("end_wood"),
@@ -59,6 +62,7 @@ public class ModBlocks{
     BEDROCK_PILLAR = new RegisteredBlock("bedrock_pillar"),
     LEYDEN_JAR = new RegisteredBlock("leyden_jar"),
     INFUSER = new RegisteredBlock("infuser"),
+    CHARGE_TRANSPOSER = new RegisteredBlock("charge_transposer"),
     CHARGE_CELL_PORT = new RegisteredBlock("charge_cell_port"),
     CHARGE_CELL_TANK = new RegisteredBlock("charge_cell_tank");
 
@@ -66,12 +70,15 @@ public class ModBlocks{
     public static final RegisteredBlockEntity<InfuserEntity> INFUSER_ENTITY;
     public static final RegisteredBlockEntity<ChargeStoragePortEntity> CHARGE_CELL_PORT_ENTITY;
     public static final RegisteredBlockEntity<ChargeStorageTankEntity> CHARGE_CELL_STORAGE_ENTITY;
+    public static final RegisteredBlockEntity<ChargeTransposerEntity> CHARGE_TRANSPOSER_ENTITY;
 
     public static final RegisteredBlockEntityRenderer<InfuserEntity> INFUSER_ENTITY_RENDERER;
     public static final RegisteredBlockEntityRenderer<ChargeStoragePortEntity> CHARGE_CELL_PORT_ENTITY_RENDERER;
     public static final RegisteredBlockEntityRenderer<ChargeStorageTankEntity> CHARGE_CELL_TANK_ENTITY_RENDERER;
+    public static final RegisteredBlockEntityRenderer<ChargeTransposerEntity> CHARGE_TRANSPOSER_ENTITY_RENDERER;
 
     public static final RegisteredScreenHandler<InfuserScreenHandler,InfuserScreen> INFUSER_SCREEN;
+    public static final RegisteredScreenHandler<ChargeTransposerScreenHandler,ChargeTransposerScreen> CHARGE_TRANSPOSER_SCREEN;
 
     //tags go here for now
     static ModTag<Block> wallsTag = new ModTag<>(TagDomain.minecraft,"walls", TagCategory.blocks);
@@ -234,6 +241,68 @@ public class ModBlocks{
         BEDROCK_PILLAR.setBlock(Globals.bootQuery(() -> new BasicBlock(Material.STONE, bedrockSettings)));
         BEDROCK_PILLAR.setBlockState(axisStates(BEDROCK_PILLAR_model));
         BEDROCK_PILLAR.finalise();
+
+
+        final String[] THUNDERSTONE_ORE_models = {
+            BlockModelPresetBuilder.allSidesSame(THUNDERSTONE_ORE.id, "block/thunderstone_ore"),
+            BlockModelPresetBuilder.allSidesSame(THUNDERSTONE_ORE.id+"2", "block/thunderstone_ore2"),
+        };
+        ConnectedTextureBlockModel THUNDERSTONE_ORE_CBTM = new ConnectedTextureBlockModel(Utils.getSprite("block/thunderstone_ore"),"thunderstone_ore",
+            block -> !block.getBlock().equals(THUNDERSTONE_BLOCK.get()),
+            (block,w,p) -> !block.getBlock().equals(THUNDERSTONE_BLOCK.get()),
+            TextureOrientation.BLOCK_ROTATION
+        );
+        THUNDERSTONE_ORE.setBlock(Globals.bootQuery(() ->new BasicBlock(Material.STONE, stoneSettings)));
+        THUNDERSTONE_ORE.setBlockState(BlockStateBuilder.create().noState(oneVariant(BlockModelPresetBuilder.generated(THUNDERSTONE_ORE_CBTM))));
+        THUNDERSTONE_ORE.setDrops(loottable->
+            loottable.addPool(pool->
+                pool.addEntry(item, entry->
+                    entry.setOutput(ModItems.THUNDERSTONE.getJSONID())
+                        .addFunction(set_count(num_uniform_random(1,3),false))
+                        .addFunction(apply_bonus("minecraft:fortune", F_apply_bonus.ore_drops()))
+                        .condition(invert(silktouch))
+
+                ).addEntry(item, entry->
+                    entry.setOutput(THUNDERSTONE_ORE.getJSONID())
+                         .condition(silktouch)
+                )
+            )
+        );
+        THUNDERSTONE_ORE.finalise();
+
+        ConnectedTextureBlockModel THUNDERSTONE_BLOCK_CBTM = new ConnectedTextureBlockModel(Utils.getSprite("block/thunderstone_block_connect"),"thunderstone_block",
+          block -> block.getBlock().equals(THUNDERSTONE_BLOCK.get()) || block.getBlock().equals(THUNDERSTONE_ORE.get()),
+          (block,w,p) -> (block.getBlock().equals(THUNDERSTONE_BLOCK.get()) || block.getBlock().equals(THUNDERSTONE_ORE.get())) || !block.isOpaqueFullCube(w,p),
+          TextureOrientation.BLOCK_ROTATION
+        );
+        THUNDERSTONE_BLOCK.setBlock(Globals.bootQuery(() ->new BasicBlock(Material.STONE,
+        settings->stoneSettings.get(settings).sounds(BlockSoundGroup.AMETHYST_BLOCK))));
+        THUNDERSTONE_BLOCK.setBlockState(BlockStateBuilder.create().noState(oneVariant(BlockModelPresetBuilder.generated(THUNDERSTONE_BLOCK_CBTM))));
+        THUNDERSTONE_BLOCK.setDrops(loottable->
+            loottable.addPool(pool->
+                pool.addEntry(item, entry->
+                    entry.setOutput(ModItems.THUNDERSTONE.getJSONID())
+                        .addFunction(set_count(num_uniform_random(3,5),false))
+                        .addFunction(apply_bonus("minecraft:fortune", F_apply_bonus.ore_drops()))
+                        .condition(invert(silktouch))
+
+                ).addEntry(item, entry->
+                    entry.setOutput(THUNDERSTONE_BLOCK.getJSONID())
+                         .condition(silktouch)
+                )
+            )
+            .addPool(pool->
+                pool.addEntry(item, entry->
+                    entry.setOutput(ModItems.THUNDER_CORE.getJSONID())
+                    .condition(droprate_with_enchantment(
+                    "minecraft:fortune",
+                    50 /* <- no enchant % */, 70, 80, 100, 100 // <- max lvl fortune %
+                    ))
+                ).condition(invert(silktouch))
+            )
+        );
+        THUNDERSTONE_BLOCK.finalise();
+
 
         /*
         ---------------------------------------------------------------------
@@ -400,7 +469,7 @@ public class ModBlocks{
         /// Multiblock (graph) for energy storage
 
         final String CHARGE_CELL_PORT_model = BlockModelPresetBuilder.customTemplate("block/custom/charge_cell_port", "charge_cell_port", "block/custom/charge_cell_port");
-        CHARGE_CELL_PORT.setBlock(Globals.bootQuery(() -> new ChargeStoragePortBlock(Material.STONE,
+        CHARGE_CELL_PORT.setBlock(Globals.bootQuery(() -> new ChargeAccessorPortBlock(Material.STONE,
             settings ->
             settings.breakByHand(false)
             .breakByTool(FabricToolTags.PICKAXES)
@@ -458,10 +527,49 @@ public class ModBlocks{
         CHARGE_CELL_STORAGE_ENTITY = new RegisteredBlockEntity<>("charge_cell_tank",ChargeStorageTankEntity::new,CHARGE_CELL_TANK);
         CHARGE_CELL_TANK_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(CHARGE_CELL_STORAGE_ENTITY::get, ChargeTankRenderer::new);
 
+
+
+        final String CHARGE_TRANSPOSER_model = BlockModelPresetBuilder.directional( CHARGE_TRANSPOSER.id, "block/custom/charge_transferer");
+        BasicBlock.selectedPlacementConfig = BasicBlock.HORIZONTAL_FACING_PLAYER_PLACEMENT;
+        CHARGE_TRANSPOSER.setBlock(Globals.bootQuery(() -> new ChargeTransposerBlock(Material.STONE,
+            settings->
+            settings.breakByHand(false)
+            .breakByTool(FabricToolTags.PICKAXES)
+            .sounds(BlockSoundGroup.STONE)
+            .hardness(2f)
+            .resistance(10f)
+        ,(b)->{}
+        )));
+        CHARGE_TRANSPOSER.setBlockState(
+            horizontalDirectionalStates(CHARGE_TRANSPOSER_model)
+            .addStateCombination(ChargeTransposerBlock.FLIPPED,
+            (flip, ml)->{
+                    ml.eachModelVariant(mv->{
+                        if(flip){ mv.setY(mv.getY()+180); }
+                    });
+                }
+            )
+        );
+        CHARGE_TRANSPOSER.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.DECORATIONS)));
+        CHARGE_TRANSPOSER.finalise();
+
+        CHARGE_TRANSPOSER_ENTITY = new RegisteredBlockEntity<>(CHARGE_TRANSPOSER.id,ChargeTransposerEntity::new,CHARGE_TRANSPOSER);
+        CHARGE_TRANSPOSER_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(CHARGE_TRANSPOSER_ENTITY::get,ChargeTransposerRenderer::new);
+
+        CHARGE_TRANSPOSER_SCREEN=
+            Globals.bootQuery( ()->
+                new RegisteredScreenHandler<>(
+                    "chargetransposerscreen",
+                    ScreenHandlerRegistry.registerSimple(CHARGE_TRANSPOSER.getIdentifier(), ChargeTransposerScreenHandler::new),
+                    ChargeTransposerScreen::new
+                )
+            );
+
          Globals.bootRun(()->{try{
              Class.forName(InfuserRenderer.class.getName());
              Class.forName(ChargePortRenderer.class.getName());
              Class.forName(ChargeTankRenderer.class.getName());
+             Class.forName(ChargeTransposerScreen.class.getName());
          }catch(ClassNotFoundException ignored){}});
         //endregion
 

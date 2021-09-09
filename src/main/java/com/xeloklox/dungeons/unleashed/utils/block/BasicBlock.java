@@ -36,8 +36,7 @@ public class BasicBlock extends Block implements Waterloggable{
     BasicBlockModifier modifier = null;
 
     public BasicBlock(Material material, Func<FabricBlockSettings, FabricBlockSettings> settingsfunc){
-        this(material, settingsfunc, block -> {
-        });
+        this(material, settingsfunc, block -> {});
     }
 
     public BasicBlock(Material material, Func<FabricBlockSettings, FabricBlockSettings> settingsfunc, Cons<BasicBlock> additionalSettings){
@@ -146,7 +145,6 @@ public class BasicBlock extends Block implements Waterloggable{
         if(newState.getBlock() != this){
             onDisturbed(state, world, pos);
             onDestroyed(state, world, pos);
-        }else{
             if(getEntityClass() != null && Inventory.class.isAssignableFrom(getEntityClass())){
                 BlockEntity blockEntity = world.getBlockEntity(pos);
                 if(blockEntity instanceof Inventory inventory){

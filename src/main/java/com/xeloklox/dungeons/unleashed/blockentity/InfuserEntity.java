@@ -24,25 +24,22 @@ import net.minecraft.world.*;
 import org.jetbrains.annotations.*;
 import org.mini2Dx.gdx.utils.*;
 
-public class InfuserEntity extends BlockEntity implements BlockEntityClientSerializable, SegmentedInventory, NamedScreenHandlerFactory, BlockEntityTicker<InfuserEntity>{
+public class InfuserEntity extends ChargeConnectingEntity implements  SegmentedInventory, NamedScreenHandlerFactory, BlockEntityTicker<InfuserEntity>{
+    public static final int powerPerCharge = 100;
+    final float delayBetweenInfusion = 40;
+    int infuseDelay=5;
+
+    //server
     int infuseProgress=0;
     int remainingPowerCharge = 0;
-    public static final int powerPerCharge = 100;
-    int infuseDelay=5;
     InfuserRecipe currentRecipe = null;
-    boolean[] jarAttach = new boolean[InfuserBlock.connectionRelative.length];
-    boolean jarUpdate = true;
-
-    final float delayBetweenInfusion = 40;
-    float delayTimer = 0;
     boolean readyToMove = false;
-    //visuals
-    float[] jarAttachAnimationTick = new float[InfuserBlock.connectionRelative.length];
-    ParameterMap[] animation = new ParameterMap[InfuserBlock.connectionRelative.length];
-    public ItemStack processingStack = ItemStack.EMPTY;
+    float delayTimer = 0;
+    //synced
     public boolean working =false;
-        //the disk thing
-    public float spin=0,rise=0; // used in renderer
+    public ItemStack processingStack = ItemStack.EMPTY;
+    //client
+    public float spin=0,rise=0;
 
 
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(7, ItemStack.EMPTY);
@@ -70,23 +67,11 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
 
 
     public InfuserEntity(BlockPos pos, BlockState state){
-        super(ModBlocks.INFUSER_ENTITY.get(), pos, state);
+        super(ModBlocks.INFUSER_ENTITY.get(), pos, state, (ChargeConnectorBlock)state.getBlock());
         addSegment(InventorySegment.of("input",0,1,2).insertableFrom(Direction.EAST,Direction.NORTH,Direction.SOUTH,Direction.WEST));
         addSegment(InventorySegment.of("output",4,5,6).extractableFrom(Direction.DOWN));
         addSegment(InventorySegment.of("processing",3).maxItems(1).syncOnChange(true));
-        for(int i=0;i<jarAttach.length;i++){
-            animation[i] = new ParameterMap();
-            animation[i].add("rotation",0f);
-            animation[i].add("extend",Utils.pixels(-5));
-            animation[i].addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"rotation",new FloatInterpolate(),
-                FrameState.get(0f,0.6f),
-                FrameState.get(180f,0.4f)
-            );
-            animation[i].addChainedInterpolator(SingularInterpolateType.EXPONENTIAL2,0.2f,"extend",new FloatInterpolate(),
-                FrameState.get(0f,0.6f),
-                FrameState.get(0f,0.4f)
-            );
-        }
+
     }
 
 
@@ -96,7 +81,6 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         nbt.putInt("infuseProgress",infuseProgress);
         nbt.putFloat("delayTimer",delayTimer);
         nbt.putInt("remainingPowerCharge",remainingPowerCharge);
-        nbt.putInt("attach",Utils.toIntMask(jarAttach));
         Inventories.writeNbt(nbt, items);
         return nbt;
     }
@@ -107,7 +91,6 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         delayTimer = nbt.getFloat("delayTimer");
         infuseProgress = nbt.getInt("infuseProgress");
         remainingPowerCharge = nbt.getInt("remainingPowerCharge");
-        Utils.fromIntMask(nbt.getInt("attach"),jarAttach);
         Inventories.readNbt(nbt, items);
     }
 
@@ -120,27 +103,18 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     }
 
     public void updateCharge(World world, BlockPos pos, BlockState state){
-        int charge=0;
-        for(int i=0;i<jarAttach.length;i++){
-            Vec3i v = Mathf.relativeDirectionHorz(state.get(Properties.HORIZONTAL_FACING),InfuserBlock.connectionRelative[i]);
-            BlockPos bp = pos.add(v);
-            BlockState adjacent = world.getBlockState(bp);
-            if(adjacent.getBlock() instanceof IChargeStorage chargeStorage){
-                if(remainingPowerCharge<=0){
-                    remainingPowerCharge += chargeStorage.drainCharge(world,bp)?powerPerCharge:0;
-                    sync();
-                }
-                charge+=chargeStorage.getCharge(world,bp);
+        while(remainingPowerCharge<=0){
+            int powerget  = drainCharge()?powerPerCharge:0;;
+            remainingPowerCharge += powerget;
+            if(powerget==0){
+                break;
             }
         }
+        updateConnections();
         syncedInts[D_POWERSTATUS] =charge;
     }
     public void updateClient(World world, BlockPos pos, BlockState state){
-        for(int i=0;i<jarAttach.length;i++){
-            jarAttachAnimationTick[i] += (jarAttach[i]?1:-1)*0.02f;
-            jarAttachAnimationTick[i] = MathHelper.clamp(jarAttachAnimationTick[i],0f,1f);
-            animation[i].update(jarAttachAnimationTick[i]);
-        }
+        updateAnimations();
         rise += (Utils.pixels(processingStack.isEmpty()?0:2)-rise)*0.1f;
         if(working && Mathf.randFloat(10)<1){
             Mathf.randVec3((rx, ry, rz)->{
@@ -229,19 +203,6 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
         return syncedInts[D_POWERSTATUS]>0 || remainingPowerCharge>0;
     }
 
-    public float[] getJarAttachAnimationTick(){
-        return jarAttachAnimationTick;
-    }
-
-    public ParameterMap[] getAnimation(){
-        return animation;
-    }
-
-    public void setJarAttach(boolean[] jarAttach){
-       this.jarAttach = jarAttach;
-        jarUpdate = true;
-    }
-
     @Override
     public DefaultedList<ItemStack> getItems(){
         return items;
@@ -250,7 +211,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     //received from server
     @Override
     public void fromClientTag(NbtCompound tag){
-        Utils.fromIntMask(tag.getInt("attach"),jarAttach);
+        super.fromClientTag(tag);
         working = tag.getBoolean("working");
         processingStack = ItemStack.fromNbt(tag.getCompound("item"));
     }
@@ -258,7 +219,7 @@ public class InfuserEntity extends BlockEntity implements BlockEntityClientSeria
     //send to client
     @Override
     public NbtCompound toClientTag(NbtCompound tag){
-        tag.putInt("attach",Utils.toIntMask(jarAttach));
+        tag = super.toClientTag(tag);
         NbtCompound item = new NbtCompound();
         getStack(getSegment("processing").slots[0]).writeNbt(item);
         tag.put("item",item);

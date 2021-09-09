@@ -187,6 +187,51 @@ public class LootTableJson extends JsonConfiguration{
                 return this;
             }
         }
+        public static class F_apply_bonus extends LootPoolFunction{
+
+            public F_apply_bonus(String enchantment, Cons<JSONObject> abf){
+                super("minecraft:apply_bonus");
+                try{
+                    base.put("enchantment", enchantment);
+                    abf.get(base);
+                }catch(JSONException ignored){}
+            }
+            public static Cons<JSONObject> binomial(int extra,float probability){
+                return jsonObject -> {
+                    try{
+                        jsonObject.put("formula","binomial_with_bonus_count");
+                        JSONObject params = new JSONObject();
+                        params.put("extra",extra);
+                        params.put("probability",probability);
+                        jsonObject.put("params",params);
+                    }catch(JSONException e){
+                        e.printStackTrace();
+                    }
+                };
+            }
+            public static Cons<JSONObject> uniform(float bonusMultiplier ){
+                return jsonObject -> {
+                    try{
+                        jsonObject.put("formula","uniform_bonus_count");
+                        JSONObject params = new JSONObject();
+                        params.put("bonusMultiplier",bonusMultiplier);
+                        jsonObject.put("params",params);
+                    }catch(JSONException e){
+                        e.printStackTrace();
+                    }
+                };
+            }
+            public static Cons<JSONObject> ore_drops( ){
+                return jsonObject -> {
+                    try{
+                        jsonObject.put("formula","ore_drops");
+                    }catch(JSONException e){
+                        e.printStackTrace();
+                    }
+                };
+            }
+        }
+        public static F_apply_bonus apply_bonus(String enchantment, Cons<JSONObject> abf){return new F_apply_bonus(enchantment,abf);}
         public static class F_set_count extends LootPoolFunction{
             String block;
             Property[] props;
@@ -406,7 +451,6 @@ public class LootTableJson extends JsonConfiguration{
             }
         }
         public static class NumberProviderConstant extends NumberProvider{
-
             NumberProviderConstant(float value){
                 super("constant");
                 try{
@@ -415,6 +459,17 @@ public class LootTableJson extends JsonConfiguration{
             }
         }
         public static NumberProviderConstant num_constant(float v){return new NumberProviderConstant(v);}
+
+        public static class NumberProviderUniform extends NumberProvider{
+            NumberProviderUniform(float min,float max){
+                super("uniform");
+                try{
+                   base.put("min", min);
+                   base.put("max", max);
+                }catch(Exception ignored){}
+            }
+        }
+        public static NumberProviderUniform num_uniform_random(float min,float max){return new NumberProviderUniform(min,max);}
 
 
         public static class PropertyEntry<T extends Comparable<T>>{

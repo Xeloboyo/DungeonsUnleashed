@@ -49,6 +49,18 @@ public class BlockModelPresetBuilder{
         }
         return "@@"+jo.toString();
     }
+    public static String directional(String name, String texture){
+        JSONObject jo = new JSONObject();
+        try{
+            jo.put("template","block/templates/cube_directional");
+            jo.put("tex_0",texture);
+            jo.put("tex_particle",texture);
+            jo.put("name",name);
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+        return "@@"+jo.toString();
+    }
     public static String TopBottomSide(String name, String top, String side, String bottom){
         JSONObject jo = new JSONObject();
         try{

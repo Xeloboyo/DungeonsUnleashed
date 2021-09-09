@@ -2,6 +2,8 @@ package com.xeloklox.dungeons.unleashed.blockentity.screens;
 
 import com.mojang.blaze3d.systems.*;
 import com.xeloklox.dungeons.unleashed.blockentity.*;
+import com.xeloklox.dungeons.unleashed.blockentity.screens.particles.*;
+import com.xeloklox.dungeons.unleashed.blockentity.screens.particles.UIParticle.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
@@ -31,7 +33,6 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
 
     float ringangle = 0;
     final float centerX = 101,centerY = 54;
-    Array<DistortableParticle> particles = new Array<>();
 
     public InfuserScreen(InfuserScreenHandler handler, PlayerInventory inventory, Text title){
         super(handler, inventory, title,50,
@@ -150,6 +151,9 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
         playerInventoryTitleY = 107;
         titleY = -13;
 
+        particles.addAffector(new ParticleAttractor(999,centerX,centerY,0.1f));
+        particles.addAffector(new ParticleDeleter(10,centerX,centerY));
+        particles.addAffector(new ParticleAccelerator(20,centerX,centerY,0.9f));
     }
     //71,20  61,70    190,105
     // 79 34    ,   0 ,200   47, 41
@@ -190,10 +194,8 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
         matrices.pop();
 
         RenderSystem.setShaderTexture(0, TEXTURE);
-        for(int i=0;i<particles.size;i++){
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, Math.min(1.0f,particles.get(i).life*0.1f));
-            particles.get(i).draw(matrices.peek().getModel(), this);
-        }
+        particles.draw(matrices, this);
+
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
         drawTexture(matrices, 93,44 , 238,0, 18, (int)(21*getProgress()));
         matrices.pop();
@@ -232,21 +234,7 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
             Vec2f v = Mathf.randVec2().multiply(65);
             addParticle(v.x+centerX,v.y+centerY);
         }
-        for(int i=0;i<particles.size;i++){
-            float dx = centerX-particles.get(i).x;
-            float dy = centerY-particles.get(i).y;
-            float d =  MathHelper.sqrt(dx*dx+dy*dy);
-
-            particles.get(i).vx+=0.1f*dx/d;
-            particles.get(i).vy+=0.1f*dy/d;
-            if(d<16){
-                particles.get(i).vx*=0.8;
-                particles.get(i).vy*=0.8;
-            }
-            if(d<10){
-                particles.removeIndex(i);
-            }
-        }
+        particles.update();
 
     }
 
@@ -281,14 +269,7 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
         float dpx = centerX-x;
         float dpy = centerY-y;
         float dp = MathHelper.sqrt(dpx*dpx+dpy*dpy);
-        particles.add(new DistortableParticle(x,y,10,0.3f*dpx/dp,0.3f*dpy/dp,3+16*Mathf.randInt(16),246,256,256,(px, py, out) -> {
-            float dx = centerX-px,dy=centerY-py;
-            float d = MathHelper.sqrt(dx*dx+dy*dy);
-            float shift = 30f/(1f+d*0.1f);
-            if(d<16){shift=d-16;}
-            float d1 = 1f/d;
-            out[0]= px+(dx*d1)*shift;
-            out[1]= py+(dy*d1)*shift;
-        }));
+        particles.add(new DistortableUIParticle(x,y,10,0.3f*dpx/dp,0.3f*dpy/dp,3+16*Mathf.randInt(16),246,256,256,
+        DistortableUIParticle.distortTowardsPoint(centerX,centerY,16,30))).renderAffectors = new RenderAffectors[]{RenderAffectors.FADE_IN};
     }
 }

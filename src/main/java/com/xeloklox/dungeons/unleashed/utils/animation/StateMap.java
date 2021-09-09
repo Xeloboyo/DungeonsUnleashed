@@ -28,6 +28,9 @@ public class StateMap{
     }
 
     public StateMap setState(String as){
+        if(as==null){
+            return this;
+        }
         current = states.get(as);
         params.removeInterops();
         current.init.get(params);
@@ -48,6 +51,9 @@ public class StateMap{
     public void update(){
         if(current==null){
             setState(onStateEnd.get(this));
+            if(current==null){
+                return;
+            }
         }
         params.update(internalTick/current.duration);
         internalTick++;

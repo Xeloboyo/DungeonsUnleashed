@@ -22,6 +22,9 @@ public class Mathf{
         float t  = rand.nextFloat()*MathConstants.PI*2.0f;
         return new Vec2f(cos(t), sin(t));
     }
+    public static Vec2f randVec2Uniform(){
+        return new Vec2f(rand.nextFloat(), rand.nextFloat());
+    }
     public static float randFloat(float max){
         return rand.nextFloat()*max;
     }
@@ -31,7 +34,7 @@ public class Mathf{
     public static float randFloat(float min,float max){
         return rand.nextFloat()*(max-min) + min;
     }
-    public static void randVec3(Cons3<Float> cons){
+    public static void randVec3(Cons3<Float,Float,Float> cons){
         float t  = rand.nextFloat()*MathConstants.PI*2.0f;
         float z =  rand.nextFloat()*2-1;
         float s1z = sqrt(1-z*z);

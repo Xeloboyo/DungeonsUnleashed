@@ -1,10 +1,13 @@
 package com.xeloklox.dungeons.unleashed.utils.models;
 
+import com.mojang.blaze3d.systems.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
+import net.minecraft.client.*;
 import net.minecraft.client.model.*;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.*;
 import net.minecraft.client.util.math.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
@@ -97,6 +100,27 @@ public class RenderableModel{
             }
         }
     }
+    static final Vec3f topLeftLight = (Vec3f)Util.make(new Vec3f(0.2F, -1.0F, -1.0F), Vec3f::normalize);
+    static final Vec3f topDownLight = (Vec3f)Util.make(new Vec3f(0.2F, 0, 1.0F), Vec3f::normalize);
+
+    public void render(MatrixStack matrices,ObjectMap<String, BoneTranslationParameters> boneTranslationProvider){
+        matrices.push();
+        matrices.translate(0.0D, 0.0D, 432.0D);
+        matrices.scale(16,16,16);
+        matrices.multiply(Vec3f.NEGATIVE_X.getDegreesQuaternion( -90));
+        RenderSystem.setShaderLights(topLeftLight, topDownLight);
+        RenderSystem.applyModelViewMatrix();
+        EntityRenderDispatcher entityRenderDispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
+        entityRenderDispatcher.setRenderShadows(false);
+        VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+          RenderSystem.runAsFancy(() -> {
+              render(matrices,immediate,15728880,OverlayTexture.DEFAULT_UV,boneTranslationProvider);
+          });
+        immediate.draw();
+        entityRenderDispatcher.setRenderShadows(true);
+        matrices.pop();
+        DiffuseLighting.enableGuiDepthLighting();
+    }
 
     public TexturedModelData loadFromBedrockModel(JSONObject modelOuter) throws JSONException{
         JSONObject model = modelOuter.getJSONArray("minecraft:geometry").getJSONObject(0);
@@ -137,17 +161,25 @@ public class RenderableModel{
                     JSONObject facesUV = cubejson.getJSONObject("uv");
                     for(int d=0;d<6;d++){
                         Direction dr = Direction.byId(d);
+                        if(!facesUV.has(dr.getName())){
+                            continue;
+                        }
                         JSONObject face = facesUV.getJSONObject(dr.getName());
                         JSONArray uv = face.getJSONArray("uv");
                         JSONArray uvsize = face.getJSONArray("uv_size");
-                        if(d!=Direction.EAST.getId() && d!=Direction.WEST.getId()){
-                            uvs[d][0] = uv.getInt(0);
-                            uvs[d][2] = uvsize.getInt(0) + uv.getInt(0);
-                            uvs[d][1] = uvsize.getInt(1) + uv.getInt(1);
-                            uvs[d][3] = uv.getInt(1);
-                        }else{
+                        if(d==Direction.EAST.getId() || d==Direction.WEST.getId()){ //
                             uvs[d][0] = uvsize.getInt(0) + uv.getInt(0);
                             uvs[d][2] = uv.getInt(0);
+                            uvs[d][1] = uvsize.getInt(1) + uv.getInt(1);
+                            uvs[d][3] = uv.getInt(1);
+                        }else if( d==Direction.UP.getId() || d==Direction.DOWN.getId()){
+                            uvs[d][2] = uvsize.getInt(0) +uv.getInt(0);//
+                            uvs[d][0] = uv.getInt(0);
+                            uvs[d][3] = uvsize.getInt(1) + uv.getInt(1);
+                            uvs[d][1] = uv.getInt(1);
+                        }else{
+                            uvs[d][0] = uv.getInt(0);
+                            uvs[d][2] = uvsize.getInt(0) + uv.getInt(0);
                             uvs[d][1] = uvsize.getInt(1) + uv.getInt(1);
                             uvs[d][3] = uv.getInt(1);
                         }
@@ -264,7 +296,21 @@ public class RenderableModel{
             this.pivot = pivot;
             this.name = name;
         }
-
+        public void render(MatrixStack matrices, ObjectMap<String, BoneTranslationParameters> boneTranslationProvider){
+            BoneTranslationParameters parameters = boneTranslationProvider.get(name);
+            matrices.push();
+            matrices.translate((parameters.offset.getX()+offset.getX()+pivot.getX())*16f, (parameters.offset.getY()+offset.getY()+pivot.getY())*16f,(parameters.offset.getZ()+offset.getZ()+pivot.getZ())*16f);
+            matrices.scale(parameters.scale.getX()*scale.getX(),parameters.scale.getY()*scale.getY(),parameters.scale.getZ()*scale.getZ());
+            matrices.multiply(Mathf.fromEulerDegXYZ(rotation.getX()+parameters.rotation.getX(),rotation.getY()+parameters.rotation.getY(),rotation.getZ()+parameters.rotation.getZ()));
+            matrices.translate(-pivot.getX(), -pivot.getY(),-pivot.getZ());
+            for(OrientedCuboid cube: cubes){
+                cube.render(matrices);
+            }
+            for(Bone bone: children){
+                bone.render(matrices,boneTranslationProvider);
+            }
+            matrices.pop();
+        }
         public void render(MatrixStack matrices, VertexConsumer vc, int light, int overlay , ObjectMap<String, BoneTranslationParameters> boneTranslationProvider, float red, float green, float blue, float alpha){
             BoneTranslationParameters parameters = boneTranslationProvider.get(name);
             matrices.push();
@@ -311,6 +357,15 @@ public class RenderableModel{
             }
             matrices.pop();
         }
+        public void render(MatrixStack matrices){
+            matrices.push();
+            matrices.translate(pivot.getX()*16f, pivot.getY()*16f,pivot.getZ()*16f);
+            matrices.multiply(Quaternion.method_35823(rotation));
+            for(int i=0;i<sides.length;i++){
+                renderQuad(matrices.peek(), sides[i]);
+            }
+            matrices.pop();
+        }
     }
     public static class Cuboid{
         final Quad[] sides = new Quad[6];
@@ -337,6 +392,17 @@ public class RenderableModel{
         }
     }
 
+
+    public static void renderQuad(MatrixStack.Entry matrices,Quad quad){
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+         for(int i = 0; i < 4; ++i){
+            bufferBuilder.vertex(matrices.getModel(), quad.vertices[i].pos.getX(), quad.vertices[i].pos.getY(), quad.vertices[i].pos.getZ()).texture(quad.vertices[i].u, quad.vertices[i].v).next();
+         }
+         bufferBuilder.end();
+         BufferRenderer.draw(bufferBuilder);
+    }
 
     public static void renderQuad(MatrixStack.Entry entry, VertexConsumer vertexConsumer, Quad quad,int light, int overlay){
         renderQuad(entry,vertexConsumer,quad,light,overlay,1f,1f,1f,1f);

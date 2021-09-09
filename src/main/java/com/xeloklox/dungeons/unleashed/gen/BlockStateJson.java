@@ -34,6 +34,7 @@ public class BlockStateJson extends JsonConfiguration{
     public void pregenerate(){
         try{
             // generated and missing models are processed here.
+            System.out.println("[ "+block.id+" ] -------------------------");
             for(String model : modelsToCheck){
                 if(model.startsWith("@@")){
                     JSONObject config = new JSONObject(model.substring(2));

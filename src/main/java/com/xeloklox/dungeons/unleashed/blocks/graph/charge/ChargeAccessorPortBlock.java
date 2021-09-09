@@ -18,9 +18,9 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.*;
 
-public class ChargeStoragePortBlock extends GraphConnectingBlock implements IChargeStorage{
+public class ChargeAccessorPortBlock extends GraphConnectingBlock implements IChargeAccessor{
 
-    public ChargeStoragePortBlock(Material material, Func<FabricBlockSettings, FabricBlockSettings> settingsfunc){
+    public ChargeAccessorPortBlock(Material material, Func<FabricBlockSettings, FabricBlockSettings> settingsfunc){
         super(material, manager -> {
             manager.add(new SidedConnectConfig<>(ChargeStorageGraph.class,Direction.UP,Direction.DOWN));
         }, settingsfunc);
