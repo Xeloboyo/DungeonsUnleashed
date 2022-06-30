@@ -16,7 +16,7 @@ import org.mini2Dx.gdx.utils.*;
 
 import java.util.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 import static com.xeloklox.dungeons.unleashed.utils.Utils.pixels;
 
 public class RenderableModel{

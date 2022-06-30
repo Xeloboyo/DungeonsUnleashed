@@ -3,6 +3,14 @@ package com.xeloklox.dungeons.unleashed.utils;
 import java.io.*;
 
 public class Strings{
+    public static final String CODE_OBFUSCATE = "§k";
+    public static final String CODE_RESET = "§r";
+    public static final String CODE_ITALIC= "§o";
+    public static final String CODE_BOLD = "§l";
+    public static final String CODE_UNDERLINE = "§n";
+    public static final String CODE_STRIKETHROUGH = "§m";
+
+
     public static int parseInt(String s){
         if(s==null||s.length()==0){return 0;}
         return Integer.parseInt(s);

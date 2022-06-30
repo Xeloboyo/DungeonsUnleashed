@@ -75,6 +75,7 @@ public interface ImplementedInventory extends Inventory{
         if (!result.isEmpty()) {
             markDirty();
         }
+        onChange(slot);
         return result;
     }
 
@@ -84,6 +85,7 @@ public interface ImplementedInventory extends Inventory{
      */
     @Override
     default ItemStack removeStack(int slot) {
+        onChange(slot);
         return Inventories.removeStack(getItems(), slot);
     }
 
@@ -100,6 +102,7 @@ public interface ImplementedInventory extends Inventory{
         if (stack.getCount() > getMaxCount(slot)) {
             stack.setCount(getMaxCount(slot));
         }
+        onChange(slot);
     }
 
     /**
@@ -145,9 +148,11 @@ public interface ImplementedInventory extends Inventory{
         int insertam = Math.min(space,stack.getCount());
         if(slot.isEmpty()){
             setStack(slotindex,stack.copy());
+            onChange(slotindex);
             return stack.getCount()-insertam;
         }else if(ItemStack.canCombine(slot,stack)){
             slot.setCount(slot.getCount()+insertam);
+            onChange(slotindex);
             return stack.getCount()-insertam;
         }else{
             return stack.getCount();
@@ -160,5 +165,7 @@ public interface ImplementedInventory extends Inventory{
         int leftover = tryInsert(toslot,getItems().get(fromslot));
         getItems().get(fromslot).setCount(leftover);
     }
+
+    default void onChange(int slot){};
 
 }

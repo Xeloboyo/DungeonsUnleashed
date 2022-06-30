@@ -1,0 +1,18 @@
+{"variants": {
+    "facing=east": [{
+        "model": "almechanistpath:block/infuser",
+        "y": 90
+    }],
+    "facing=north": [{
+        "model": "almechanistpath:block/infuser",
+        "y": 0
+    }],
+    "facing=south": [{
+        "model": "almechanistpath:block/infuser",
+        "y": 180
+    }],
+    "facing=west": [{
+        "model": "almechanistpath:block/infuser",
+        "y": 270
+    }]
+}}

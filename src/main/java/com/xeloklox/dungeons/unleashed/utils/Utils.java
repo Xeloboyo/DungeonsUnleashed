@@ -1,16 +1,13 @@
 package com.xeloklox.dungeons.unleashed.utils;
 
-import com.google.common.collect.*;
-import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.client.texture.*;
 import net.minecraft.client.util.*;
 import net.minecraft.util.*;
 import org.json.*;
 
-import java.util.*;
-import java.util.function.*;
+import java.lang.reflect.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class Utils{
     public static int toIntMask(boolean[] mask){
@@ -43,6 +40,26 @@ public class Utils{
             floats[i]= (float)ja.getDouble(i);
         }
         return floats;
+    }
+
+    public static int rgb(int red,int green, int blue){
+        return (red<<16) | (green<<8) | blue;
+    }
+
+
+    public static <T> void setFinalInt(T d,String f, int a){
+        Field field = null;
+        try{
+            field = d.getClass().getDeclaredField(f);
+        }catch(NoSuchFieldException e){
+            e.printStackTrace();
+        }
+        field.setAccessible(true);
+        try{
+            field.setInt(d,a);
+        }catch(IllegalAccessException e){
+            e.printStackTrace();
+        }
     }
 
 

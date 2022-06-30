@@ -1,0 +1,9 @@
+{
+    "credit": "autogen",
+    "parent": "minecraft:block/cube_bottom_top",
+    "textures": {
+        "bottom": "almechanistpath:block/end_soil",
+        "side": "almechanistpath:block/end_grass_side",
+        "top": "almechanistpath:block/end_grass_top"
+    }
+}

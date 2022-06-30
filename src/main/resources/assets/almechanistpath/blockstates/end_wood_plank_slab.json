@@ -1,0 +1,5 @@
+{"variants": {
+    "type=bottom": [{"model": "almechanistpath:block/end_wood_plank_slab"}],
+    "type=double": [{"model": "almechanistpath:block/end_wood_planks"}],
+    "type=top": [{"model": "almechanistpath:block/end_wood_plank_slab_top"}]
+}}

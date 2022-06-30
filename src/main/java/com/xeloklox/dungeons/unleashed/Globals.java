@@ -44,6 +44,7 @@ public class Globals{
         });
         register_noRegsitry.forEach(entry2-> {
             if(entry2.value.getEnvironment().equals(env)){
+                System.out.println("[OTHER REGISTRY]: registered "+entry2.value.id);
                 entry2.value.register();
             }
         });

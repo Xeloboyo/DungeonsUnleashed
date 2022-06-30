@@ -1,0 +1,70 @@
+{"multipart": [
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side",
+            "uvlock": true,
+            "y": 0
+        },
+        "when": {"north": "low"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side",
+            "uvlock": true,
+            "y": 180
+        },
+        "when": {"south": "low"}
+    },
+    {
+        "apply": {"model": "almechanistpath:block/end_wood_fence_post"},
+        "when": {"up": "true"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side",
+            "uvlock": true,
+            "y": 270
+        },
+        "when": {"west": "low"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side_tall",
+            "uvlock": true,
+            "y": 180
+        },
+        "when": {"south": "tall"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side_tall",
+            "uvlock": true,
+            "y": 0
+        },
+        "when": {"north": "tall"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side_tall",
+            "uvlock": true,
+            "y": 90
+        },
+        "when": {"east": "tall"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side",
+            "uvlock": true,
+            "y": 90
+        },
+        "when": {"east": "low"}
+    },
+    {
+        "apply": {
+            "model": "almechanistpath:block/end_wood_fence_side_tall",
+            "uvlock": true,
+            "y": 270
+        },
+        "when": {"west": "tall"}
+    }
+]}

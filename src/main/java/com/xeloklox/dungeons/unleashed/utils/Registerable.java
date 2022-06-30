@@ -4,7 +4,7 @@ import com.xeloklox.dungeons.unleashed.*;
 import net.minecraft.util.*;
 import net.minecraft.util.registry.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 import static com.xeloklox.dungeons.unleashed.Globals.bootStrapped;
 
 public abstract class Registerable<T>{

@@ -25,9 +25,10 @@ import net.minecraft.block.enums.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.sound.*;
+import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 import static com.xeloklox.dungeons.unleashed.blocks.LeydenJarBlock.MAX_CHARGE;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.LootPoolEntry.LootPoolEntryType.*;
@@ -61,6 +62,7 @@ public class ModBlocks{
     END_LEAVES = new RegisteredBlock("end_leaves"),
     BEDROCK_PILLAR = new RegisteredBlock("bedrock_pillar"),
     LEYDEN_JAR = new RegisteredBlock("leyden_jar"),
+    JOURNEYER_TABLE = new RegisteredBlock("journeyer_table"),
     INFUSER = new RegisteredBlock("infuser"),
     CHARGE_TRANSPOSER = new RegisteredBlock("charge_transposer"),
     CHARGE_CELL_PORT = new RegisteredBlock("charge_cell_port"),
@@ -79,6 +81,7 @@ public class ModBlocks{
 
     public static final RegisteredScreenHandler<InfuserScreenHandler,InfuserScreen> INFUSER_SCREEN;
     public static final RegisteredScreenHandler<ChargeTransposerScreenHandler,ChargeTransposerScreen> CHARGE_TRANSPOSER_SCREEN;
+    public static final RegisteredScreenHandler<ResearchMapScreenHandler,ResearchMapScreen> RESEARCH_MAP_SCREEN;
 
     //tags go here for now
     static ModTag<Block> wallsTag = new ModTag<>(TagDomain.minecraft,"walls", TagCategory.blocks);
@@ -402,24 +405,25 @@ public class ModBlocks{
         LEYDEN_JAR.setBlockState(LEYDEN_JAR_STATE);
         LEYDEN_JAR.setRenderlayer(RenderLayerOptions.CUTOUT);
         LEYDEN_JAR.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.BUILDING_BLOCKS).maxCount(8)));
-        LEYDEN_JAR.setBlockitem((id, bitem) ->
-            new RegisteredItem(id, bitem,
-                model -> {
-                    model.setModelParent(ModelParent.ITEM_GENERATED).setTextureLayers("item/leyden_jar");
-                    for(int i = 1; i <= MAX_CHARGE; i++){
-                        int finalI = i;
-                        model.addOverride(override -> override.setModel("item/leyden_jar" + (finalI + 1)).addModelPredicate("charge", finalI / (float)MAX_CHARGE));
-                    }
-                    return model;
-                },
-                item -> item.addPredicate("charge", (itemstack, world, entity, seed) -> {
-                    NbtCompound blockEntityTag = itemstack.getOrCreateSubNbt("BlockStateTag");
-                    if(blockEntityTag == null){
-                        return 0;
-                    }
-                    return Strings.parseInt(blockEntityTag.getString(LeydenJarBlock.CHARGE.getName())) / (float)MAX_CHARGE;
-                })
-            )
+        LEYDEN_JAR.setBlockitem((id, bitem) -> {
+            var item = new RegisteredItem(id, bitem);
+            item.setModel(model -> {
+                model.setModelParent(ModelParent.ITEM_GENERATED).setTextureLayers("item/leyden_jar");
+                for(int i = 1; i <= MAX_CHARGE; i++){
+                    int finalI = i;
+                    model.addOverride(override -> override.setModel("item/leyden_jar" + (finalI + 1)).addModelPredicate("charge", finalI / (float)MAX_CHARGE));
+                }
+                return model;
+            });
+            item.addPredicate("charge", (itemstack, world, entity, seed) -> {
+                NbtCompound blockEntityTag = itemstack.getOrCreateSubNbt("BlockStateTag");
+                if(blockEntityTag == null){
+                    return 0;
+                }
+                return Strings.parseInt(blockEntityTag.getString(LeydenJarBlock.CHARGE.getName())) / (float)MAX_CHARGE;
+            });
+            return item;
+        }
         );
         LEYDEN_JAR.setDrops(lootTable ->
             lootTable.addPool(pool ->
@@ -517,11 +521,10 @@ public class ModBlocks{
         CHARGE_CELL_TANK.setRenderlayer(RenderLayerOptions.CUTOUT);
         CHARGE_CELL_TANK.setName("Small Charge Tank");
         CHARGE_CELL_TANK.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.DECORATIONS)));
-        CHARGE_CELL_TANK.setBlockitem((id, bitem) ->
-            new RegisteredItem(id, bitem,
-                item->{item.modelId = "charge_cell_tank_unconnected"; return item;}
-            )
-        );
+        CHARGE_CELL_TANK.setBlockitem((id, bitem) ->{
+            var item = new RegisteredItem(id, bitem);
+            return item.setModel(model->{model.modelId= "charge_cell_tank_unconnected"; return model;});
+        });
         CHARGE_CELL_TANK.finalise();
 
         CHARGE_CELL_STORAGE_ENTITY = new RegisteredBlockEntity<>("charge_cell_tank",ChargeStorageTankEntity::new,CHARGE_CELL_TANK);
@@ -557,13 +560,27 @@ public class ModBlocks{
         CHARGE_TRANSPOSER_ENTITY_RENDERER = new RegisteredBlockEntityRenderer<>(CHARGE_TRANSPOSER_ENTITY::get,ChargeTransposerRenderer::new);
 
         CHARGE_TRANSPOSER_SCREEN=
-            Globals.bootQuery( ()->
-                new RegisteredScreenHandler<>(
-                    "chargetransposerscreen",
-                    ScreenHandlerRegistry.registerSimple(CHARGE_TRANSPOSER.getIdentifier(), ChargeTransposerScreenHandler::new),
-                    ChargeTransposerScreen::new
-                )
-            );
+        Globals.bootQuery( ()->
+            new RegisteredScreenHandler<>(
+                "chargetransposerscreen",
+                ScreenHandlerRegistry.registerSimple(CHARGE_TRANSPOSER.getIdentifier(), ChargeTransposerScreenHandler::new),
+                ChargeTransposerScreen::new
+            )
+        );
+        final String JOURNEYER_TABLE_model = BlockModelPresetBuilder.customTemplate("block/custom/journeyer_table","journeyer_table","block/custom/journeyer_table");
+        JOURNEYER_TABLE.setBlock(Globals.bootQuery(() -> new JourneyerTableBlock(Material.WOOD,woodSettings)));
+        JOURNEYER_TABLE.setBlockState(BlockStateBuilder.create().noState(oneVariant(JOURNEYER_TABLE_model)));
+        JOURNEYER_TABLE.setSettings(ModItems.getSettings((s) -> s.group(ItemGroup.DECORATIONS)));
+        JOURNEYER_TABLE.finalise();
+
+        RESEARCH_MAP_SCREEN=
+        Globals.bootQuery( ()->
+            new RegisteredScreenHandler<>(
+                "researchmapscreen",
+                ScreenHandlerRegistry.registerSimple(new Identifier(MODID,"researchmapscreen"), ResearchMapScreenHandler::new),
+                ResearchMapScreen::new
+            )
+        );
 
          Globals.bootRun(()->{try{
              Class.forName(InfuserRenderer.class.getName());
@@ -638,11 +655,10 @@ public class ModBlocks{
         String wallSideTall = sideTallModel==null?BlockModelPresetBuilder.WallSideTall(WALL.id+"_side_tall",tex[0]):sideTallModel;
         ModelJson inventory = BlockModelPresetBuilder.getModelJson(inventorymodel==null?BlockModelPresetBuilder.WallInventory("block/"+WALL.id+"_inventory",tex[0]):inventorymodel);
         WALL.setBlockState(wallStates(wallPost,wallSide,wallSideTall));
-        WALL.setBlockitem((id, bitem) ->
-            new RegisteredItem(id, bitem,
-                item->{item.modelId = WALL.id+"_inventory"; return item;}
-            )
-        );
+        WALL.setBlockitem((id, bitem) ->{
+            var item = new RegisteredItem(id, bitem);
+            return item.setModel(model->{model.modelId = WALL.id+"_inventory"; return model;});
+        });
         wallsTag.add(WALL);
     }
     static void makeFenceFrom(RegisteredBlock ORIGINAL, RegisteredBlock FENCE){
@@ -658,9 +674,7 @@ public class ModBlocks{
         ModelJson inventory = BlockModelPresetBuilder.getModelJson(inventorymodel==null?BlockModelPresetBuilder.FenceInventory("block/"+FENCE.id+"_inventory",tex[0]):inventorymodel);
         FENCE.setBlockState(fenceStates(fencePost,fenceSide));
         FENCE.setBlockitem((id, bitem) ->
-            new RegisteredItem(id, bitem,
-                item->{item.modelId = FENCE.id+"_inventory"; return item;}
-            )
+            new RegisteredItem(id, bitem).setModel(model->{model.modelId = FENCE.id+"_inventory"; return model;})
         );
         fencesTag.add(FENCE);
     }

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "dungeonunleash",
+  "id": "almechanistpath",
   "version": "${version}",
 
-  "name": "Dungeons Unleashed",
-  "description": "The mod is inspired off Dungeons but adds a few extra things",
+  "name": "The Almechanist's path",
+  "description": "Magic is simply the unexplainable phenomena in the world. But no almechanist would be satisfied with that.",
   "authors": [
     "Xelo","Klox"
   ],
@@ -13,17 +13,20 @@
     "sources": "N/A"
   },
 
-  "accessWidener" : "dungeonunleash.accesswidener",
+  "accessWidener" : "almechanistpath.accesswidener",
   "license": "CC0-1.0",
-  "icon": "assets/dungeonunleash/icon.png",
+  "icon": "assets/almechanistpath/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.xeloklox.dungeons.unleashed.DungeonsUnleashed"
+      "com.xeloklox.dungeons.unleashed.ModInitClientServer"
     ],
     "client": [
-      "com.xeloklox.dungeons.unleashed.DungeonsUnleashedClient"
+      "com.xeloklox.dungeons.unleashed.ModInitClient"
+    ],
+    "server": [
+      "com.xeloklox.dungeons.unleashed.ModInitDedicatedServer"
     ]
   },
   "mixins": [

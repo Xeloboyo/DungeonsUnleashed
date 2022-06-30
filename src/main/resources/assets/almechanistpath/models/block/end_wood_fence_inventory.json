@@ -1,0 +1,4 @@
+{
+    "parent": "minecraft:block/wall_inventory",
+    "textures": {"wall": "almechanistpath:block/end_wood_planks"}
+}

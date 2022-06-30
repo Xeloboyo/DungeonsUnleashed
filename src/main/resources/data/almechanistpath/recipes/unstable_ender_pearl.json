@@ -1,0 +1,17 @@
+{
+    "key": {
+        "D": {"item": "minecraft:diamond"},
+        "E": {"item": "minecraft:ender_pearl"},
+        "G": {"item": "minecraft:glowstone_dust"}
+    },
+    "pattern": [
+        " D ",
+        "GEG",
+        " D "
+    ],
+    "result": {
+        "count": 1,
+        "item": "almechanistpath:unstable_ender_pearl"
+    },
+    "type": "minecraft:crafting_shaped"
+}

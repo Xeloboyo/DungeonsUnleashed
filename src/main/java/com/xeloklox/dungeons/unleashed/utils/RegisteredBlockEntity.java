@@ -2,11 +2,10 @@ package com.xeloklox.dungeons.unleashed.utils;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder.*;
-import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
 import net.minecraft.util.registry.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 import static com.xeloklox.dungeons.unleashed.Globals.bootQuery;
 
 public class RegisteredBlockEntity <T extends BlockEntity> extends Registerable<BlockEntityType<T>>{

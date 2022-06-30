@@ -1,6 +1,6 @@
 package com.xeloklox.dungeons.unleashed;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class Paths{
     public static final String

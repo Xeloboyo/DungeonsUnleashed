@@ -1,0 +1,18 @@
+{"variants": {"": [
+    {
+        "model": "almechanistpath:block/end_grass_patchy",
+        "y": 0
+    },
+    {
+        "model": "almechanistpath:block/end_grass_patchy",
+        "y": 90
+    },
+    {
+        "model": "almechanistpath:block/end_grass_patchy",
+        "y": 180
+    },
+    {
+        "model": "almechanistpath:block/end_grass_patchy",
+        "y": 270
+    }
+]}}

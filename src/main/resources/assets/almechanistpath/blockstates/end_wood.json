@@ -1,0 +1,16 @@
+{"variants": {
+    "axis=x": [{
+        "model": "almechanistpath:block/end_wood",
+        "x": 90,
+        "y": 90
+    }],
+    "axis=y": [{
+        "model": "almechanistpath:block/end_wood",
+        "y": 0
+    }],
+    "axis=z": [{
+        "model": "almechanistpath:block/end_wood",
+        "x": 90,
+        "y": 0
+    }]
+}}

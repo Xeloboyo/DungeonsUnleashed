@@ -23,6 +23,7 @@ public class AssetGenerator{
         Class.forName(ModItems.class.getName());
         Class.forName(ModBlocks.class.getName());
         Class.forName(ModRecipes.class.getName());
+        Class.forName(ModResearch.class.getName());
         generators.forEach(Generator::pregenerate);
         generators.forEach(gen->{
             try{

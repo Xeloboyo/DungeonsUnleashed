@@ -1,8 +1,0 @@
-{
-    "parent": "minecraft:block/outer_stairs",
-    "textures": {
-        "bottom": "dungeonunleash:block/void_rock_tile",
-        "side": "dungeonunleash:block/void_rock_tile",
-        "top": "dungeonunleash:block/void_rock_tile"
-    }
-}

@@ -75,6 +75,9 @@ public class Mathf{
     public static float map(float r, float rmin,float rmax, float mapmin,float mapmax){
         return mapmin + (mapmax-mapmin)*(r-rmin)/(rmax-rmin);
     }
+    public static float mapClamped(float r, float rmin,float rmax, float mapmin,float mapmax){
+        return mapmin + (mapmax-mapmin)*MathHelper.clamp((r-rmin)/(rmax-rmin),0,1);
+    }
     public static float catmull(float t, float x,float x2,float m1,float m2){
         float t2 = t*t;
         float t3 = t2*t;
@@ -90,11 +93,29 @@ public class Mathf{
     }
 
 
-
+    public static float dst2(float x,float y){
+        return x*x+y*y;
+    }
 
     public static float approach(float x, float target,float speed){
         return x+(target>=x?Math.min(speed,target-x):-Math.min(speed,x-target));
     }
+    public static float lerpTowards(float x, float target,float speed){
+        return x+(target-x)*speed;
+    }
 
+    public static final int lookupSize = 256;
+    public static float[][] randLookup = new float[lookupSize][lookupSize];
+
+    public static float getRandFromPoint(int x,int y){
+        return randLookup[x&0xFF][y&0xFF];
+    }
+    static {
+        for(int i = 0;i<lookupSize;i++){
+            for(int j = 0;j<lookupSize;j++){
+                randLookup[i][j] = Mathf.randFloat(1);
+            }
+        }
+    }
 
 }

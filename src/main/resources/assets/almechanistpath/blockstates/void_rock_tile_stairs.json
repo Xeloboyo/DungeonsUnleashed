@@ -1,0 +1,242 @@
+{"variants": {
+    "shape=inner_left,facing=east,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 0,
+        "y": 270
+    }],
+    "shape=inner_left,facing=east,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 0
+    }],
+    "shape=inner_left,facing=north,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 0,
+        "y": 180
+    }],
+    "shape=inner_left,facing=north,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+    }],
+    "shape=inner_left,facing=south,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": false,
+        "x": 0,
+        "y": 0
+    }],
+    "shape=inner_left,facing=south,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+    }],
+    "shape=inner_left,facing=west,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 0,
+        "y": 90
+    }],
+    "shape=inner_left,facing=west,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+    }],
+    "shape=inner_right,facing=east,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": false,
+        "x": 0,
+        "y": 0
+    }],
+    "shape=inner_right,facing=east,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+    }],
+    "shape=inner_right,facing=north,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 0,
+        "y": 270
+    }],
+    "shape=inner_right,facing=north,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 0
+    }],
+    "shape=inner_right,facing=south,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 0,
+        "y": 90
+    }],
+    "shape=inner_right,facing=south,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+    }],
+    "shape=inner_right,facing=west,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 0,
+        "y": 180
+    }],
+    "shape=inner_right,facing=west,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_inner",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+    }],
+    "shape=outer_left,facing=east,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 0,
+        "y": 270
+    }],
+    "shape=outer_left,facing=east,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 0
+    }],
+    "shape=outer_left,facing=north,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 0,
+        "y": 180
+    }],
+    "shape=outer_left,facing=north,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+    }],
+    "shape=outer_left,facing=south,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": false,
+        "x": 0,
+        "y": 0
+    }],
+    "shape=outer_left,facing=south,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+    }],
+    "shape=outer_left,facing=west,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 0,
+        "y": 90
+    }],
+    "shape=outer_left,facing=west,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+    }],
+    "shape=outer_right,facing=east,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": false,
+        "x": 0,
+        "y": 0
+    }],
+    "shape=outer_right,facing=east,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+    }],
+    "shape=outer_right,facing=north,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 0,
+        "y": 270
+    }],
+    "shape=outer_right,facing=north,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 0
+    }],
+    "shape=outer_right,facing=south,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 0,
+        "y": 90
+    }],
+    "shape=outer_right,facing=south,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+    }],
+    "shape=outer_right,facing=west,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 0,
+        "y": 180
+    }],
+    "shape=outer_right,facing=west,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs_outer",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+    }],
+    "shape=straight,facing=east,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": false,
+        "x": 0,
+        "y": 0
+    }],
+    "shape=straight,facing=east,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 180,
+        "y": 0
+    }],
+    "shape=straight,facing=north,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 0,
+        "y": 270
+    }],
+    "shape=straight,facing=north,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 180,
+        "y": 270
+    }],
+    "shape=straight,facing=south,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 0,
+        "y": 90
+    }],
+    "shape=straight,facing=south,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 180,
+        "y": 90
+    }],
+    "shape=straight,facing=west,half=bottom": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 0,
+        "y": 180
+    }],
+    "shape=straight,facing=west,half=top": [{
+        "model": "almechanistpath:block/void_rock_tile_stairs",
+        "uvlock": true,
+        "x": 180,
+        "y": 180
+    }]
+}}

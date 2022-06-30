@@ -2,21 +2,21 @@ package com.xeloklox.dungeons.unleashed.blockentity.screens;
 
 import com.mojang.blaze3d.systems.*;
 import com.xeloklox.dungeons.unleashed.blockentity.*;
-import com.xeloklox.dungeons.unleashed.blockentity.screens.particles.*;
-import com.xeloklox.dungeons.unleashed.blockentity.screens.particles.UIParticle.*;
+import com.xeloklox.dungeons.unleashed.utils.ui.particles.*;
+import com.xeloklox.dungeons.unleashed.utils.ui.particles.UIParticle.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.Interpolations.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.StateMap.*;
+import com.xeloklox.dungeons.unleashed.utils.ui.*;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
-import org.mini2Dx.gdx.utils.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
     private static final Identifier TEXTURE = new Identifier(MODID, "textures/gui/infuser_ui.png");
@@ -212,29 +212,28 @@ public class InfuserScreen extends AnimatedScreen<InfuserScreenHandler>{
     @Override
     public void updateLogic(){
         if(isPowered()){
-            if(stateMap.isState(STATE_IDLE_POWERINGDOWN)||stateMap.isState(STATE_IDLE_UNPOWERED)){
-                stateMap.requestState(STATE_IDLE_POWERINGUP);
+            if(stateMap.is(STATE_IDLE_POWERINGDOWN)||stateMap.is(STATE_IDLE_UNPOWERED)){
+                stateMap.request(STATE_IDLE_POWERINGUP);
             }
             boolean working =  this.getScreenHandler().getSyncedInt(InfuserEntity.D_TOTAL)>0;
-            if(stateMap.isState(STATE_IDLE_POWERED) && working){
-                stateMap.requestState(STATE_WINDINGUP);
-            }else if(stateMap.isState(STATE_WORKING)  && !working){
-                stateMap.requestState(STATE_WINDINGDOWN);
+            if(stateMap.is(STATE_IDLE_POWERED) && working){
+                stateMap.request(STATE_WINDINGUP);
+            }else if(stateMap.is(STATE_WORKING)  && !working){
+                stateMap.request(STATE_WINDINGDOWN);
             }
         }else{
-            if(stateMap.isState(STATE_IDLE_POWERINGUP)||stateMap.isState(STATE_IDLE_POWERED)){
-                stateMap.requestState(STATE_IDLE_POWERINGDOWN);
+            if(stateMap.is(STATE_IDLE_POWERINGUP)||stateMap.is(STATE_IDLE_POWERED)){
+                stateMap.request(STATE_IDLE_POWERINGDOWN);
             }
-            if(stateMap.isState(STATE_WORKING)||stateMap.isState(STATE_WINDINGUP)){
-                stateMap.requestState(STATE_WINDINGDOWN);
+            if(stateMap.is(STATE_WORKING)||stateMap.is(STATE_WINDINGUP)){
+                stateMap.request(STATE_WINDINGDOWN);
             }
         }
         ringangle += stateMap.f("rotation");
-        if(stateMap.isState(STATE_WORKING) && Mathf.randFloat(10)<1){
+        if(stateMap.is(STATE_WORKING) && Mathf.randFloat(10)<1){
             Vec2f v = Mathf.randVec2().multiply(65);
             addParticle(v.x+centerX,v.y+centerY);
         }
-        particles.update();
 
     }
 

@@ -1,13 +1,10 @@
 package com.xeloklox.dungeons.unleashed.mixin;
 
-import com.xeloklox.dungeons.unleashed.items.*;
-import net.minecraft.client.gui.screen.TitleScreen;
+import com.xeloklox.dungeons.unleashed.utils.item.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.*;
 import net.minecraft.item.*;
 import net.minecraft.world.*;
-import org.lwjgl.system.CallbackI.*;
-import org.mini2Dx.gdx.utils.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

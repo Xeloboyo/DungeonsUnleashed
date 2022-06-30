@@ -15,7 +15,7 @@ public class StateMap{
         this.onStateEnd = onStateEnd;
         initVariables.get(params);
     }
-    public boolean isState(String as){
+    public boolean is(String as){
         if(as==null || as.length()==0){
             return current==null;
         }
@@ -38,7 +38,7 @@ public class StateMap{
         return this;
     }
 
-    public StateMap requestState(String as){
+    public StateMap request(String as){
         if(current==null || !current.needsToComplete){
             setState(as);
         }else{

@@ -1,0 +1,5 @@
+{
+    "credit": "autogen",
+    "parent": "block/cube_all",
+    "textures": {"all": "almechanistpath:block/end_wood_planks"}
+}

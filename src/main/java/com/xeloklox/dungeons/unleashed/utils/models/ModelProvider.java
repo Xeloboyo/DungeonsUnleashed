@@ -7,7 +7,7 @@ import net.minecraft.util.*;
 import org.jetbrains.annotations.*;
 import org.mini2Dx.gdx.utils.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class ModelProvider  implements ModelResourceProvider{
     static ObjectMap<String,GeneratedModel> models = new ObjectMap<>();

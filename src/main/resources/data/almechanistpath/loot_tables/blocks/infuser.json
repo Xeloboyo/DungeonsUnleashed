@@ -1,0 +1,13 @@
+{
+    "pools": [{
+        "bonus_rolls": 0,
+        "conditions": [{"condition": "minecraft:survives_explosion"}],
+        "entries": [{
+            "name": "almechanistpath:infuser",
+            "type": "minecraft:item"
+        }],
+        "functions": [],
+        "rolls": 1
+    }],
+    "type": "minecraft:block"
+}

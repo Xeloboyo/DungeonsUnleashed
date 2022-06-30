@@ -1,8 +1,8 @@
 package com.xeloklox.dungeons.unleashed.items;
 
 import com.xeloklox.dungeons.unleashed.items.hooks.*;
+import com.xeloklox.dungeons.unleashed.utils.item.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
-import net.minecraft.entity.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.entity.projectile.thrown.*;
 import net.minecraft.item.*;

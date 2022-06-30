@@ -1,7 +1,7 @@
 package com.xeloklox.dungeons.unleashed.items.hooks;
 
-import com.xeloklox.dungeons.unleashed.items.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.item.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.*;
 import net.minecraft.particle.*;

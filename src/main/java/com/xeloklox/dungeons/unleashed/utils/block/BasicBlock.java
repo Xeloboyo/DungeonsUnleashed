@@ -99,6 +99,7 @@ public class BasicBlock extends Block implements Waterloggable{
             }
             return ActionResult.SUCCESS;
         }
+
         return isGUI ? ActionResult.SUCCESS : (modifier!=null?modifier.onUse(state,world,pos,player,hand,hit):ActionResult.PASS);
     }
 

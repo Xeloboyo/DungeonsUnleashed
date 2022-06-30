@@ -17,7 +17,7 @@ import net.minecraft.util.registry.*;
 import org.apache.commons.lang3.*;
 import org.json.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 import static com.xeloklox.dungeons.unleashed.Globals.bootQuery;
 import static com.xeloklox.dungeons.unleashed.gen.LootTableJson.LootPool.*;
 
@@ -50,9 +50,10 @@ public class RegisteredBlock extends Registerable<Block> implements IHasName{
             this.renderlayer = new BlockRenderLayerRegistration(this, RenderLayerOptions.NORMAL);
         }
         if(blockitem==null){
-            blockitem = new RegisteredItem(id, new BlockItem(registration, settings),model->model);
+            blockitem = new RegisteredItem(id, new BlockItem(registration, settings));
             blockitem.setName(name);
         }
+        blockitem.finalise();
         if(drops==null){
             Func<LootTableJson,LootTableJson> lt = lootTable->
                 lootTable.addPool(pool->

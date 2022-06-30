@@ -1,0 +1,25 @@
+{
+    "pools": [{
+        "bonus_rolls": 0,
+        "conditions": [],
+        "entries": [{
+            "functions": [{
+                "add": false,
+                "conditions": [{
+                    "block": "almechanistpath:void_rock_tile_slab",
+                    "condition": "minecraft:block_state_property"
+                }],
+                "count": {
+                    "type": "constant",
+                    "value": 2
+                },
+                "function": "minecraft:set_count"
+            }],
+            "name": "almechanistpath:void_rock_tile_slab",
+            "type": "minecraft:item"
+        }],
+        "functions": [],
+        "rolls": 1
+    }],
+    "type": "minecraft:block"
+}

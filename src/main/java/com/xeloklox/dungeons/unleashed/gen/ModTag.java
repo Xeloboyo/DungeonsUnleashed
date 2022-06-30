@@ -3,10 +3,9 @@ package com.xeloklox.dungeons.unleashed.gen;
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import org.json.*;
-import org.lwjgl.system.CallbackI.*;
 import org.mini2Dx.gdx.utils.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class ModTag<T> extends JsonConfiguration{
     TagDomain domain;

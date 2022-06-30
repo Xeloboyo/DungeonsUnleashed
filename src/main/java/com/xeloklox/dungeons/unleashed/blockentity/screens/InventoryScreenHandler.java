@@ -1,6 +1,8 @@
 package com.xeloklox.dungeons.unleashed.blockentity.screens;
 
 import com.xeloklox.dungeons.unleashed.blockentity.*;
+import com.xeloklox.dungeons.unleashed.utils.*;
+import com.xeloklox.dungeons.unleashed.utils.block.entity.*;
 import com.xeloklox.dungeons.unleashed.utils.lambda.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.*;
@@ -12,6 +14,7 @@ import org.jetbrains.annotations.*;
 public class InventoryScreenHandler extends ScreenHandler{
     protected final Inventory inventory;
     PropertyDelegate propertyDelegate;
+    public PlayerInventory pl;
     protected InventoryScreenHandler(@Nullable ScreenHandlerType<?> type, int syncId, Inventory i){
         super(type, syncId);
         this.inventory=i;
@@ -26,8 +29,8 @@ public class InventoryScreenHandler extends ScreenHandler{
         return this.inventory.canPlayerUse(player);
     }
 
-    public void addSingle(Inventory pl, int index, int x,int y){
-        this.addSlot(new Slot(pl, index, x , y));
+    public Slot addSingle(Inventory pl, int index, int x,int y){
+        return this.addSlot(new Slot(pl, index, x , y));
     }
     public void addColumn(Inventory pl, int index, int x,int y, int amount){
         for (int m = 0; m < amount; ++m) {
@@ -40,8 +43,14 @@ public class InventoryScreenHandler extends ScreenHandler{
             this.addSlot(new Slot(pl, m+index, x+ m * 18 , y));
         }
     }
+    public void addHiddenSlots(HiddenInventory pl){
+        for (int m = 0; m < pl.size(); ++m) {
+            pl.ids[m] = this.addSlot(new Slot(pl, m, -900 , -900)).id;
+        }
+    }
 
     public void addPlayerInventory(PlayerInventory pl, int x,int y){
+        this.pl=pl;
         int m;
         int l;
         //The player inventory
@@ -54,6 +63,11 @@ public class InventoryScreenHandler extends ScreenHandler{
         for (m = 0; m < 9; ++m) {
             this.addSlot(new Slot(pl, m, x + m * 18, y+58));
         }
+    }
+
+    public void moveSlot(Slot slot,int x,int y){
+        Utils.setFinalInt(slot,"x",x);
+        Utils.setFinalInt(slot,"y",y);
     }
 
     // Shift + Player Inv Slot
@@ -79,5 +93,9 @@ public class InventoryScreenHandler extends ScreenHandler{
             }
         }
         return newStack;
+    }
+
+    public Inventory getInventory(){
+        return inventory;
     }
 }

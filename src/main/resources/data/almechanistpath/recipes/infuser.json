@@ -1,0 +1,18 @@
+{
+    "key": {
+        "A": {"item": "minecraft:copper_ingot"},
+        "B": {"item": "minecraft:ender_pearl"},
+        "C": {"item": "minecraft:copper_block"},
+        "D": {"item": "minecraft:end_stone"}
+    },
+    "pattern": [
+        "ABA",
+        "BCB",
+        "DBD"
+    ],
+    "result": {
+        "count": 1,
+        "item": "almechanistpath:infuser"
+    },
+    "type": "minecraft:crafting_shaped"
+}

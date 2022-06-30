@@ -79,7 +79,11 @@ public abstract class GraphConnectingEntity extends BlockEntity implements Block
 
     public void disconnect(){
         connections.each((cls, connector) -> {
-            connector.graph.remove(connector);
+            if(connector.graph!=null){
+                connector.graph.remove(connector);
+            }else{
+                System.out.println("graph was null!");
+            }
             connector.disconnect();
         });
     }

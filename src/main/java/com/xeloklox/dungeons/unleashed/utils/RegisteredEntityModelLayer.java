@@ -4,9 +4,8 @@ import net.fabricmc.fabric.api.client.rendereregistry.v1.*;
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityModelLayerRegistry.*;
 import net.minecraft.client.render.entity.model.*;
 import net.minecraft.util.*;
-import net.minecraft.util.registry.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class RegisteredEntityModelLayer extends Registerable<EntityModelLayer>{
     TexturedModelDataProvider prov;

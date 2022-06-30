@@ -1,0 +1,18 @@
+{
+    "pools": [{
+        "bonus_rolls": 0,
+        "conditions": [],
+        "entries": [{
+            "functions": [{
+                "block": "almechanistpath:leyden_jar",
+                "function": "minecraft:copy_state",
+                "properties": ["charge"]
+            }],
+            "name": "almechanistpath:leyden_jar",
+            "type": "minecraft:item"
+        }],
+        "functions": [],
+        "rolls": 1
+    }],
+    "type": "minecraft:block"
+}

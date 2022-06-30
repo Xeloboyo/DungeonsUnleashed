@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/slab",
+    "textures": {
+        "bottom": "almechanistpath:block/void_rock_smooth",
+        "side": "almechanistpath:block/void_rock_smooth",
+        "top": "almechanistpath:block/void_rock_smooth"
+    }
+}

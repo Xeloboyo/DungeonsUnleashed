@@ -1,6 +1,7 @@
 package com.xeloklox.dungeons.unleashed.gen;
 
 import com.xeloklox.dungeons.unleashed.*;
+import com.xeloklox.dungeons.unleashed.utils.*;
 import net.minecraft.data.server.recipe.*;
 import net.minecraft.recipe.*;
 import org.json.*;
@@ -20,6 +21,17 @@ public abstract class RecipeJson extends JsonConfiguration{
         result=item;
         return this;
     }
+    public RecipeJson setResult(RegisteredItem item, int am){
+        resultam = am;
+        result=item.getJSONID();
+        return this;
+    }
+    public RecipeJson setResult(RegisteredBlock item, int am){
+        resultam = am;
+        result=item.blockitem.getJSONID();
+        return this;
+    }
+
     @Override
     public void fillJSONObj(){
         try{

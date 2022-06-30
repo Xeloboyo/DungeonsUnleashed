@@ -11,7 +11,7 @@ import org.mini2Dx.gdx.utils.*;
 
 import java.io.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class ModelJson extends JsonConfiguration{
     public JSONObject config;

@@ -4,6 +4,7 @@ import org.json.*;
 import org.mini2Dx.gdx.utils.*;
 
 import java.io.*;
+import java.nio.charset.*;
 
 public interface IHasName{
     public static final Array<IHasName> names= new Array<>();
@@ -14,7 +15,7 @@ public interface IHasName{
             if(!f.exists()){
                 f.createNewFile();
             }
-            FileWriter fw =new FileWriter(f);
+            Writer fw = new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8);
             JSONObject jsonObject = new JSONObject();
             for(IHasName name:names){
                 jsonObject.put(name.getNameID(),name.getName());

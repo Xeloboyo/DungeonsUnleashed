@@ -1,0 +1,5 @@
+{"variants": {
+    "type=bottom": [{"model": "almechanistpath:block/void_rock_tile_slab"}],
+    "type=double": [{"model": "almechanistpath:block/void_rock_tile"}],
+    "type=top": [{"model": "almechanistpath:block/void_rock_tile_slab_top"}]
+}}

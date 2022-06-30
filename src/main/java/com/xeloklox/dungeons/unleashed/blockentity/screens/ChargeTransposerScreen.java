@@ -3,13 +3,14 @@ package com.xeloklox.dungeons.unleashed.blockentity.screens;
 import com.mojang.blaze3d.systems.*;
 import com.xeloklox.dungeons.unleashed.*;
 import com.xeloklox.dungeons.unleashed.blockentity.*;
-import com.xeloklox.dungeons.unleashed.blockentity.screens.particles.*;
-import com.xeloklox.dungeons.unleashed.blockentity.screens.particles.UIParticle.*;
+import com.xeloklox.dungeons.unleashed.utils.ui.particles.*;
+import com.xeloklox.dungeons.unleashed.utils.ui.particles.UIParticle.*;
 import com.xeloklox.dungeons.unleashed.gen.*;
 import com.xeloklox.dungeons.unleashed.utils.*;
 import com.xeloklox.dungeons.unleashed.utils.animation.*;
 import com.xeloklox.dungeons.unleashed.utils.models.*;
 import com.xeloklox.dungeons.unleashed.utils.models.RenderableModel.*;
+import com.xeloklox.dungeons.unleashed.utils.ui.*;
 import net.minecraft.client.model.*;
 import net.minecraft.client.util.math.*;
 import net.minecraft.entity.player.*;
@@ -19,7 +20,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import org.mini2Dx.gdx.utils.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 public class ChargeTransposerScreen extends AnimatedScreen<ChargeTransposerScreenHandler>{
     private static final Identifier TEXTURE = new Identifier(MODID, "textures/gui/transposer_ui.png");
@@ -113,7 +114,6 @@ public class ChargeTransposerScreen extends AnimatedScreen<ChargeTransposerScree
             }
         }
         attractionPoint.y = rotate?114:-10;
-        particles.update();
     }
 
     @Override

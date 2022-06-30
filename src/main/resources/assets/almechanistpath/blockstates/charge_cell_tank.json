@@ -1,0 +1,6 @@
+{"variants": {
+    "up=false,down=false": [{"model": "almechanistpath:block/charge_cell_tank_unconnected"}],
+    "up=false,down=true": [{"model": "almechanistpath:block/charge_cell_tank_top"}],
+    "up=true,down=false": [{"model": "almechanistpath:block/charge_cell_tank_bottom"}],
+    "up=true,down=true": [{"model": "almechanistpath:block/charge_cell_tank_middle"}]
+}}

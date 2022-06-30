@@ -11,7 +11,7 @@ import org.mini2Dx.gdx.utils.*;
 
 import java.io.*;
 
-import static com.xeloklox.dungeons.unleashed.DungeonsUnleashed.MODID;
+import static com.xeloklox.dungeons.unleashed.ModInitClientServer.MODID;
 
 // this is only run in preprocessing.
 public class ItemJsonModel extends JsonConfiguration{

@@ -1,0 +1,9 @@
+{
+    "credit": "autogen",
+    "parent": "minecraft:block/cube_bottom_top",
+    "textures": {
+        "bottom": "almechanistpath:block/bedrock_pillar_top",
+        "side": "almechanistpath:block/bedrock_pillar_side",
+        "top": "almechanistpath:block/bedrock_pillar_top"
+    }
+}

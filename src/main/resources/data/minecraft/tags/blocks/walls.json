@@ -1,7 +1,7 @@
 {
     "replace": false,
     "values": [
-        "dungeonunleash:void_rock_smooth_wall",
-        "dungeonunleash:end_wood_fence"
+        "almechanistpath:void_rock_smooth_wall",
+        "almechanistpath:end_wood_fence"
     ]
 }
