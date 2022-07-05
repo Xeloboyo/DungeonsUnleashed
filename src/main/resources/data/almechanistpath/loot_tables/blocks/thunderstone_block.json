@@ -1,0 +1,75 @@
+{
+    "pools": [
+        {
+            "bonus_rolls": 0,
+            "conditions": [],
+            "entries": [
+                {
+                    "conditions": [{
+                        "condition": "minecraft:inverted",
+                        "term": {
+                            "condition": "minecraft:match_tool",
+                            "predicate": {"enchantments": [{"enchantment": "minecraft:silk_touch"}]}
+                        }
+                    }],
+                    "functions": [
+                        {
+                            "add": false,
+                            "count": {
+                                "max": 5,
+                                "min": 3,
+                                "type": "uniform"
+                            },
+                            "function": "minecraft:set_count"
+                        },
+                        {
+                            "enchantment": "minecraft:fortune",
+                            "formula": "ore_drops",
+                            "function": "minecraft:apply_bonus"
+                        }
+                    ],
+                    "name": "almechanistpath:thunderstone",
+                    "type": "minecraft:item"
+                },
+                {
+                    "conditions": [{
+                        "condition": "minecraft:match_tool",
+                        "predicate": {"enchantments": [{"enchantment": "minecraft:silk_touch"}]}
+                    }],
+                    "name": "almechanistpath:thunderstone_block",
+                    "type": "minecraft:item"
+                }
+            ],
+            "functions": [],
+            "rolls": 1
+        },
+        {
+            "bonus_rolls": 0,
+            "conditions": [{
+                "condition": "minecraft:inverted",
+                "term": {
+                    "condition": "minecraft:match_tool",
+                    "predicate": {"enchantments": [{"enchantment": "minecraft:silk_touch"}]}
+                }
+            }],
+            "entries": [{
+                "conditions": [{
+                    "chances": [
+                        0.5,
+                        0.699999988079071,
+                        0.7999999523162842,
+                        1,
+                        1
+                    ],
+                    "condition": "minecraft:table_bonus",
+                    "enchantment": "minecraft:fortune"
+                }],
+                "name": "almechanistpath:thunder_core",
+                "type": "minecraft:item"
+            }],
+            "functions": [],
+            "rolls": 1
+        }
+    ],
+    "type": "minecraft:block"
+}

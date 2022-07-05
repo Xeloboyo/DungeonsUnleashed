@@ -1,0 +1,46 @@
+{
+    "pools": [{
+        "bonus_rolls": 0,
+        "conditions": [],
+        "entries": [
+            {
+                "conditions": [{
+                    "condition": "minecraft:inverted",
+                    "term": {
+                        "condition": "minecraft:match_tool",
+                        "predicate": {"enchantments": [{"enchantment": "minecraft:silk_touch"}]}
+                    }
+                }],
+                "functions": [
+                    {
+                        "add": false,
+                        "count": {
+                            "max": 3,
+                            "min": 1,
+                            "type": "uniform"
+                        },
+                        "function": "minecraft:set_count"
+                    },
+                    {
+                        "enchantment": "minecraft:fortune",
+                        "formula": "ore_drops",
+                        "function": "minecraft:apply_bonus"
+                    }
+                ],
+                "name": "almechanistpath:thunderstone",
+                "type": "minecraft:item"
+            },
+            {
+                "conditions": [{
+                    "condition": "minecraft:match_tool",
+                    "predicate": {"enchantments": [{"enchantment": "minecraft:silk_touch"}]}
+                }],
+                "name": "almechanistpath:thunderstone_ore",
+                "type": "minecraft:item"
+            }
+        ],
+        "functions": [],
+        "rolls": 1
+    }],
+    "type": "minecraft:block"
+}

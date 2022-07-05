@@ -1,0 +1,34 @@
+{"variants": {
+    "flipped=false,facing=east": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 90
+    }],
+    "flipped=false,facing=north": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 0
+    }],
+    "flipped=false,facing=south": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 180
+    }],
+    "flipped=false,facing=west": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 270
+    }],
+    "flipped=true,facing=east": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 270
+    }],
+    "flipped=true,facing=north": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 180
+    }],
+    "flipped=true,facing=south": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 0
+    }],
+    "flipped=true,facing=west": [{
+        "model": "almechanistpath:block/charge_transposer",
+        "y": 90
+    }]
+}}

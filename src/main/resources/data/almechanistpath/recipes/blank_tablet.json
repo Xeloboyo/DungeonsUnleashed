@@ -1,0 +1,13 @@
+{
+    "key": {"A": {"item": "minecraft:stone"}},
+    "pattern": [
+        "AAA",
+        "AAA",
+        "AAA"
+    ],
+    "result": {
+        "count": 1,
+        "item": "almechanistpath:blank_tablet"
+    },
+    "type": "minecraft:crafting_shaped"
+}
